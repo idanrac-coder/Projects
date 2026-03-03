@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Shield
@@ -47,11 +48,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.novachat.BuildConfig
 import com.novachat.core.theme.AuroraColors
+
+private const val PRIVACY_POLICY_URL = "https://idanrac-coder.github.io/Projects/privacy-policy.html"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,6 +74,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val whatsAppForwardEnabled by viewModel.whatsAppForwardEnabled.collectAsState()
+    val uriHandler = LocalUriHandler.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     Scaffold(
@@ -276,6 +281,13 @@ fun SettingsScreen(
                         title = "QR Contact Sharing",
                         subtitle = "Share your contact via QR",
                         onClick = onQrClick
+                    )
+                    SettingsDivider()
+                    SettingsItem(
+                        icon = Icons.Default.Policy,
+                        title = "Privacy Policy",
+                        subtitle = "How your data is handled",
+                        onClick = { uriHandler.openUri(PRIVACY_POLICY_URL) }
                     )
                 }
             }

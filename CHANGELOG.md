@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.5.5] - 2026-03-03
+
+### Added
+- Privacy Policy link in Settings under Data & Privacy section
+
 ## [3.5.4] - 2026-03-02
 
 ### Changed

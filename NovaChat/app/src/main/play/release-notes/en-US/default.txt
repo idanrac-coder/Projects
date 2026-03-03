@@ -1,9 +1,3 @@
-Smart & Secure screen polished to match our design:
-- Green stats bar with checkmark showing blocked spam count
-- Teal-tinted AI Scam Detection toggle with shield icon
-- Blocking and Spam Folder now inside Smart & Secure
+You can now view our Privacy Policy directly from Settings > Data & Privacy.
 
-Smarter spam protection:
-- Messages from your contacts are always trusted
-- Unknown senders are scrutinized more carefully
-- Repeat spammers are automatically blocked
+Bug fixes and performance improvements.
