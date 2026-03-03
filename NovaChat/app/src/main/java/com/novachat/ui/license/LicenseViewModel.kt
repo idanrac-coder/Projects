@@ -30,6 +30,10 @@ class LicenseViewModel @Inject constructor(
         licenseManager.restorePurchases()
     }
 
+    fun resetLicenseForTesting() {
+        licenseManager.consumePurchaseForTesting()
+    }
+
     fun clearError() {
         licenseManager.clearError()
     }

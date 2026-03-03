@@ -7,6 +7,7 @@ import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.ConsumeParams
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
@@ -191,6 +192,33 @@ class LicenseManager @Inject constructor(
                 .setPurchaseToken(purchase.purchaseToken)
                 .build()
             billingClient.acknowledgePurchase(params) { /* logged */ }
+        }
+    }
+
+    fun consumePurchaseForTesting() {
+        val params = QueryPurchasesParams.newBuilder()
+            .setProductType(BillingClient.ProductType.INAPP)
+            .build()
+
+        billingClient.queryPurchasesAsync(params) { result, purchases ->
+            if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                val premiumPurchase = purchases.firstOrNull {
+                    it.products.contains(PRODUCT_ID)
+                }
+                premiumPurchase?.let { purchase ->
+                    val consumeParams = ConsumeParams.newBuilder()
+                        .setPurchaseToken(purchase.purchaseToken)
+                        .build()
+                    billingClient.consumeAsync(consumeParams) { billingResult, _ ->
+                        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                            Log.d(TAG, "Purchase consumed for testing")
+                            scope.launch { preferencesRepository.setPremium(false) }
+                        } else {
+                            Log.e(TAG, "Failed to consume purchase: ${billingResult.debugMessage}")
+                        }
+                    }
+                }
+            }
         }
     }
 

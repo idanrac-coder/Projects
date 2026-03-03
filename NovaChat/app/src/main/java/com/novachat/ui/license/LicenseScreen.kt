@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.novachat.BuildConfig
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -154,6 +155,19 @@ fun LicenseScreen(
                             color = Color.White.copy(alpha = 0.9f)
                         )
                     }
+                }
+            }
+
+            if (isPremium && BuildConfig.DEBUG) {
+                Spacer(modifier = Modifier.height(12.dp))
+                OutlinedButton(
+                    onClick = { viewModel.resetLicenseForTesting() },
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text("Reset License (Dev)")
                 }
             }
 

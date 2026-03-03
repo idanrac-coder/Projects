@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.5.7] - 2026-03-03
+
+### Added
+- Debug-only "Reset License" button on Premium screen to consume test purchases via consumeAsync
+
 ## [3.5.6] - 2026-03-03
 
 ### Fixed
