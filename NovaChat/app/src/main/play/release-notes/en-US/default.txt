@@ -1,1 +1,1 @@
-Bug fixes and performance improvements.
+Restore your data when you reinstall! After granting permissions, you'll now see an option to restore your messages from Google Drive or a local backup file. You can also skip and start fresh.

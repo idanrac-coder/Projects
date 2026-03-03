@@ -27,6 +27,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +46,9 @@ import com.novachat.domain.repository.ConversationRepository
 import com.novachat.domain.repository.ThemeRepository
 import com.novachat.ui.navigation.ChatRoute
 import com.novachat.ui.navigation.NovaChatNavHost
+import com.novachat.ui.onboarding.RestoreOnboardingScreen
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -121,31 +124,11 @@ class MainActivity : ComponentActivity() {
                 bubbleShapeOverride = bubbleShapeOverride
             ) {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    if (hasPermissions) {
-                        val navController = rememberNavController()
+                    val isFirstLaunch by userPreferencesRepository.isFirstLaunch
+                        .collectAsState(initial = false)
+                    val scope = rememberCoroutineScope()
 
-                        LaunchedEffect(pendingChatThreadId, pendingChatAddress) {
-                            val addr = pendingChatAddress
-                            if (addr != null) {
-                                var tid = pendingChatThreadId
-                                if (tid <= 0) {
-                                    tid = conversationRepository.getThreadIdForAddress(addr)
-                                }
-                                if (tid > 0) {
-                                    navController.navigate(
-                                        ChatRoute(tid, addr, pendingChatContactName)
-                                    ) {
-                                        launchSingleTop = true
-                                    }
-                                }
-                                pendingChatThreadId = -1L
-                                pendingChatAddress = null
-                                pendingChatContactName = null
-                            }
-                        }
-
-                        NovaChatNavHost(navController = navController)
-                    } else {
+                    if (!hasPermissions) {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -176,6 +159,38 @@ class MainActivity : ComponentActivity() {
                                 Text("Grant Permissions")
                             }
                         }
+                    } else if (isFirstLaunch) {
+                        RestoreOnboardingScreen(
+                            onSkip = {
+                                scope.launch {
+                                    userPreferencesRepository.setFirstLaunchComplete()
+                                }
+                            }
+                        )
+                    } else {
+                        val navController = rememberNavController()
+
+                        LaunchedEffect(pendingChatThreadId, pendingChatAddress) {
+                            val addr = pendingChatAddress
+                            if (addr != null) {
+                                var tid = pendingChatThreadId
+                                if (tid <= 0) {
+                                    tid = conversationRepository.getThreadIdForAddress(addr)
+                                }
+                                if (tid > 0) {
+                                    navController.navigate(
+                                        ChatRoute(tid, addr, pendingChatContactName)
+                                    ) {
+                                        launchSingleTop = true
+                                    }
+                                }
+                                pendingChatThreadId = -1L
+                                pendingChatAddress = null
+                                pendingChatContactName = null
+                            }
+                        }
+
+                        NovaChatNavHost(navController = navController)
                     }
                 }
             }

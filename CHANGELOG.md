@@ -3,6 +3,16 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.6.0] - 2026-03-03
+
+### Added
+- First-launch restore onboarding screen shown after permissions are granted on fresh install or reinstall
+- Options to restore from Google Drive or local file before entering the app
+- "Start Fresh" option to skip restore and proceed directly
+
+### Changed
+- Extract backup/restore utility functions into shared BackupUtils for reuse across screens
+
 ## [3.5.7] - 2026-03-03
 
 ### Added
