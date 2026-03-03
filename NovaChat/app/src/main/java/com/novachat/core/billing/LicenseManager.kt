@@ -154,6 +154,14 @@ class LicenseManager @Inject constructor(
         queryExistingPurchases()
     }
 
+    fun recheckLicense() {
+        if (billingClient.isReady) {
+            queryExistingPurchases()
+        } else {
+            connectToGooglePlay()
+        }
+    }
+
     override fun onPurchasesUpdated(result: BillingResult, purchases: List<Purchase>?) {
         _purchaseInProgress.value = false
 

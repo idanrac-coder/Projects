@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
+import com.novachat.core.billing.LicenseManager
 import com.novachat.core.datastore.UserPreferencesRepository
 import com.novachat.core.sms.BubbleNotificationHelper
 import com.novachat.core.theme.NovaChatMaterialTheme
@@ -61,6 +62,9 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var conversationRepository: ConversationRepository
+
+    @Inject
+    lateinit var licenseManager: LicenseManager
 
     private var hasPermissions by mutableStateOf(false)
     private var pendingChatThreadId by mutableStateOf(-1L)
@@ -176,6 +180,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        licenseManager.recheckLicense()
     }
 
     override fun onNewIntent(intent: Intent) {

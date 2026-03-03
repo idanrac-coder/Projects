@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.5.6] - 2026-03-03
+
+### Fixed
+- License not revoking after refund — app now re-validates purchase with Google Play every time it resumes
+
 ## [3.5.5] - 2026-03-03
 
 ### Added
