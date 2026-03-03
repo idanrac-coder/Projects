@@ -55,9 +55,11 @@ import com.novachat.domain.repository.BlockRepository
 @Composable
 fun BlockingScreen(
     onBack: () -> Unit,
+    onNavigateToPremium: () -> Unit = {},
     viewModel: BlockingViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val showBlockLimitDialog by viewModel.showBlockLimitDialog.collectAsStateWithLifecycle()
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     val tabs = listOf("By Number", "By Words", "By Sender", "By Language")
 
@@ -179,6 +181,16 @@ fun BlockingScreen(
                 type = uiState.addDialogType,
                 onConfirm = { value, isRegex -> viewModel.addRule(value, isRegex) },
                 onDismiss = { viewModel.dismissDialog() }
+            )
+        }
+
+        if (showBlockLimitDialog) {
+            BlockRuleLimitDialog(
+                onUpgrade = {
+                    viewModel.dismissBlockLimitDialog()
+                    onNavigateToPremium()
+                },
+                onDismiss = { viewModel.dismissBlockLimitDialog() }
             )
         }
     }

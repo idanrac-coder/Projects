@@ -45,7 +45,8 @@ data class ConversationsUiState(
     val showDeleteConfirmation: Boolean = false,
     val pendingDeleteThreadIds: Set<Long> = emptySet(),
     val showDefaultSmsPrompt: Boolean = false,
-    val showDefaultSmsCheck: Boolean = false
+    val showDefaultSmsCheck: Boolean = false,
+    val showBlockLimitDialog: Boolean = false
 )
 
 data class BlockTarget(
@@ -498,6 +499,10 @@ class ConversationsViewModel @Inject constructor(
         )
     }
 
+    fun dismissBlockLimitDialog() {
+        _uiState.value = _uiState.value.copy(showBlockLimitDialog = false)
+    }
+
     fun confirmBlockNumber() {
         val current = _uiState.value
         val target = current.blockTarget ?: return
@@ -529,7 +534,7 @@ class ConversationsViewModel @Inject constructor(
                 clearSelection()
                 loadConversations()
             } catch (e: BlockRuleLimitException) {
-                _uiState.value = _uiState.value.copy(error = e.message, showBlockDialog = false)
+                _uiState.value = _uiState.value.copy(showBlockLimitDialog = true, showBlockDialog = false)
             }
         }
     }
@@ -653,7 +658,7 @@ class ConversationsViewModel @Inject constructor(
                 clearSelection()
                 loadConversations()
             } catch (e: BlockRuleLimitException) {
-                _uiState.value = _uiState.value.copy(error = e.message, showBlockDialog = false)
+                _uiState.value = _uiState.value.copy(showBlockLimitDialog = true, showBlockDialog = false)
             }
         }
     }
@@ -679,7 +684,7 @@ class ConversationsViewModel @Inject constructor(
                 clearSelection()
                 loadConversations()
             } catch (e: BlockRuleLimitException) {
-                _uiState.value = _uiState.value.copy(error = e.message, showBlockDialog = false)
+                _uiState.value = _uiState.value.copy(showBlockLimitDialog = true, showBlockDialog = false)
             }
         }
     }
@@ -705,7 +710,7 @@ class ConversationsViewModel @Inject constructor(
                 clearSelection()
                 loadConversations()
             } catch (e: BlockRuleLimitException) {
-                _uiState.value = _uiState.value.copy(error = e.message, showBlockDialog = false)
+                _uiState.value = _uiState.value.copy(showBlockLimitDialog = true, showBlockDialog = false)
             }
         }
     }

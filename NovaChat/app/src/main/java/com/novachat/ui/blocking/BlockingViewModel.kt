@@ -6,6 +6,7 @@ import com.novachat.core.datastore.UserPreferencesRepository
 import com.novachat.domain.model.BlockRule
 import com.novachat.domain.model.BlockType
 import com.novachat.domain.repository.BlockRepository
+import com.novachat.domain.repository.BlockRuleLimitException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -40,6 +41,9 @@ class BlockingViewModel @Inject constructor(
     private val _showDialog = MutableStateFlow(false)
     private val _dialogType = MutableStateFlow(BlockType.NUMBER)
     private val _error = MutableStateFlow<String?>(null)
+
+    private val _showBlockLimitDialog = MutableStateFlow(false)
+    val showBlockLimitDialog: StateFlow<Boolean> = _showBlockLimitDialog.asStateFlow()
 
     val uiState: StateFlow<BlockingUiState> = combine(
         blockRepository.getRulesByType(BlockType.NUMBER),
@@ -87,10 +91,17 @@ class BlockingViewModel @Inject constructor(
                     )
                 )
                 _showDialog.value = false
+            } catch (e: BlockRuleLimitException) {
+                _showDialog.value = false
+                _showBlockLimitDialog.value = true
             } catch (e: Exception) {
                 _error.value = e.message
             }
         }
+    }
+
+    fun dismissBlockLimitDialog() {
+        _showBlockLimitDialog.value = false
     }
 
     fun deleteRule(id: Long) {

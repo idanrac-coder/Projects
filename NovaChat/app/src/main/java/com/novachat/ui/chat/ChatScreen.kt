@@ -1,5 +1,6 @@
 package com.novachat.ui.chat
 
+import com.novachat.ui.blocking.BlockRuleLimitDialog
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -150,6 +151,7 @@ fun ChatScreen(
     onNavigateToCompose: (String) -> Unit = {},
     onNavigateToMediaGallery: () -> Unit = {},
     onNavigateToPinnedMessages: () -> Unit = {},
+    onNavigateToPremium: () -> Unit = {},
     viewModel: ChatViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -190,6 +192,13 @@ fun ChatScreen(
         if (uiState.spamReportedEvent) {
             Toast.makeText(context, "Reported as spam", Toast.LENGTH_SHORT).show()
             viewModel.consumeSpamReportedEvent()
+        }
+    }
+
+    LaunchedEffect(uiState.blockSuccessNavigateBack) {
+        if (uiState.blockSuccessNavigateBack) {
+            viewModel.clearBlockSuccessEvent()
+            onBack()
         }
     }
 
@@ -1082,25 +1091,25 @@ fun ChatScreen(
                 displayName = displayName,
                 address = address,
                 hasContactName = hasContactName,
-                onBlockNumber = {
-                    viewModel.blockNumber(address)
-                    onBack()
-                },
+                onBlockNumber = { viewModel.blockNumber(address) },
                 onBlockName = {
                     if (contactName != null) {
                         viewModel.blockName(contactName)
-                        onBack()
                     }
                 },
-                onBlockWords = { words ->
-                    viewModel.blockWords(words)
-                    onBack()
-                },
-                onBlockLanguage = { lang ->
-                    viewModel.blockLanguage(lang)
-                    onBack()
-                },
+                onBlockWords = { words -> viewModel.blockWords(words) },
+                onBlockLanguage = { lang -> viewModel.blockLanguage(lang) },
                 onDismiss = { viewModel.dismissBlockDialog() }
+            )
+        }
+
+        if (uiState.showBlockLimitDialog) {
+            BlockRuleLimitDialog(
+                onUpgrade = {
+                    viewModel.dismissBlockLimitDialog()
+                    onNavigateToPremium()
+                },
+                onDismiss = { viewModel.dismissBlockLimitDialog() }
             )
         }
 

@@ -1,5 +1,6 @@
 package com.novachat.ui.conversations
 
+import com.novachat.ui.blocking.BlockRuleLimitDialog
 import android.app.Activity
 import android.app.role.RoleManager
 import android.content.Intent
@@ -108,6 +109,7 @@ fun ConversationsScreen(
     onComposeClick: () -> Unit,
     onSearchClick: () -> Unit,
     onSettingsClick: () -> Unit,
+    onNavigateToPremium: () -> Unit = {},
     viewModel: ConversationsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -544,6 +546,16 @@ fun ConversationsScreen(
                 onBlockWords = { words -> viewModel.confirmBlockWords(words) },
                 onBlockLanguage = { lang -> viewModel.confirmBlockLanguage(lang) },
                 onDismiss = { viewModel.dismissBlockDialog() }
+            )
+        }
+
+        if (uiState.showBlockLimitDialog) {
+            BlockRuleLimitDialog(
+                onUpgrade = {
+                    viewModel.dismissBlockLimitDialog()
+                    onNavigateToPremium()
+                },
+                onDismiss = { viewModel.dismissBlockLimitDialog() }
             )
         }
 

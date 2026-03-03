@@ -49,7 +49,9 @@ data class ChatUiState(
     val scamWarnings: Map<Long, ScamAnalysis> = emptyMap(),
     val dismissedScamWarnings: Set<Long> = emptySet(),
     val pendingSendMessage: PendingSend? = null,
-    val spamReportedEvent: Boolean = false
+    val spamReportedEvent: Boolean = false,
+    val showBlockLimitDialog: Boolean = false,
+    val blockSuccessNavigateBack: Boolean = false
 ) {
     val matchCount: Int get() = matchingMessageIds.size
     val activeMatchMessageId: Long? get() =
@@ -509,7 +511,7 @@ class ChatViewModel @Inject constructor(
                 )
                 moveThreadToSpamAndClose(ruleId, BlockType.NUMBER.name)
             } catch (e: BlockRuleLimitException) {
-                _uiState.value = _uiState.value.copy(error = e.message, showBlockDialog = false)
+                _uiState.value = _uiState.value.copy(showBlockLimitDialog = true, showBlockDialog = false)
             }
         }
     }
@@ -522,7 +524,7 @@ class ChatViewModel @Inject constructor(
                 )
                 moveThreadToSpamAndClose(ruleId, BlockType.SENDER_NAME.name)
             } catch (e: BlockRuleLimitException) {
-                _uiState.value = _uiState.value.copy(error = e.message, showBlockDialog = false)
+                _uiState.value = _uiState.value.copy(showBlockLimitDialog = true, showBlockDialog = false)
             }
         }
     }
@@ -536,7 +538,7 @@ class ChatViewModel @Inject constructor(
                 )
                 moveThreadToSpamAndClose(ruleId, BlockType.KEYWORD.name)
             } catch (e: BlockRuleLimitException) {
-                _uiState.value = _uiState.value.copy(error = e.message, showBlockDialog = false)
+                _uiState.value = _uiState.value.copy(showBlockLimitDialog = true, showBlockDialog = false)
             }
         }
     }
@@ -550,9 +552,13 @@ class ChatViewModel @Inject constructor(
                 )
                 moveThreadToSpamAndClose(ruleId, BlockType.LANGUAGE.name)
             } catch (e: BlockRuleLimitException) {
-                _uiState.value = _uiState.value.copy(error = e.message, showBlockDialog = false)
+                _uiState.value = _uiState.value.copy(showBlockLimitDialog = true, showBlockDialog = false)
             }
         }
+    }
+
+    fun dismissBlockLimitDialog() {
+        _uiState.value = _uiState.value.copy(showBlockLimitDialog = false)
     }
 
     private suspend fun moveThreadToSpamAndClose(ruleId: Long, ruleType: String) {
@@ -572,7 +578,11 @@ class ChatViewModel @Inject constructor(
             }
             try { conversationRepository.deleteThread(currentThreadId) } catch (e: Exception) {}
         }
-        _uiState.value = _uiState.value.copy(showBlockDialog = false)
+        _uiState.value = _uiState.value.copy(showBlockDialog = false, blockSuccessNavigateBack = true)
+    }
+
+    fun clearBlockSuccessEvent() {
+        _uiState.value = _uiState.value.copy(blockSuccessNavigateBack = false)
     }
 
     fun getMessageById(messageId: Long): Message? {

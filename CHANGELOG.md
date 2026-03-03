@@ -3,6 +3,15 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.7.1] - 2026-03-03
+
+### Added
+- Show upgrade-to-premium dialog when free users hit the block rule limit from any screen
+- Navigate directly to Premium purchase screen from the limit dialog
+
+### Changed
+- Block actions in Chat screen now wait for result before navigating back
+
 ## [3.7.0] - 2026-03-03
 
 ### Changed

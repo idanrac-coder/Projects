@@ -44,7 +44,8 @@ fun NovaChatNavHost(
                 },
                 onComposeClick = { navController.navigate(ComposeMessageRoute()) },
                 onSearchClick = { navController.navigate(SearchRoute) },
-                onSettingsClick = { navController.navigate(SettingsRoute) }
+                onSettingsClick = { navController.navigate(SettingsRoute) },
+                onNavigateToPremium = { navController.navigate(LicenseRoute) }
             )
         }
 
@@ -63,7 +64,8 @@ fun NovaChatNavHost(
                 },
                 onNavigateToPinnedMessages = {
                     navController.navigate(PinnedMessagesRoute(route.threadId, route.contactName))
-                }
+                },
+                onNavigateToPremium = { navController.navigate(LicenseRoute) }
             )
         }
 
@@ -113,7 +115,10 @@ fun NovaChatNavHost(
         }
 
         composable<BlockingRoute> {
-            BlockingScreen(onBack = { navController.popBackStack() })
+            BlockingScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToPremium = { navController.navigate(LicenseRoute) }
+            )
         }
 
         composable<SpamFolderRoute> {

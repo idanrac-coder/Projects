@@ -1,3 +1,5 @@
 You can now block up to 15 numbers and senders for free (up from 5)! The limit is now properly enforced everywhere in the app.
 
-Premium users will see a "Premium Account" badge in Settings instead of the upgrade prompt.
+When you reach the limit, you'll be prompted to upgrade to Premium for unlimited block rules.
+
+Premium users will see a "Premium Account" badge in Settings.
