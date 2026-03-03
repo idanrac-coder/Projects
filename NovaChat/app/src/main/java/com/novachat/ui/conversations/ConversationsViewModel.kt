@@ -10,6 +10,7 @@ import com.novachat.domain.model.Conversation
 import com.novachat.domain.model.MessageCategory
 import com.novachat.domain.model.SwipeAction
 import com.novachat.domain.repository.BlockRepository
+import com.novachat.domain.repository.BlockRuleLimitException
 import com.novachat.domain.repository.ConversationRepository
 import com.novachat.core.database.dao.SpamMessageDao
 import com.novachat.core.database.entity.SpamMessageEntity
@@ -501,31 +502,35 @@ class ConversationsViewModel @Inject constructor(
         val current = _uiState.value
         val target = current.blockTarget ?: return
         viewModelScope.launch {
-            val threadIdsToBlock = if (current.selectedThreadIds.isNotEmpty()) {
-                current.selectedThreadIds.toList()
-            } else {
-                listOfNotNull(current.conversations.find { it.address == target.address }?.threadId)
-            }
-            
-            val addresses = if (current.selectedThreadIds.isNotEmpty()) {
-                current.conversations
-                    .filter { it.threadId in current.selectedThreadIds }
-                    .map { it.address }
-            } else {
-                target.address.split(", ")
-            }
-            addresses.forEachIndexed { index, address ->
-                val ruleId = blockRepository.addRule(
-                    BlockRule(type = BlockType.NUMBER, value = address)
-                )
-                val threadId = threadIdsToBlock.getOrNull(index)
-                if (threadId != null) {
-                    moveThreadToSpam(threadId, ruleId, BlockType.NUMBER.name)
+            try {
+                val threadIdsToBlock = if (current.selectedThreadIds.isNotEmpty()) {
+                    current.selectedThreadIds.toList()
+                } else {
+                    listOfNotNull(current.conversations.find { it.address == target.address }?.threadId)
                 }
+
+                val addresses = if (current.selectedThreadIds.isNotEmpty()) {
+                    current.conversations
+                        .filter { it.threadId in current.selectedThreadIds }
+                        .map { it.address }
+                } else {
+                    target.address.split(", ")
+                }
+                addresses.forEachIndexed { index, address ->
+                    val ruleId = blockRepository.addRule(
+                        BlockRule(type = BlockType.NUMBER, value = address)
+                    )
+                    val threadId = threadIdsToBlock.getOrNull(index)
+                    if (threadId != null) {
+                        moveThreadToSpam(threadId, ruleId, BlockType.NUMBER.name)
+                    }
+                }
+                dismissBlockDialog()
+                clearSelection()
+                loadConversations()
+            } catch (e: BlockRuleLimitException) {
+                _uiState.value = _uiState.value.copy(error = e.message, showBlockDialog = false)
             }
-            dismissBlockDialog()
-            clearSelection()
-            loadConversations()
         }
     }
 
@@ -617,35 +622,39 @@ class ConversationsViewModel @Inject constructor(
         val target = current.blockTarget ?: return
         if (customName != null && customName.isBlank()) return
         viewModelScope.launch {
-            val threadIdsToBlock = if (current.selectedThreadIds.isNotEmpty()) {
-                current.selectedThreadIds.toList()
-            } else {
-                listOfNotNull(current.conversations.find { it.address == target.address }?.threadId)
-            }
-
-            val names = if (customName != null) {
-                List(threadIdsToBlock.size) { customName }
-            } else if (current.selectedThreadIds.isNotEmpty()) {
-                current.conversations
-                    .filter { it.threadId in current.selectedThreadIds }
-                    .mapNotNull { it.contactName }
-            } else {
-                listOfNotNull(
-                    current.conversations.find { it.address == target.address }?.contactName
-                )
-            }
-            names.forEachIndexed { index, name ->
-                val ruleId = blockRepository.addRule(
-                    BlockRule(type = BlockType.SENDER_NAME, value = name)
-                )
-                val threadId = threadIdsToBlock.getOrNull(index)
-                if (threadId != null) {
-                    moveThreadToSpam(threadId, ruleId, BlockType.SENDER_NAME.name)
+            try {
+                val threadIdsToBlock = if (current.selectedThreadIds.isNotEmpty()) {
+                    current.selectedThreadIds.toList()
+                } else {
+                    listOfNotNull(current.conversations.find { it.address == target.address }?.threadId)
                 }
+
+                val names = if (customName != null) {
+                    List(threadIdsToBlock.size) { customName }
+                } else if (current.selectedThreadIds.isNotEmpty()) {
+                    current.conversations
+                        .filter { it.threadId in current.selectedThreadIds }
+                        .mapNotNull { it.contactName }
+                } else {
+                    listOfNotNull(
+                        current.conversations.find { it.address == target.address }?.contactName
+                    )
+                }
+                names.forEachIndexed { index, name ->
+                    val ruleId = blockRepository.addRule(
+                        BlockRule(type = BlockType.SENDER_NAME, value = name)
+                    )
+                    val threadId = threadIdsToBlock.getOrNull(index)
+                    if (threadId != null) {
+                        moveThreadToSpam(threadId, ruleId, BlockType.SENDER_NAME.name)
+                    }
+                }
+                dismissBlockDialog()
+                clearSelection()
+                loadConversations()
+            } catch (e: BlockRuleLimitException) {
+                _uiState.value = _uiState.value.copy(error = e.message, showBlockDialog = false)
             }
-            dismissBlockDialog()
-            clearSelection()
-            loadConversations()
         }
     }
 
@@ -654,20 +663,24 @@ class ConversationsViewModel @Inject constructor(
         val target = current.blockTarget ?: return
         if (words.isBlank()) return
         viewModelScope.launch {
-            val ruleId = blockRepository.addRule(
-                BlockRule(type = BlockType.KEYWORD, value = words)
-            )
-            val threadIdsToBlock = if (current.selectedThreadIds.isNotEmpty()) {
-                current.selectedThreadIds.toList()
-            } else {
-                listOfNotNull(current.conversations.find { it.address == target.address }?.threadId)
+            try {
+                val ruleId = blockRepository.addRule(
+                    BlockRule(type = BlockType.KEYWORD, value = words)
+                )
+                val threadIdsToBlock = if (current.selectedThreadIds.isNotEmpty()) {
+                    current.selectedThreadIds.toList()
+                } else {
+                    listOfNotNull(current.conversations.find { it.address == target.address }?.threadId)
+                }
+                threadIdsToBlock.forEach { threadId ->
+                    moveThreadToSpam(threadId, ruleId, BlockType.KEYWORD.name)
+                }
+                dismissBlockDialog()
+                clearSelection()
+                loadConversations()
+            } catch (e: BlockRuleLimitException) {
+                _uiState.value = _uiState.value.copy(error = e.message, showBlockDialog = false)
             }
-            threadIdsToBlock.forEach { threadId ->
-                moveThreadToSpam(threadId, ruleId, BlockType.KEYWORD.name)
-            }
-            dismissBlockDialog()
-            clearSelection()
-            loadConversations()
         }
     }
 
@@ -676,20 +689,24 @@ class ConversationsViewModel @Inject constructor(
         val target = current.blockTarget ?: return
         if (language.isBlank()) return
         viewModelScope.launch {
-            val ruleId = blockRepository.addRule(
-                BlockRule(type = BlockType.LANGUAGE, value = language.trim().lowercase())
-            )
-            val threadIdsToBlock = if (current.selectedThreadIds.isNotEmpty()) {
-                current.selectedThreadIds.toList()
-            } else {
-                listOfNotNull(current.conversations.find { it.address == target.address }?.threadId)
+            try {
+                val ruleId = blockRepository.addRule(
+                    BlockRule(type = BlockType.LANGUAGE, value = language.trim().lowercase())
+                )
+                val threadIdsToBlock = if (current.selectedThreadIds.isNotEmpty()) {
+                    current.selectedThreadIds.toList()
+                } else {
+                    listOfNotNull(current.conversations.find { it.address == target.address }?.threadId)
+                }
+                threadIdsToBlock.forEach { threadId ->
+                    moveThreadToSpam(threadId, ruleId, BlockType.LANGUAGE.name)
+                }
+                dismissBlockDialog()
+                clearSelection()
+                loadConversations()
+            } catch (e: BlockRuleLimitException) {
+                _uiState.value = _uiState.value.copy(error = e.message, showBlockDialog = false)
             }
-            threadIdsToBlock.forEach { threadId ->
-                moveThreadToSpam(threadId, ruleId, BlockType.LANGUAGE.name)
-            }
-            dismissBlockDialog()
-            clearSelection()
-            loadConversations()
         }
     }
 

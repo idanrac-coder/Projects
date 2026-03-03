@@ -3,9 +3,11 @@ package com.novachat.data.repository
 import com.google.mlkit.nl.languageid.LanguageIdentification
 import com.novachat.core.database.dao.BlockRuleDao
 import com.novachat.core.database.entity.BlockRuleEntity
+import com.novachat.core.datastore.UserPreferencesRepository
 import com.novachat.domain.model.BlockRule
 import com.novachat.domain.model.BlockType
 import com.novachat.domain.repository.BlockRepository
+import com.novachat.domain.repository.BlockRuleLimitException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -15,7 +17,8 @@ import javax.inject.Singleton
 
 @Singleton
 class BlockRepositoryImpl @Inject constructor(
-    private val blockRuleDao: BlockRuleDao
+    private val blockRuleDao: BlockRuleDao,
+    private val preferencesRepository: UserPreferencesRepository
 ) : BlockRepository {
 
     private val languageIdentifier = LanguageIdentification.getClient()
@@ -37,6 +40,11 @@ class BlockRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addRule(rule: BlockRule): Long {
+        val count = blockRuleDao.getRuleCount().first()
+        val isPremium = preferencesRepository.isPremium.first()
+        if (!isPremium && count >= BlockRepository.FREE_RULE_LIMIT) {
+            throw BlockRuleLimitException()
+        }
         return blockRuleDao.insertRule(BlockRuleEntity.fromDomainModel(rule))
     }
 

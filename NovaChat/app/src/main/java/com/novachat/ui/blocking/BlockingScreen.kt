@@ -49,6 +49,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.novachat.domain.model.BlockRule
 import com.novachat.domain.model.BlockType
+import com.novachat.domain.repository.BlockRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,7 +105,7 @@ fun BlockingScreen(
                     )
                 ) {
                     Text(
-                        text = "Free plan: ${uiState.ruleCount}/5 block rules used. Upgrade to Premium for unlimited rules.",
+                        text = "Free plan: ${uiState.ruleCount}/${BlockRepository.FREE_RULE_LIMIT} block rules used. Upgrade to Premium for unlimited rules.",
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(12.dp)
                     )

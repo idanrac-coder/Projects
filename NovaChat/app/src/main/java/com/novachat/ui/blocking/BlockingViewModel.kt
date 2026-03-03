@@ -28,7 +28,7 @@ data class BlockingUiState(
     val error: String? = null
 ) {
     val canAddMoreRules: Boolean
-        get() = isPremium || ruleCount < 5
+        get() = isPremium || ruleCount < BlockRepository.FREE_RULE_LIMIT
 }
 
 @HiltViewModel

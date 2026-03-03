@@ -3,6 +3,16 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.7.0] - 2026-03-03
+
+### Changed
+- Increase free block rule limit from 5 to 15
+- Enforce block rule limit at repository layer across all code paths (Chat, Conversations, auto-block)
+- Show "Premium Account" instead of "Upgrade to Premium" in Settings for premium users
+
+### Fixed
+- Free users could bypass block rule limit by blocking from Chat or Conversations screens
+
 ## [3.6.0] - 2026-03-03
 
 ### Added

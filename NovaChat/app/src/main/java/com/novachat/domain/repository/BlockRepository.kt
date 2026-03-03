@@ -4,7 +4,13 @@ import com.novachat.domain.model.BlockRule
 import com.novachat.domain.model.BlockType
 import kotlinx.coroutines.flow.Flow
 
+class BlockRuleLimitException : Exception("Free block rule limit reached. Upgrade to Premium for unlimited rules.")
+
 interface BlockRepository {
+    companion object {
+        const val FREE_RULE_LIMIT = 15
+    }
+
     fun getAllRules(): Flow<List<BlockRule>>
     fun getRulesByType(type: BlockType): Flow<List<BlockRule>>
     fun getRuleCount(): Flow<Int>

@@ -1,1 +1,3 @@
-Restore your data when you reinstall! After granting permissions, you'll now see an option to restore your messages from Google Drive or a local backup file. You can also skip and start fresh.
+You can now block up to 15 numbers and senders for free (up from 5)! The limit is now properly enforced everywhere in the app.
+
+Premium users will see a "Premium Account" badge in Settings instead of the upgrade prompt.

@@ -194,7 +194,7 @@ fun LicenseScreen(
                 PremiumFeatureRow(
                     icon = Icons.Default.Block,
                     title = "Unlimited Block Rules",
-                    description = "Create as many block rules as you need (free limit: 5)"
+                    description = "Create as many block rules as you need (free limit: 15)"
                 )
                 PremiumFeatureRow(
                     icon = Icons.Default.Notifications,

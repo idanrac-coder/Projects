@@ -12,6 +12,7 @@ import com.novachat.domain.model.Message
 import com.novachat.domain.model.MessageType
 import com.novachat.domain.model.Reaction
 import com.novachat.domain.repository.BlockRepository
+import com.novachat.domain.repository.BlockRuleLimitException
 import com.novachat.domain.repository.ConversationRepository
 import com.novachat.core.database.dao.SpamMessageDao
 import com.novachat.core.database.entity.SpamMessageEntity
@@ -502,39 +503,55 @@ class ChatViewModel @Inject constructor(
 
     fun blockNumber(address: String) {
         viewModelScope.launch {
-            val ruleId = blockRepository.addRule(
-                BlockRule(type = BlockType.NUMBER, value = address)
-            )
-            moveThreadToSpamAndClose(ruleId, BlockType.NUMBER.name)
+            try {
+                val ruleId = blockRepository.addRule(
+                    BlockRule(type = BlockType.NUMBER, value = address)
+                )
+                moveThreadToSpamAndClose(ruleId, BlockType.NUMBER.name)
+            } catch (e: BlockRuleLimitException) {
+                _uiState.value = _uiState.value.copy(error = e.message, showBlockDialog = false)
+            }
         }
     }
 
     fun blockName(name: String) {
         viewModelScope.launch {
-            val ruleId = blockRepository.addRule(
-                BlockRule(type = BlockType.SENDER_NAME, value = name)
-            )
-            moveThreadToSpamAndClose(ruleId, BlockType.SENDER_NAME.name)
+            try {
+                val ruleId = blockRepository.addRule(
+                    BlockRule(type = BlockType.SENDER_NAME, value = name)
+                )
+                moveThreadToSpamAndClose(ruleId, BlockType.SENDER_NAME.name)
+            } catch (e: BlockRuleLimitException) {
+                _uiState.value = _uiState.value.copy(error = e.message, showBlockDialog = false)
+            }
         }
     }
 
     fun blockWords(words: String) {
         if (words.isBlank()) return
         viewModelScope.launch {
-            val ruleId = blockRepository.addRule(
-                BlockRule(type = BlockType.KEYWORD, value = words)
-            )
-            moveThreadToSpamAndClose(ruleId, BlockType.KEYWORD.name)
+            try {
+                val ruleId = blockRepository.addRule(
+                    BlockRule(type = BlockType.KEYWORD, value = words)
+                )
+                moveThreadToSpamAndClose(ruleId, BlockType.KEYWORD.name)
+            } catch (e: BlockRuleLimitException) {
+                _uiState.value = _uiState.value.copy(error = e.message, showBlockDialog = false)
+            }
         }
     }
 
     fun blockLanguage(language: String) {
         if (language.isBlank()) return
         viewModelScope.launch {
-            val ruleId = blockRepository.addRule(
-                BlockRule(type = BlockType.LANGUAGE, value = language.trim().lowercase())
-            )
-            moveThreadToSpamAndClose(ruleId, BlockType.LANGUAGE.name)
+            try {
+                val ruleId = blockRepository.addRule(
+                    BlockRule(type = BlockType.LANGUAGE, value = language.trim().lowercase())
+                )
+                moveThreadToSpamAndClose(ruleId, BlockType.LANGUAGE.name)
+            } catch (e: BlockRuleLimitException) {
+                _uiState.value = _uiState.value.copy(error = e.message, showBlockDialog = false)
+            }
         }
     }
 
