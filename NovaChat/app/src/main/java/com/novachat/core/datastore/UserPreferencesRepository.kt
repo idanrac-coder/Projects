@@ -3,6 +3,7 @@ package com.novachat.core.datastore
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import com.novachat.domain.model.BubbleShape
 import com.novachat.domain.model.SwipeAction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -53,5 +54,53 @@ class UserPreferencesRepository @Inject constructor(
 
     suspend fun setFirstLaunchComplete() {
         dataStore.edit { it[PreferencesKeys.FIRST_LAUNCH] = false }
+    }
+
+    val autoBackupEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[PreferencesKeys.AUTO_BACKUP_ENABLED] ?: false
+    }
+
+    val backupFrequency: Flow<String> = dataStore.data.map { prefs ->
+        prefs[PreferencesKeys.BACKUP_FREQUENCY] ?: "daily"
+    }
+
+    val lastBackupTime: Flow<Long> = dataStore.data.map { prefs ->
+        prefs[PreferencesKeys.LAST_BACKUP_TIME] ?: 0L
+    }
+
+    suspend fun setAutoBackupEnabled(enabled: Boolean) {
+        dataStore.edit { it[PreferencesKeys.AUTO_BACKUP_ENABLED] = enabled }
+    }
+
+    suspend fun setBackupFrequency(frequency: String) {
+        dataStore.edit { it[PreferencesKeys.BACKUP_FREQUENCY] = frequency }
+    }
+
+    suspend fun setLastBackupTime(time: Long) {
+        dataStore.edit { it[PreferencesKeys.LAST_BACKUP_TIME] = time }
+    }
+
+    val activeBubbleShape: Flow<BubbleShape?> = dataStore.data.map { prefs ->
+        prefs[PreferencesKeys.ACTIVE_BUBBLE_SHAPE]?.let {
+            try { BubbleShape.valueOf(it) } catch (_: Exception) { null }
+        }
+    }
+
+    suspend fun setBubbleShape(shape: BubbleShape?) {
+        dataStore.edit {
+            if (shape != null) {
+                it[PreferencesKeys.ACTIVE_BUBBLE_SHAPE] = shape.name
+            } else {
+                it.remove(PreferencesKeys.ACTIVE_BUBBLE_SHAPE)
+            }
+        }
+    }
+
+    val scamDetectionEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[PreferencesKeys.SCAM_DETECTION_ENABLED] ?: true
+    }
+
+    suspend fun setScamDetectionEnabled(enabled: Boolean) {
+        dataStore.edit { it[PreferencesKeys.SCAM_DETECTION_ENABLED] = enabled }
     }
 }

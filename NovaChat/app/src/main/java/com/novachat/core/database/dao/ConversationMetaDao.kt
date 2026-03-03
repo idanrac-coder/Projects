@@ -33,4 +33,25 @@ interface ConversationMetaDao {
 
     @Query("UPDATE conversation_meta SET isMuted = :muted WHERE threadId = :threadId")
     suspend fun setMuted(threadId: Long, muted: Boolean)
+
+    @Query("UPDATE conversation_meta SET customThemeId = :themeId WHERE threadId = :threadId")
+    suspend fun setCustomTheme(threadId: Long, themeId: Long?)
+
+    @Query("UPDATE conversation_meta SET autoDeleteAfterMs = :durationMs WHERE threadId = :threadId")
+    suspend fun setAutoDelete(threadId: Long, durationMs: Long?)
+
+    @Query("UPDATE conversation_meta SET customCategory = :category WHERE threadId = :threadId")
+    suspend fun setCustomCategory(threadId: Long, category: String?)
+
+    @Query("UPDATE conversation_meta SET lastReadTimestamp = :timestamp WHERE threadId = :threadId")
+    suspend fun setLastReadTimestamp(threadId: Long, timestamp: Long)
+
+    @Query("UPDATE conversation_meta SET lastReadMessageCount = :count WHERE threadId = :threadId")
+    suspend fun setLastReadMessageCount(threadId: Long, count: Int)
+
+    @Query("SELECT * FROM conversation_meta WHERE isArchived = 1")
+    suspend fun getArchivedConversationsOnce(): List<ConversationMetaEntity>
+
+    @Query("SELECT * FROM conversation_meta")
+    suspend fun getAllMetas(): List<ConversationMetaEntity>
 }

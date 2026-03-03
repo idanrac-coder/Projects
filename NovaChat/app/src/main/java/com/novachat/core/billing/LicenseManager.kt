@@ -2,6 +2,7 @@ package com.novachat.core.billing
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
@@ -17,6 +18,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,10 +33,13 @@ class LicenseManager @Inject constructor(
 ) : PurchasesUpdatedListener {
 
     companion object {
+        private const val TAG = "LicenseManager"
         const val PRODUCT_ID = "novachat_lifetime_premium"
+        private const val MAX_RETRY_ATTEMPTS = 3
     }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private var retryCount = 0
 
     private val _isPremium = MutableStateFlow(false)
     val isPremium: StateFlow<Boolean> = _isPremium.asStateFlow()
@@ -70,13 +75,24 @@ class LicenseManager @Inject constructor(
         billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingSetupFinished(result: BillingResult) {
                 if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                    retryCount = 0
                     queryProductDetails()
                     queryExistingPurchases()
                 }
             }
 
             override fun onBillingServiceDisconnected() {
-                // Retry in production with exponential backoff
+                if (retryCount < MAX_RETRY_ATTEMPTS) {
+                    retryCount++
+                    val delayMs = (1000L * (1 shl (retryCount - 1)))
+                    Log.w(TAG, "Billing disconnected, retrying in ${delayMs}ms (attempt $retryCount)")
+                    scope.launch {
+                        delay(delayMs)
+                        connectToGooglePlay()
+                    }
+                } else {
+                    Log.e(TAG, "Billing disconnected after $MAX_RETRY_ATTEMPTS retries")
+                }
             }
         })
     }

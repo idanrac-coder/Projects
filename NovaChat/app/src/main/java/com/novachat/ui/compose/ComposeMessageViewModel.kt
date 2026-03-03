@@ -62,14 +62,15 @@ class ComposeMessageViewModel @Inject constructor(
         }
     }
 
-    fun sendMessage(address: String, body: String, onSuccess: () -> Unit) {
+    fun sendMessage(address: String, body: String, onSuccess: (threadId: Long) -> Unit) {
         if (body.isBlank() || address.isBlank()) return
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSending = true)
             val result = conversationRepository.sendSms(address, body)
             result.onSuccess {
                 _uiState.value = _uiState.value.copy(isSending = false)
-                onSuccess()
+                val threadId = conversationRepository.getThreadIdForAddress(address)
+                onSuccess(threadId)
             }.onFailure { e ->
                 _uiState.value = _uiState.value.copy(
                     isSending = false,

@@ -1,8 +1,10 @@
 package com.novachat.core.sms
 
 import android.app.PendingIntent
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.provider.Telephony
 import android.telephony.SmsManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -40,9 +42,28 @@ class SmsSender @Inject constructor(
                 }
                 smsManager.sendMultipartTextMessage(address, null, parts, sentIntents, deliveredIntents)
             }
+
+            writeSentMessageToProvider(address, body)
+
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    private fun writeSentMessageToProvider(address: String, body: String) {
+        try {
+            val values = ContentValues().apply {
+                put(Telephony.Sms.ADDRESS, address)
+                put(Telephony.Sms.BODY, body)
+                put(Telephony.Sms.TYPE, Telephony.Sms.MESSAGE_TYPE_SENT)
+                put(Telephony.Sms.DATE, System.currentTimeMillis())
+                put(Telephony.Sms.READ, 1)
+                put(Telephony.Sms.SEEN, 1)
+            }
+            context.contentResolver.insert(Telephony.Sms.CONTENT_URI, values)
+        } catch (_: Exception) {
+            // Non-fatal: message was sent but couldn't be persisted locally
         }
     }
 }

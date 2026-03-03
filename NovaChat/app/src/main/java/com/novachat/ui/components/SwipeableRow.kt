@@ -65,11 +65,13 @@ fun SwipeableRow(
                     .padding(horizontal = 24.dp),
                 contentAlignment = alignment
             ) {
-                Icon(
-                    imageVector = swipeActionIcon(action),
-                    contentDescription = action.name,
-                    tint = Color.White
-                )
+                if (action != SwipeAction.OFF) {
+                    Icon(
+                        imageVector = swipeActionIcon(action),
+                        contentDescription = action.name,
+                        tint = Color.White
+                    )
+                }
             }
         },
         enableDismissFromStartToEnd = leftAction != SwipeAction.OFF,
@@ -79,12 +81,12 @@ fun SwipeableRow(
 }
 
 fun swipeActionColor(action: SwipeAction): Color = when (action) {
-    SwipeAction.ARCHIVE -> Color(0xFF1976D2)
-    SwipeAction.DELETE -> Color(0xFFD32F2F)
-    SwipeAction.PIN -> Color(0xFF388E3C)
-    SwipeAction.MARK_READ_UNREAD -> Color(0xFF7B1FA2)
-    SwipeAction.MUTE -> Color(0xFFF57C00)
-    SwipeAction.BLOCK -> Color(0xFF455A64)
+    SwipeAction.ARCHIVE -> Color(0xFF0984E3)
+    SwipeAction.DELETE -> Color(0xFFFF6B6B)
+    SwipeAction.PIN -> Color(0xFF00B894)
+    SwipeAction.MARK_READ_UNREAD -> Color(0xFF6C5CE7)
+    SwipeAction.MUTE -> Color(0xFFFDCB6E)
+    SwipeAction.BLOCK -> Color(0xFF636E72)
     SwipeAction.OFF -> Color.Transparent
 }
 

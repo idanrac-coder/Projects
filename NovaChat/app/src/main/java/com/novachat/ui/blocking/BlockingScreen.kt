@@ -58,7 +58,7 @@ fun BlockingScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
-    val tabs = listOf("By Number", "By Words", "By Sender")
+    val tabs = listOf("By Number", "By Words", "By Sender", "By Language")
 
     Scaffold(
         topBar = {
@@ -78,7 +78,8 @@ fun BlockingScreen(
                         val type = when (selectedTab) {
                             0 -> BlockType.NUMBER
                             1 -> BlockType.KEYWORD
-                            else -> BlockType.SENDER_NAME
+                            2 -> BlockType.SENDER_NAME
+                            else -> BlockType.LANGUAGE
                         }
                         viewModel.showAddDialog(type)
                     }
@@ -126,7 +127,8 @@ fun BlockingScreen(
             val rules = when (selectedTab) {
                 0 -> uiState.numberRules
                 1 -> uiState.keywordRules
-                else -> uiState.senderRules
+                2 -> uiState.senderRules
+                else -> uiState.languageRules
             }
 
             if (rules.isEmpty()) {
@@ -233,11 +235,13 @@ private fun AddBlockRuleDialog(
         BlockType.NUMBER -> "Block Number"
         BlockType.KEYWORD -> "Block Keyword"
         BlockType.SENDER_NAME -> "Block Sender"
+        BlockType.LANGUAGE -> "Block Language"
     }
     val placeholder = when (type) {
         BlockType.NUMBER -> "Phone number (e.g., +1555*)"
         BlockType.KEYWORD -> "Keyword or phrase"
         BlockType.SENDER_NAME -> "Sender name"
+        BlockType.LANGUAGE -> "Language code (e.g. en, es, fr)"
     }
 
     AlertDialog(

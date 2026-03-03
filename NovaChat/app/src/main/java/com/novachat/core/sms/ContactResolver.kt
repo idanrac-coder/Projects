@@ -14,9 +14,44 @@ class ContactResolver @Inject constructor(
     private val contentResolver: ContentResolver
 ) {
     private val nameCache = mutableMapOf<String, String?>()
+    @Volatile
+    private var contactsPreloaded = false
+    private val miniMatchMap = HashMap<String, String>()
+
+    fun preloadContacts() {
+        if (contactsPreloaded) return
+
+        contentResolver.query(
+            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+            arrayOf(
+                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                ContactsContract.CommonDataKinds.Phone.NUMBER
+            ),
+            null, null, null
+        )?.use { cursor ->
+            val colName = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+            val colNumber = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER)
+            while (cursor.moveToNext()) {
+                val name = cursor.getString(colName) ?: continue
+                val number = cursor.getString(colNumber) ?: continue
+                val key = miniMatch(number)
+                if (key.isNotEmpty()) {
+                    miniMatchMap.putIfAbsent(key, name)
+                }
+            }
+        }
+        contactsPreloaded = true
+    }
 
     fun getContactName(phoneNumber: String): String? {
-        nameCache[phoneNumber]?.let { return it }
+        if (nameCache.containsKey(phoneNumber)) return nameCache[phoneNumber]
+
+        if (contactsPreloaded) {
+            val key = miniMatch(phoneNumber)
+            val name = if (key.isNotEmpty()) miniMatchMap[key] else null
+            nameCache[phoneNumber] = name
+            return name
+        }
 
         val uri = Uri.withAppendedPath(
             ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
@@ -34,6 +69,11 @@ class ContactResolver @Inject constructor(
         }
         nameCache[phoneNumber] = name
         return name
+    }
+
+    private fun miniMatch(number: String): String {
+        val digits = number.replace("\\D".toRegex(), "")
+        return if (digits.length >= 7) digits.takeLast(7) else digits
     }
 
     suspend fun getAllContacts(): List<Contact> = withContext(Dispatchers.IO) {
@@ -74,5 +114,7 @@ class ContactResolver @Inject constructor(
 
     fun clearCache() {
         nameCache.clear()
+        miniMatchMap.clear()
+        contactsPreloaded = false
     }
 }

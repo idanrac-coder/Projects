@@ -34,5 +34,10 @@ enum class BubbleShape {
 enum class WallpaperType {
     SOLID,
     GRADIENT,
-    IMAGE
+    IMAGE,
+    PATTERN_BOTANICAL,
+    PATTERN_GEOMETRIC,
+    PATTERN_WAVES,
+    PATTERN_DOTS,
+    PATTERN_LEAVES
 }

@@ -11,5 +11,6 @@ data class BlockRule(
 enum class BlockType {
     NUMBER,
     KEYWORD,
-    SENDER_NAME
+    SENDER_NAME,
+    LANGUAGE
 }

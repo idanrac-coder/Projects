@@ -18,16 +18,21 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CleaningServices
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.MoveToInbox
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,8 +50,18 @@ fun SpamFolderScreen(
     viewModel: SpamFolderViewModel = hiltViewModel()
 ) {
     val spamMessages by viewModel.spamMessages.collectAsStateWithLifecycle()
+    val restoredEvent by viewModel.restoredEvent.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(restoredEvent) {
+        restoredEvent?.let { address ->
+            snackbarHostState.showSnackbar("Message from $address restored to inbox")
+            viewModel.clearRestoredEvent()
+        }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Blocked / Spam") },
@@ -121,6 +136,13 @@ fun SpamFolderScreen(
                                         .format(Date(spam.timestamp)),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                )
+                            }
+                            IconButton(onClick = { viewModel.restoreToInbox(spam.id) }) {
+                                Icon(
+                                    Icons.Default.MoveToInbox,
+                                    contentDescription = "Restore to inbox",
+                                    tint = MaterialTheme.colorScheme.primary
                                 )
                             }
                             IconButton(onClick = { viewModel.deleteSpamMessage(spam.id) }) {

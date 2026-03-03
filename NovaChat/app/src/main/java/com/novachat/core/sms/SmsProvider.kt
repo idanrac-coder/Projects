@@ -1,12 +1,16 @@
 package com.novachat.core.sms
 
+import android.app.role.RoleManager
 import android.content.ContentResolver
+import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.provider.Telephony
+import android.util.Log
 import com.novachat.domain.model.Conversation
 import com.novachat.domain.model.Message
 import com.novachat.domain.model.MessageType
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -14,83 +18,94 @@ import javax.inject.Singleton
 
 @Singleton
 class SmsProvider @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val contentResolver: ContentResolver,
     private val contactResolver: ContactResolver
 ) {
 
-    suspend fun getConversations(): List<Conversation> = withContext(Dispatchers.IO) {
-        val conversations = mutableListOf<Conversation>()
-        val uri = Telephony.Sms.Conversations.CONTENT_URI
+    fun isDefaultSmsApp(): Boolean {
+        val roleManager = context.getSystemService(RoleManager::class.java)
+        return roleManager.isRoleHeld(RoleManager.ROLE_SMS)
+    }
 
-        val cursor = contentResolver.query(
-            uri,
-            arrayOf(
-                Telephony.Sms.Conversations.THREAD_ID,
-                Telephony.Sms.Conversations.SNIPPET,
-                Telephony.Sms.Conversations.MESSAGE_COUNT
-            ),
-            null, null,
-            "date DESC"
+    suspend fun getConversations(): List<Conversation> = withContext(Dispatchers.IO) {
+        Log.d("NC_DEBUG", "*** SmsProvider.getConversations() querying content://sms")
+        data class ThreadAccum(
+            var address: String = "",
+            var snippet: String = "",
+            var timestamp: Long = 0L,
+            var messageCount: Int = 0,
+            var unreadCount: Int = 0
         )
 
-        cursor?.use {
-            while (it.moveToNext()) {
-                val threadId = it.getLong(it.getColumnIndexOrThrow(Telephony.Sms.Conversations.THREAD_ID))
-                val snippet = it.getString(it.getColumnIndexOrThrow(Telephony.Sms.Conversations.SNIPPET)) ?: ""
-                val messageCount = it.getInt(it.getColumnIndexOrThrow(Telephony.Sms.Conversations.MESSAGE_COUNT))
+        val threadMap = LinkedHashMap<Long, ThreadAccum>()
 
-                val threadInfo = getThreadInfo(threadId)
-                if (threadInfo != null) {
-                    val contactName = contactResolver.getContactName(threadInfo.address)
-                    conversations.add(
-                        Conversation(
-                            threadId = threadId,
-                            address = threadInfo.address,
-                            contactName = contactName,
-                            snippet = snippet,
-                            timestamp = threadInfo.timestamp,
-                            messageCount = messageCount,
-                            unreadCount = getUnreadCount(threadId)
-                        )
+        contentResolver.query(
+            Telephony.Sms.CONTENT_URI,
+            arrayOf(
+                Telephony.Sms.THREAD_ID,
+                Telephony.Sms.ADDRESS,
+                Telephony.Sms.BODY,
+                Telephony.Sms.DATE,
+                Telephony.Sms.TYPE,
+                Telephony.Sms.READ
+            ),
+            null, null,
+            "${Telephony.Sms.DATE} DESC"
+        )?.use { cursor ->
+            val colThread = cursor.getColumnIndexOrThrow(Telephony.Sms.THREAD_ID)
+            val colAddress = cursor.getColumnIndexOrThrow(Telephony.Sms.ADDRESS)
+            val colBody = cursor.getColumnIndexOrThrow(Telephony.Sms.BODY)
+            val colDate = cursor.getColumnIndexOrThrow(Telephony.Sms.DATE)
+            val colType = cursor.getColumnIndexOrThrow(Telephony.Sms.TYPE)
+            val colRead = cursor.getColumnIndexOrThrow(Telephony.Sms.READ)
+
+            while (cursor.moveToNext()) {
+                val threadId = cursor.getLong(colThread)
+                val address = cursor.getString(colAddress) ?: ""
+                val body = cursor.getString(colBody) ?: ""
+                val date = cursor.getLong(colDate)
+                val type = cursor.getInt(colType)
+                val read = cursor.getInt(colRead)
+
+                val accum = threadMap.getOrPut(threadId) {
+                    ThreadAccum(
+                        address = address,
+                        snippet = body,
+                        timestamp = date
                     )
+                }
+                accum.messageCount++
+                if (read == 0 && type == Telephony.Sms.MESSAGE_TYPE_INBOX) {
+                    accum.unreadCount++
                 }
             }
         }
-        conversations
-    }
 
-    private fun getThreadInfo(threadId: Long): ThreadInfo? {
-        val cursor = contentResolver.query(
-            Telephony.Sms.CONTENT_URI,
-            arrayOf(Telephony.Sms.ADDRESS, Telephony.Sms.DATE),
-            "${Telephony.Sms.THREAD_ID} = ?",
-            arrayOf(threadId.toString()),
-            "${Telephony.Sms.DATE} DESC LIMIT 1"
-        )
-        return cursor?.use {
-            if (it.moveToFirst()) {
-                ThreadInfo(
-                    address = it.getString(it.getColumnIndexOrThrow(Telephony.Sms.ADDRESS)) ?: "",
-                    timestamp = it.getLong(it.getColumnIndexOrThrow(Telephony.Sms.DATE))
-                )
-            } else null
+        Log.d("NC_DEBUG", "*** SmsProvider.getConversations() found ${threadMap.size} threads")
+        threadMap.forEach { (tid, acc) ->
+            Log.d("NC_DEBUG", "***   thread=$tid addr=${acc.address} msgs=${acc.messageCount} unread=${acc.unreadCount} snippet=${acc.snippet.take(20)}")
+        }
+
+        if (threadMap.isEmpty()) return@withContext emptyList()
+
+        contactResolver.preloadContacts()
+
+        threadMap.map { (threadId, accum) ->
+            Conversation(
+                threadId = threadId,
+                address = accum.address,
+                contactName = contactResolver.getContactName(accum.address),
+                snippet = accum.snippet,
+                timestamp = accum.timestamp,
+                messageCount = accum.messageCount,
+                unreadCount = accum.unreadCount
+            )
         }
     }
 
-    private fun getUnreadCount(threadId: Long): Int {
-        val cursor = contentResolver.query(
-            Telephony.Sms.CONTENT_URI,
-            arrayOf("COUNT(*)"),
-            "${Telephony.Sms.THREAD_ID} = ? AND ${Telephony.Sms.READ} = 0",
-            arrayOf(threadId.toString()),
-            null
-        )
-        return cursor?.use {
-            if (it.moveToFirst()) it.getInt(0) else 0
-        } ?: 0
-    }
-
     suspend fun getMessagesForThread(threadId: Long): List<Message> = withContext(Dispatchers.IO) {
+        Log.d("NC_DEBUG", "*** SmsProvider.getMessagesForThread($threadId) querying")
         val messages = mutableListOf<Message>()
         val cursor = contentResolver.query(
             Telephony.Sms.CONTENT_URI,
@@ -113,6 +128,7 @@ class SmsProvider @Inject constructor(
                 messages.add(cursorToMessage(it))
             }
         }
+        Log.d("NC_DEBUG", "*** SmsProvider.getMessagesForThread($threadId) found ${messages.size} messages")
         messages
     }
 
@@ -145,20 +161,65 @@ class SmsProvider @Inject constructor(
     suspend fun markThreadAsRead(threadId: Long) = withContext(Dispatchers.IO) {
         val values = android.content.ContentValues().apply {
             put(Telephony.Sms.READ, 1)
+            put(Telephony.Sms.SEEN, 1)
         }
         contentResolver.update(
             Telephony.Sms.CONTENT_URI,
             values,
-            "${Telephony.Sms.THREAD_ID} = ? AND ${Telephony.Sms.READ} = 0",
+            "${Telephony.Sms.THREAD_ID} = ? AND (${Telephony.Sms.READ} = 0 OR ${Telephony.Sms.SEEN} = 0)",
             arrayOf(threadId.toString())
         )
     }
 
-    suspend fun deleteThread(threadId: Long) = withContext(Dispatchers.IO) {
-        contentResolver.delete(
+    data class InsertResult(val uri: Uri?, val threadId: Long)
+
+    suspend fun insertIncomingSms(address: String, body: String, timestamp: Long): InsertResult = withContext(Dispatchers.IO) {
+        val threadId = Telephony.Threads.getOrCreateThreadId(context, address)
+        val values = android.content.ContentValues().apply {
+            put(Telephony.Sms.ADDRESS, address)
+            put(Telephony.Sms.BODY, body)
+            put(Telephony.Sms.DATE, timestamp)
+            put(Telephony.Sms.DATE_SENT, timestamp)
+            put(Telephony.Sms.READ, 0)
+            put(Telephony.Sms.SEEN, 0)
+            put(Telephony.Sms.TYPE, Telephony.Sms.MESSAGE_TYPE_INBOX)
+            put(Telephony.Sms.THREAD_ID, threadId)
+        }
+        try {
+            val uri = contentResolver.insert(Telephony.Sms.CONTENT_URI, values)
+                ?: contentResolver.insert(Telephony.Sms.Inbox.CONTENT_URI, values)
+            Log.d("SmsProvider", "Insert result: uri=$uri threadId=$threadId address=$address")
+            InsertResult(uri, threadId)
+        } catch (e: Exception) {
+            Log.e("SmsProvider", "Failed to insert incoming SMS", e)
+            InsertResult(null, threadId)
+        }
+    }
+
+    suspend fun getThreadIdForAddress(address: String): Long = withContext(Dispatchers.IO) {
+        try {
+            Telephony.Threads.getOrCreateThreadId(context, address)
+        } catch (_: Exception) {
+            0L
+        }
+    }
+
+    suspend fun getMessageCountForThread(threadId: Long): Int = withContext(Dispatchers.IO) {
+        val cursor = contentResolver.query(
             Telephony.Sms.CONTENT_URI,
+            arrayOf(Telephony.Sms._ID),
             "${Telephony.Sms.THREAD_ID} = ?",
-            arrayOf(threadId.toString())
+            arrayOf(threadId.toString()),
+            null
+        )
+        cursor?.use { it.count } ?: 0
+    }
+
+    suspend fun deleteThread(threadId: Long): Int = withContext(Dispatchers.IO) {
+        contentResolver.delete(
+            Uri.parse("content://mms-sms/conversations/$threadId"),
+            null,
+            null
         )
     }
 

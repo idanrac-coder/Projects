@@ -9,7 +9,7 @@ object ConversationsRoute
 data class ChatRoute(val threadId: Long, val address: String, val contactName: String?)
 
 @Serializable
-object ComposeMessageRoute
+data class ComposeMessageRoute(val recipient: String? = null)
 
 @Serializable
 object SearchRoute
@@ -37,3 +37,27 @@ object NotificationSettingsRoute
 
 @Serializable
 object LicenseRoute
+
+@Serializable
+data class MediaGalleryRoute(val threadId: Long, val contactName: String?)
+
+@Serializable
+data class PinnedMessagesRoute(val threadId: Long, val contactName: String?)
+
+@Serializable
+data class QrContactRoute(val phoneNumber: String, val contactName: String?)
+
+@Serializable
+object BackupRestoreRoute
+
+@Serializable
+object ScheduledMessagesRoute
+
+@Serializable
+object ArchivedConversationsRoute
+
+@Serializable
+object NotificationProfilesRoute
+
+@Serializable
+object SmartSecureRoute

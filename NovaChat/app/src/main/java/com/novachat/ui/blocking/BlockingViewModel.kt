@@ -20,6 +20,7 @@ data class BlockingUiState(
     val numberRules: List<BlockRule> = emptyList(),
     val keywordRules: List<BlockRule> = emptyList(),
     val senderRules: List<BlockRule> = emptyList(),
+    val languageRules: List<BlockRule> = emptyList(),
     val ruleCount: Int = 0,
     val isPremium: Boolean = false,
     val showAddDialog: Boolean = false,
@@ -44,6 +45,7 @@ class BlockingViewModel @Inject constructor(
         blockRepository.getRulesByType(BlockType.NUMBER),
         blockRepository.getRulesByType(BlockType.KEYWORD),
         blockRepository.getRulesByType(BlockType.SENDER_NAME),
+        blockRepository.getRulesByType(BlockType.LANGUAGE),
         blockRepository.getRuleCount(),
         preferencesRepository.isPremium,
         _showDialog,
@@ -55,11 +57,12 @@ class BlockingViewModel @Inject constructor(
             numberRules = values[0] as List<BlockRule>,
             keywordRules = values[1] as List<BlockRule>,
             senderRules = values[2] as List<BlockRule>,
-            ruleCount = values[3] as Int,
-            isPremium = values[4] as Boolean,
-            showAddDialog = values[5] as Boolean,
-            addDialogType = values[6] as BlockType,
-            error = values[7] as String?
+            languageRules = values[3] as List<BlockRule>,
+            ruleCount = values[4] as Int,
+            isPremium = values[5] as Boolean,
+            showAddDialog = values[6] as Boolean,
+            addDialogType = values[7] as BlockType,
+            error = values[8] as String?
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), BlockingUiState())
 

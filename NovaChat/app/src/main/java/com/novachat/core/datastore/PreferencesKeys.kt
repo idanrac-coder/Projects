@@ -21,4 +21,9 @@ object PreferencesKeys {
     val DND_END_HOUR = stringPreferencesKey("dnd_end_hour")
     val IS_DEFAULT_SMS_APP = booleanPreferencesKey("is_default_sms_app")
     val FIRST_LAUNCH = booleanPreferencesKey("first_launch")
+    val AUTO_BACKUP_ENABLED = booleanPreferencesKey("auto_backup_enabled")
+    val BACKUP_FREQUENCY = stringPreferencesKey("backup_frequency")
+    val LAST_BACKUP_TIME = longPreferencesKey("last_backup_time")
+    val ACTIVE_BUBBLE_SHAPE = stringPreferencesKey("active_bubble_shape")
+    val SCAM_DETECTION_ENABLED = booleanPreferencesKey("scam_detection_enabled")
 }

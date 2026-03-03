@@ -50,12 +50,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ComposeMessageScreen(
+    initialRecipient: String? = null,
     onBack: () -> Unit,
     onConversationStarted: (threadId: Long, address: String, contactName: String?) -> Unit,
     viewModel: ComposeMessageViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var recipient by rememberSaveable { mutableStateOf("") }
+    var recipient by rememberSaveable(initialRecipient) { mutableStateOf(initialRecipient.orEmpty()) }
     var messageText by rememberSaveable { mutableStateOf("") }
     var selectedContactName by rememberSaveable { mutableStateOf<String?>(null) }
 
@@ -172,8 +173,8 @@ fun ComposeMessageScreen(
                 )
                 FilledIconButton(
                     onClick = {
-                        viewModel.sendMessage(recipient, messageText) {
-                            onConversationStarted(0L, recipient, selectedContactName)
+                        viewModel.sendMessage(recipient, messageText) { threadId ->
+                            onConversationStarted(threadId, recipient, selectedContactName)
                         }
                     },
                     modifier = Modifier.size(48.dp),

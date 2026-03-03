@@ -11,7 +11,10 @@ data class Conversation(
     val isPinned: Boolean = false,
     val isMuted: Boolean = false,
     val isArchived: Boolean = false,
-    val avatarUri: String? = null
+    val avatarUri: String? = null,
+    val category: MessageCategory = MessageCategory.ALL,
+    val customCategory: String? = null,
+    val customThemeId: Long? = null
 ) {
     val displayName: String
         get() = contactName ?: address

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">NovaChat</string>
+    <string name="app_name">Aura</string>
     <string name="conversations">Conversations</string>
     <string name="search">Search</string>
     <string name="settings">Settings</string>
@@ -22,6 +22,6 @@
     <string name="lifetime_license">Lifetime License</string>
     <string name="restore_purchase">Restore Purchase</string>
     <string name="permission_required">Permission Required</string>
-    <string name="sms_permission_rationale">NovaChat needs SMS permissions to read and send messages.</string>
+    <string name="sms_permission_rationale">Aura needs SMS permissions to read and send messages.</string>
     <string name="grant_permission">Grant Permission</string>
 </resources>

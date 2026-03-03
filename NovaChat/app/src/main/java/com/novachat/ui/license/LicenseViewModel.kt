@@ -19,7 +19,7 @@ class LicenseViewModel @Inject constructor(
     val formattedPrice: String
         get() {
             val details = licenseManager.productDetails.value
-            return details?.oneTimePurchaseOfferDetails?.formattedPrice ?: "$9.99"
+            return details?.oneTimePurchaseOfferDetails?.formattedPrice ?: "$4.99"
         }
 
     fun purchase(activity: Activity) {

@@ -1,5 +1,6 @@
 package com.novachat.ui.themes
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
@@ -23,7 +25,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,8 +33,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -46,8 +46,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.novachat.domain.model.BubbleShape
 import com.novachat.domain.model.NovaChatTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,7 +60,6 @@ fun ThemesScreen(
     viewModel: ThemesViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val tabs = listOf("Gallery", "Custom")
 
     Scaffold(
         topBar = {
@@ -72,46 +73,85 @@ fun ThemesScreen(
             )
         },
         floatingActionButton = {
-            if (uiState.selectedTab == 1 && uiState.isPremium) {
+            if (uiState.isPremium) {
                 FloatingActionButton(onClick = onEditTheme) {
                     Icon(Icons.Default.Add, contentDescription = "Create theme")
                 }
             }
         }
     ) { padding ->
-        Column(
+        val allThemes = uiState.builtInThemes + uiState.customThemes
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .padding(horizontal = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            TabRow(selectedTabIndex = uiState.selectedTab) {
-                tabs.forEachIndexed { index, title ->
-                    Tab(
-                        selected = uiState.selectedTab == index,
-                        onClick = { viewModel.selectTab(index) },
-                        text = { Text(title) }
-                    )
-                }
+            item(span = { GridItemSpan(2) }) {
+                BubbleStylePicker(
+                    activeShape = uiState.activeBubbleShape,
+                    onShapeSelect = { viewModel.setBubbleShape(it) }
+                )
             }
 
-            when (uiState.selectedTab) {
-                0 -> ThemeGallery(
-                    themes = uiState.builtInThemes,
-                    activeThemeId = uiState.activeThemeId,
-                    isPremium = uiState.isPremium,
-                    onThemeSelect = { viewModel.applyTheme(it) }
-                )
-                1 -> {
-                    if (!uiState.isPremium) {
-                        PremiumGate()
-                    } else {
-                        ThemeGallery(
-                            themes = uiState.customThemes,
-                            activeThemeId = uiState.activeThemeId,
-                            isPremium = true,
-                            onThemeSelect = { viewModel.applyTheme(it) }
-                        )
+            item(span = { GridItemSpan(2) }) {
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+
+            items(allThemes, key = { it.id }) { theme ->
+                ThemeCard(
+                    theme = theme,
+                    isActive = theme.id == uiState.activeThemeId,
+                    isLocked = theme.isPremium && !uiState.isPremium,
+                    onClick = {
+                        if (!theme.isPremium || uiState.isPremium) {
+                            viewModel.applyTheme(theme.id)
+                        }
                     }
+                )
+            }
+
+            item(span = { GridItemSpan(2) }) {
+                Spacer(modifier = Modifier.height(80.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun BubbleStylePicker(
+    activeShape: BubbleShape,
+    onShapeSelect: (BubbleShape) -> Unit
+) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Bubble Style",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                BubbleShape.entries.forEach { shape ->
+                    BubbleShapeOption(
+                        shape = shape,
+                        isSelected = shape == activeShape,
+                        onClick = { onShapeSelect(shape) }
+                    )
                 }
             }
         }
@@ -119,46 +159,62 @@ fun ThemesScreen(
 }
 
 @Composable
-private fun ThemeGallery(
-    themes: List<NovaChatTheme>,
-    activeThemeId: Long,
-    isPremium: Boolean,
-    onThemeSelect: (Long) -> Unit
+private fun BubbleShapeOption(
+    shape: BubbleShape,
+    isSelected: Boolean,
+    onClick: () -> Unit
 ) {
-    if (themes.isEmpty()) {
+    val borderColor by animateColorAsState(
+        targetValue = if (isSelected) MaterialTheme.colorScheme.primary
+        else MaterialTheme.colorScheme.outlineVariant,
+        label = "bubble_border"
+    )
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable(onClick = onClick)
+    ) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .size(56.dp)
+                .border(2.dp, borderColor, RoundedCornerShape(12.dp))
+                .padding(6.dp),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "No themes available",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        return
-    }
-
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(12.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        items(themes, key = { it.id }) { theme ->
-            ThemeCard(
-                theme = theme,
-                isActive = theme.id == activeThemeId,
-                isLocked = theme.isPremium && !isPremium,
-                onClick = {
-                    if (!theme.isPremium || isPremium) {
-                        onThemeSelect(theme.id)
-                    }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(3.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                val (sentRadius, receivedRadius) = when (shape) {
+                    BubbleShape.ROUNDED -> 10.dp to 10.dp
+                    BubbleShape.SQUARE -> 2.dp to 2.dp
+                    BubbleShape.CLOUD -> 12.dp to 12.dp
+                    BubbleShape.MINIMAL -> 6.dp to 6.dp
                 }
-            )
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .size(width = 28.dp, height = 10.dp)
+                        .clip(RoundedCornerShape(receivedRadius))
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                )
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .size(width = 28.dp, height = 10.dp)
+                        .clip(RoundedCornerShape(sentRadius))
+                        .background(MaterialTheme.colorScheme.primary)
+                )
+            }
         }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = shape.name.lowercase().replaceFirstChar { it.uppercase() },
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+            color = if (isSelected) MaterialTheme.colorScheme.primary
+            else MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
@@ -189,13 +245,11 @@ private fun ThemeCard(
                     .background(Color(theme.backgroundColor))
                     .padding(12.dp)
             ) {
-                // Mini chat preview
                 Box(modifier = Modifier.weight(1f)) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        // Received bubble
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(12.dp, 12.dp, 12.dp, 4.dp))
@@ -203,12 +257,11 @@ private fun ThemeCard(
                                 .padding(horizontal = 10.dp, vertical = 6.dp)
                         ) {
                             Text(
-                                text = "Hey there!",
+                                text = "Hey!",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = Color(theme.receivedTextColor)
                             )
                         }
-                        // Sent bubble
                         Box(
                             modifier = Modifier
                                 .align(Alignment.End)
@@ -217,28 +270,27 @@ private fun ThemeCard(
                                 .padding(horizontal = 10.dp, vertical = 6.dp)
                         ) {
                             Text(
-                                text = "Hi! How are you?",
+                                text = "Check out this theme.",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = Color(theme.sentTextColor)
                             )
                         }
-                        // Received bubble
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(12.dp, 12.dp, 12.dp, 4.dp))
-                                .background(Color(theme.receivedBubbleColor))
+                                .align(Alignment.End)
+                                .clip(RoundedCornerShape(12.dp, 12.dp, 4.dp, 12.dp))
+                                .background(Color(theme.sentBubbleColor))
                                 .padding(horizontal = 10.dp, vertical = 6.dp)
                         ) {
                             Text(
-                                text = "Doing great!",
+                                text = "Hey! Check this.",
                                 style = MaterialTheme.typography.labelSmall,
-                                color = Color(theme.receivedTextColor)
+                                color = Color(theme.sentTextColor)
                             )
                         }
                     }
                 }
 
-                // Theme name + color dots
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -261,7 +313,6 @@ private fun ThemeCard(
                 }
             }
 
-            // Badges
             if (isActive) {
                 Box(
                     modifier = Modifier
@@ -286,16 +337,17 @@ private fun ThemeCard(
                     modifier = Modifier
                         .align(Alignment.TopStart)
                         .padding(8.dp)
-                        .size(24.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(Color(0xFFFDCB6E)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        Icons.Default.Lock,
-                        contentDescription = "Premium",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(14.dp)
+                    Text(
+                        text = "PRO",
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF3A3010),
+                        fontSize = 9.sp
                     )
                 }
             }
@@ -311,34 +363,4 @@ private fun ColorDot(color: Color) {
             .clip(CircleShape)
             .background(color)
     )
-}
-
-@Composable
-private fun PremiumGate() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                Icons.Default.Lock,
-                contentDescription = null,
-                modifier = Modifier.size(64.dp),
-                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Custom Themes",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Upgrade to Premium to create\nyour own custom themes",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
 }

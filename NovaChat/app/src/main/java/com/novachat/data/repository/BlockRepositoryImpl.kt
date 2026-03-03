@@ -1,5 +1,6 @@
 package com.novachat.data.repository
 
+import com.google.mlkit.nl.languageid.LanguageIdentification
 import com.novachat.core.database.dao.BlockRuleDao
 import com.novachat.core.database.entity.BlockRuleEntity
 import com.novachat.domain.model.BlockRule
@@ -8,6 +9,7 @@ import com.novachat.domain.repository.BlockRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -15,6 +17,8 @@ import javax.inject.Singleton
 class BlockRepositoryImpl @Inject constructor(
     private val blockRuleDao: BlockRuleDao
 ) : BlockRepository {
+
+    private val languageIdentifier = LanguageIdentification.getClient()
 
     override fun getAllRules(): Flow<List<BlockRule>> {
         return blockRuleDao.getAllRules().map { entities ->
@@ -42,34 +46,77 @@ class BlockRepositoryImpl @Inject constructor(
 
     override suspend fun isBlocked(address: String, senderName: String?, body: String): BlockRule? {
         val rules = blockRuleDao.getAllRules().first()
+        if (rules.isEmpty()) return null
+        
+        var detectedLanguage: String? = null
+        val languageRules = rules.filter { it.type == BlockType.LANGUAGE.name }
+        if (languageRules.isNotEmpty() && body.isNotBlank()) {
+            try {
+                val languageCode = languageIdentifier.identifyLanguage(body).await()
+                if (languageCode != "und") {
+                    detectedLanguage = languageCode
+                }
+            } catch (e: Exception) {
+                // Ignore language detection errors
+            }
+        }
+
         for (entity in rules) {
             val rule = entity.toDomainModel()
             when (rule.type) {
                 BlockType.NUMBER -> {
-                    if (matchesPattern(address, rule.value, rule.isRegex)) return rule
+                    if (matchesPattern(address, rule.value, rule.isRegex, exactMatch = true)) return rule
                 }
                 BlockType.KEYWORD -> {
                     if (matchesPattern(body, rule.value, rule.isRegex)) return rule
                 }
                 BlockType.SENDER_NAME -> {
-                    if (senderName != null && matchesPattern(senderName, rule.value, rule.isRegex)) return rule
+                    val nameToMatch = senderName ?: address
+                    if (matchesPattern(nameToMatch, rule.value, rule.isRegex, exactMatch = true)) return rule
+                }
+                BlockType.LANGUAGE -> {
+                    if (detectedLanguage != null && rule.value.equals(detectedLanguage, ignoreCase = true)) return rule
                 }
             }
         }
         return null
     }
 
-    private fun matchesPattern(input: String, pattern: String, isRegex: Boolean): Boolean {
+    private fun matchesPattern(input: String, pattern: String, isRegex: Boolean, exactMatch: Boolean = false): Boolean {
         return if (isRegex) {
             try {
-                Regex(pattern, RegexOption.IGNORE_CASE).containsMatchIn(input)
+                if (exactMatch) {
+                    Regex(pattern, RegexOption.IGNORE_CASE).matches(input)
+                } else {
+                    Regex(pattern, RegexOption.IGNORE_CASE).containsMatchIn(input)
+                }
             } catch (e: Exception) {
                 false
             }
         } else {
-            val wildcardPattern = pattern.replace("*", ".*")
-            input.contains(wildcardPattern, ignoreCase = true) ||
-                Regex(wildcardPattern, RegexOption.IGNORE_CASE).matches(input)
+            if (exactMatch) {
+                if (pattern.contains("*")) {
+                    val regexPattern = Regex.escape(pattern).replace("\\*", ".*")
+                    try {
+                        Regex("^$regexPattern\$", RegexOption.IGNORE_CASE).matches(input)
+                    } catch (e: Exception) {
+                        false
+                    }
+                } else {
+                    input.equals(pattern, ignoreCase = true)
+                }
+            } else {
+                if (pattern.contains("*")) {
+                    val regexPattern = Regex.escape(pattern).replace("\\*", ".*")
+                    try {
+                        Regex(regexPattern, RegexOption.IGNORE_CASE).containsMatchIn(input)
+                    } catch (e: Exception) {
+                        false
+                    }
+                } else {
+                    input.contains(pattern, ignoreCase = true)
+                }
+            }
         }
     }
 }
