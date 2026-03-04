@@ -190,13 +190,23 @@ class ChatViewModel @Inject constructor(
 
     fun dismissScamWarning(messageId: Long) {
         val message = _uiState.value.messages.find { it.id == messageId }
-        _uiState.value = _uiState.value.copy(
-            dismissedScamWarnings = _uiState.value.dismissedScamWarnings + messageId
-        )
         if (message != null) {
+            val senderAddress = message.address
+            val allWarningIdsForSender = _uiState.value.scamWarnings.keys.filter { id ->
+                _uiState.value.messages.find { it.id == id }?.address == senderAddress
+            }.toSet()
+            _uiState.value = _uiState.value.copy(
+                dismissedScamWarnings = _uiState.value.dismissedScamWarnings + allWarningIdsForSender,
+                scamWarnings = _uiState.value.scamWarnings.filterKeys { it !in allWarningIdsForSender }
+            )
             viewModelScope.launch {
-                scamDetector.reportNotSpam(message.address, message.body)
+                scamDetector.addToAllowlist(senderAddress)
+                scamDetector.reportNotSpam(senderAddress, message.body)
             }
+        } else {
+            _uiState.value = _uiState.value.copy(
+                dismissedScamWarnings = _uiState.value.dismissedScamWarnings + messageId
+            )
         }
     }
 

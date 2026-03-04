@@ -22,6 +22,7 @@ import com.novachat.core.database.entity.MessageReminderEntity
 import com.novachat.core.database.entity.NotificationProfileEntity
 import com.novachat.core.database.entity.PinnedMessageEntity
 import com.novachat.core.database.entity.ScheduledMessageEntity
+import com.novachat.core.database.entity.SenderAllowlistEntity
 import com.novachat.core.database.entity.SpamKeywordWeightEntity
 import com.novachat.core.database.entity.SpamLearningEntity
 import com.novachat.core.database.entity.SpamMessageEntity
@@ -42,9 +43,10 @@ import com.novachat.core.database.entity.ThemeEntity
         NotificationProfileEntity::class,
         SpamLearningEntity::class,
         SpamSenderReputationEntity::class,
-        SpamKeywordWeightEntity::class
+        SpamKeywordWeightEntity::class,
+        SenderAllowlistEntity::class
     ],
-    version = 9,
+    version = 10,
     exportSchema = true
 )
 abstract class NovaChatDatabase : RoomDatabase() {

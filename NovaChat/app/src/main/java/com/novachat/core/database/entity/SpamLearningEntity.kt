@@ -34,3 +34,10 @@ data class SpamKeywordWeightEntity(
     val hamOccurrences: Int = 0,
     val weight: Float = 0f
 )
+
+@Entity(tableName = "sender_allowlist")
+data class SenderAllowlistEntity(
+    @PrimaryKey
+    val address: String,
+    val createdAt: Long = System.currentTimeMillis()
+)

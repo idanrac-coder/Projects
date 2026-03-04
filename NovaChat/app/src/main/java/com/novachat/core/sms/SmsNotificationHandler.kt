@@ -79,13 +79,13 @@ class SmsNotificationHandler @Inject constructor(
 
         val isKnownContact = contactName != null
         val scamDetectionEnabled = userPreferencesRepository.scamDetectionEnabled.first()
+        val isSenderAllowlisted = scamDetector.isAllowlisted(address)
 
-        // Trusted contact bypass: skip spam analysis entirely for saved contacts
-        if (isKnownContact || !scamDetectionEnabled) {
-            if (isKnownContact) {
-                Log.d(TAG, "Contact trust: $address is a known contact ($contactName), skipping spam analysis")
-            } else {
-                Log.d(TAG, "Scam detection disabled by user, skipping spam analysis")
+        if (isKnownContact || !scamDetectionEnabled || isSenderAllowlisted) {
+            when {
+                isKnownContact -> Log.d(TAG, "Contact trust: $address is a known contact ($contactName), skipping spam analysis")
+                isSenderAllowlisted -> Log.d(TAG, "Sender allowlist: $address was marked as not spam by user, skipping spam analysis")
+                else -> Log.d(TAG, "Scam detection disabled by user, skipping spam analysis")
             }
         } else {
             // Run the learning spam agent — high-confidence spam is auto-blocked.

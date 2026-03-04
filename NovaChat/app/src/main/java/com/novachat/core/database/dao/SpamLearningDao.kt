@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.novachat.core.database.entity.SenderAllowlistEntity
 import com.novachat.core.database.entity.SpamKeywordWeightEntity
 import com.novachat.core.database.entity.SpamLearningEntity
 import com.novachat.core.database.entity.SpamSenderReputationEntity
@@ -43,4 +44,16 @@ interface SpamLearningDao {
 
     @Query("SELECT * FROM spam_keyword_weights ORDER BY weight DESC")
     suspend fun getAllKeywordWeights(): List<SpamKeywordWeightEntity>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun addToAllowlist(entry: SenderAllowlistEntity)
+
+    @Query("DELETE FROM sender_allowlist WHERE address = :address")
+    suspend fun removeFromAllowlist(address: String)
+
+    @Query("SELECT EXISTS(SELECT 1 FROM sender_allowlist WHERE address = :address)")
+    suspend fun isAllowlisted(address: String): Boolean
+
+    @Query("SELECT * FROM sender_allowlist ORDER BY createdAt DESC")
+    suspend fun getAllAllowlisted(): List<SenderAllowlistEntity>
 }

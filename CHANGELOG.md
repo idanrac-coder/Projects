@@ -3,6 +3,16 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.8.0] - 2026-03-04
+
+### Added
+- Sender allowlist: tapping "Not spam" on any message permanently trusts that sender
+- All scam warnings in the conversation are dismissed immediately when one message is marked safe
+- Future messages from allowlisted senders skip spam analysis entirely
+
+### Changed
+- Database upgraded to version 10 with new `sender_allowlist` table
+
 ## [3.7.1] - 2026-03-03
 
 ### Added

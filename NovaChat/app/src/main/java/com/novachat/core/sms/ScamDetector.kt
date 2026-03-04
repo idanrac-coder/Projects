@@ -189,6 +189,28 @@ class ScamDetector @Inject constructor(
         )
     }
 
+    suspend fun isAllowlisted(address: String): Boolean {
+        return try {
+            learningDao.isAllowlisted(address)
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    suspend fun addToAllowlist(address: String) {
+        mutex.withLock {
+            learningDao.addToAllowlist(
+                com.novachat.core.database.entity.SenderAllowlistEntity(address = address)
+            )
+        }
+    }
+
+    suspend fun removeFromAllowlist(address: String) {
+        mutex.withLock {
+            learningDao.removeFromAllowlist(address)
+        }
+    }
+
     /**
      * Extended analysis that also considers sender reputation from the DB.
      * Call this from a coroutine context (e.g. ViewModel).
@@ -198,6 +220,10 @@ class ScamDetector @Inject constructor(
         address: String,
         isKnownContact: Boolean = false
     ): ScamAnalysis {
+        if (isAllowlisted(address)) {
+            return ScamAnalysis(isScam = false, confidence = 0f, reason = null, category = null)
+        }
+
         ensureCacheLoaded()
         val base = analyze(body)
         var adjusted = base.confidence
