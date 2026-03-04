@@ -11,6 +11,7 @@ import com.novachat.ui.backup.BackupRestoreScreen
 import com.novachat.ui.blocking.BlockingScreen
 import com.novachat.ui.blocking.SmartSecureScreen
 import com.novachat.ui.blocking.SpamFolderScreen
+import com.novachat.ui.blocking.TrustedSendersScreen
 import com.novachat.ui.chat.ChatScreen
 import com.novachat.ui.compose.ComposeMessageScreen
 import com.novachat.ui.conversations.ConversationsScreen
@@ -110,8 +111,13 @@ fun NovaChatNavHost(
             SmartSecureScreen(
                 onBack = { navController.popBackStack() },
                 onBlockingClick = { navController.navigate(BlockingRoute) },
-                onSpamFolderClick = { navController.navigate(SpamFolderRoute) }
+                onSpamFolderClick = { navController.navigate(SpamFolderRoute) },
+                onTrustedSendersClick = { navController.navigate(TrustedSendersRoute) }
             )
+        }
+
+        composable<TrustedSendersRoute> {
+            TrustedSendersScreen(onBack = { navController.popBackStack() })
         }
 
         composable<BlockingRoute> {

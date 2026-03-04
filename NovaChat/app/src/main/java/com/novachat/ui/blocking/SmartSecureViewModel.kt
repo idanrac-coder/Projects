@@ -2,9 +2,7 @@ package com.novachat.ui.blocking
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.novachat.core.database.dao.SpamLearningDao
 import com.novachat.core.database.dao.SpamMessageDao
-import com.novachat.core.database.entity.SenderAllowlistEntity
 import com.novachat.core.database.entity.SpamMessageEntity
 import com.novachat.core.datastore.UserPreferencesRepository
 import com.novachat.core.sms.ScamDetector
@@ -22,14 +20,12 @@ data class SmartSecureUiState(
     val spamCount: Int = 0,
     val latestSpam: SpamMessageEntity? = null,
     val scamDetectionEnabled: Boolean = true,
-    val agentStats: SpamAgentStats? = null,
-    val allowlistedSenders: List<SenderAllowlistEntity> = emptyList()
+    val agentStats: SpamAgentStats? = null
 )
 
 @HiltViewModel
 class SmartSecureViewModel @Inject constructor(
     private val spamMessageDao: SpamMessageDao,
-    private val spamLearningDao: SpamLearningDao,
     private val preferencesRepository: UserPreferencesRepository,
     private val scamDetector: ScamDetector
 ) : ViewModel() {
@@ -40,20 +36,13 @@ class SmartSecureViewModel @Inject constructor(
         spamMessageDao.getSpamCount(),
         spamMessageDao.getAllSpamMessages(),
         preferencesRepository.scamDetectionEnabled,
-        _agentStats,
-        spamLearningDao.observeAllowlist()
-    ) { values ->
-        val spamCount = values[0] as Int
-        val spamMessages = @Suppress("UNCHECKED_CAST") (values[1] as List<SpamMessageEntity>)
-        val scamEnabled = values[2] as Boolean
-        val stats = values[3] as SpamAgentStats?
-        val allowlist = @Suppress("UNCHECKED_CAST") (values[4] as List<SenderAllowlistEntity>)
+        _agentStats
+    ) { spamCount, spamMessages, scamEnabled, stats ->
         SmartSecureUiState(
             spamCount = spamCount,
             latestSpam = spamMessages.firstOrNull(),
             scamDetectionEnabled = scamEnabled,
-            agentStats = stats,
-            allowlistedSenders = allowlist
+            agentStats = stats
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SmartSecureUiState())
 
@@ -70,12 +59,6 @@ class SmartSecureViewModel @Inject constructor(
     fun setScamDetectionEnabled(enabled: Boolean) {
         viewModelScope.launch {
             preferencesRepository.setScamDetectionEnabled(enabled)
-        }
-    }
-
-    fun removeFromAllowlist(address: String) {
-        viewModelScope.launch {
-            scamDetector.removeFromAllowlist(address)
         }
     }
 }

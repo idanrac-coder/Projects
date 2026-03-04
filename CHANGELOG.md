@@ -3,11 +3,15 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## [3.8.1] - 2026-03-04
+## [3.9.0] - 2026-03-04
 
 ### Added
-- Trusted Senders section in Smart & Secure screen showing all allowlisted senders
+- Dedicated Trusted Senders screen accessible from Smart & Secure (alongside Blocking and Spam Folder)
+- Manual add dialog to trust any phone number or sender name via the + button
 - Remove button on each trusted sender to revoke trust and re-enable spam checks
+
+### Changed
+- Trusted Senders moved from inline section to its own navigable screen
 
 ## [3.8.0] - 2026-03-04
 

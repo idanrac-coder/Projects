@@ -61,3 +61,6 @@ object NotificationProfilesRoute
 
 @Serializable
 object SmartSecureRoute
+
+@Serializable
+object TrustedSendersRoute

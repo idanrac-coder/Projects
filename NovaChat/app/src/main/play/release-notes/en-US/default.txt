@@ -1,3 +1,3 @@
-Smarter spam protection! When you mark a message as "Not spam", the sender is now permanently trusted — no more repeated warnings for the same person.
+New Trusted Senders screen! Manage senders that skip spam checks, right alongside Blocking and Spam Folder in Smart & Secure.
 
-New in Smart & Secure: see all your trusted senders at a glance and remove any of them to re-enable spam checks.
+Tap + to manually add any phone number or sender name you trust. You can also remove trusted senders anytime to re-enable spam checks for them.
