@@ -1,3 +1,3 @@
-New Trusted Senders screen! Manage senders that skip spam checks, right alongside Blocking and Spam Folder in Smart & Secure.
+New in conversations: when you open a chat from an unknown sender, a quick action bar appears at the top with Trust and Block buttons.
 
-Tap + to manually add any phone number or sender name you trust. You can also remove trusted senders anytime to re-enable spam checks for them.
+Tap Trust to whitelist the sender instantly, or Block to report them as spam. The bar only shows for unsaved contacts and goes away once you choose.

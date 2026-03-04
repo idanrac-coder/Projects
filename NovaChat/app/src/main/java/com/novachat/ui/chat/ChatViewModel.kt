@@ -51,7 +51,9 @@ data class ChatUiState(
     val pendingSendMessage: PendingSend? = null,
     val spamReportedEvent: Boolean = false,
     val showBlockLimitDialog: Boolean = false,
-    val blockSuccessNavigateBack: Boolean = false
+    val blockSuccessNavigateBack: Boolean = false,
+    val isSenderAllowlisted: Boolean = false,
+    val senderBannerDismissed: Boolean = false
 ) {
     val matchCount: Int get() = matchingMessageIds.size
     val activeMatchMessageId: Long? get() =
@@ -156,12 +158,15 @@ class ChatViewModel @Inject constructor(
                 val pinnedMsgs = messages.filter { it.isPinned }
                 val smartReplies = generateSmartReplies(messages)
                 val scamWarnings = analyzeForScams(messages)
+                val senderAddress = messages.firstOrNull { it.type == MessageType.RECEIVED }?.address
+                val allowlisted = if (senderAddress != null) scamDetector.isAllowlisted(senderAddress) else false
                 _uiState.value = _uiState.value.copy(
                     messages = messages,
                     isLoading = false,
                     smartReplies = smartReplies,
                     pinnedMessages = pinnedMsgs,
                     scamWarnings = scamWarnings,
+                    isSenderAllowlisted = allowlisted,
                     error = null
                 )
             } catch (e: Exception) {
@@ -208,6 +213,25 @@ class ChatViewModel @Inject constructor(
                 dismissedScamWarnings = _uiState.value.dismissedScamWarnings + messageId
             )
         }
+    }
+
+    fun trustSender(address: String) {
+        val allWarningIdsForSender = _uiState.value.scamWarnings.keys.filter { id ->
+            _uiState.value.messages.find { it.id == id }?.address == address
+        }.toSet()
+        _uiState.value = _uiState.value.copy(
+            isSenderAllowlisted = true,
+            senderBannerDismissed = true,
+            dismissedScamWarnings = _uiState.value.dismissedScamWarnings + allWarningIdsForSender,
+            scamWarnings = _uiState.value.scamWarnings.filterKeys { it !in allWarningIdsForSender }
+        )
+        viewModelScope.launch {
+            scamDetector.addToAllowlist(address)
+        }
+    }
+
+    fun dismissSenderBanner() {
+        _uiState.value = _uiState.value.copy(senderBannerDismissed = true)
     }
 
     fun confirmSpam(messageId: Long) {

@@ -3,6 +3,13 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.9.1] - 2026-03-04
+
+### Added
+- Unknown sender action banner in chat: Trust or Block an unsaved contact with one tap
+- Banner auto-hides for saved contacts and already-trusted senders
+- Trusting from the banner also clears all scam warnings in the conversation
+
 ## [3.9.0] - 2026-03-04
 
 ### Added

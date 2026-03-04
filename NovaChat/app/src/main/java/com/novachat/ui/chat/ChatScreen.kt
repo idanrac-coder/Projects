@@ -48,6 +48,7 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
@@ -117,6 +118,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.novachat.core.theme.AuroraColors
 import com.novachat.core.theme.GradientAvatar
 import com.novachat.core.theme.LocalChatWallpaper
 import com.novachat.domain.model.Message
@@ -475,6 +477,79 @@ fun ChatScreen(
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Medium
                         )
+                    }
+                }
+            }
+
+            // Unknown sender action banner
+            val showSenderBanner = contactName == null
+                && !uiState.isSenderAllowlisted
+                && !uiState.senderBannerDismissed
+            AnimatedVisibility(
+                visible = showSenderBanner,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.80f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.VerifiedUser,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = AuroraColors.TealSpark
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Unknown sender",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f)
+                        )
+                        TextButton(
+                            onClick = { viewModel.trustSender(address) },
+                            modifier = Modifier.height(32.dp)
+                        ) {
+                            Text(
+                                "Trust",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = AuroraColors.TealSpark
+                            )
+                        }
+                        Text(
+                            "\u00B7",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                        )
+                        TextButton(
+                            onClick = { viewModel.showBlockDialog() },
+                            modifier = Modifier.height(32.dp)
+                        ) {
+                            Text(
+                                "Block",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                        IconButton(
+                            onClick = { viewModel.dismissSenderBanner() },
+                            modifier = Modifier.size(28.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Dismiss",
+                                modifier = Modifier.size(16.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                            )
+                        }
                     }
                 }
             }
