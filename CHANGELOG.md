@@ -3,6 +3,12 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.8.1] - 2026-03-04
+
+### Added
+- Trusted Senders section in Smart & Secure screen showing all allowlisted senders
+- Remove button on each trusted sender to revoke trust and re-enable spam checks
+
 ## [3.8.0] - 2026-03-04
 
 ### Added

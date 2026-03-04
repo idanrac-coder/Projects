@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.novachat.core.database.entity.SenderAllowlistEntity
+import kotlinx.coroutines.flow.Flow
 import com.novachat.core.database.entity.SpamKeywordWeightEntity
 import com.novachat.core.database.entity.SpamLearningEntity
 import com.novachat.core.database.entity.SpamSenderReputationEntity
@@ -56,4 +57,7 @@ interface SpamLearningDao {
 
     @Query("SELECT * FROM sender_allowlist ORDER BY createdAt DESC")
     suspend fun getAllAllowlisted(): List<SenderAllowlistEntity>
+
+    @Query("SELECT * FROM sender_allowlist ORDER BY createdAt DESC")
+    fun observeAllowlist(): Flow<List<SenderAllowlistEntity>>
 }
