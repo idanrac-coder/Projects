@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.14.0] - 2026-03-07
+
+### Security
+- Block link clicks in suspicious messages until user marks "Report spam" or "Not spam"; show warning toast instead
+
 ## [3.13.0] - 2026-03-07
 
 ### Added

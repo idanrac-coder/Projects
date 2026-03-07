@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -48,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.widget.Toast
 import com.novachat.core.theme.LocalChatColors
 import com.novachat.core.theme.LocalChatShapes
 import com.novachat.core.theme.sentBubbleGradient
@@ -198,8 +200,10 @@ fun MessageBubble(
                         )
                     } else {
                         val uriHandler = LocalUriHandler.current
+                        val context = LocalContext.current
                         val formatted = remember(message.body) { parseFormattedText(message.body) }
                         val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
+                        val isSuspicious = scamAnalysis != null && scamAnalysis.isScam
                         Text(
                             text = formatted,
                             style = MaterialTheme.typography.bodyLarge.copy(
@@ -207,7 +211,7 @@ fun MessageBubble(
                                 lineHeight = 22.sp
                             ),
                             onTextLayout = { layoutResult.value = it },
-                            modifier = Modifier.pointerInput(formatted) {
+                            modifier = Modifier.pointerInput(formatted, isSuspicious) {
                                 detectTapGestures { pos ->
                                     layoutResult.value?.let { layout ->
                                         val offset = layout.getOffsetForPosition(pos)
@@ -219,7 +223,17 @@ fun MessageBubble(
                                             ?.let { onPhoneNumberClick(it.item); return@detectTapGestures }
                                         formatted.getStringAnnotations("URL", offset, offset)
                                             .firstOrNull()
-                                            ?.let { uriHandler.openUri(it.item) }
+                                            ?.let { urlAnnotation ->
+                                                if (isSuspicious) {
+                                                    Toast.makeText(
+                                                        context,
+                                                        "Suspicious link – open only after marking as not spam",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                } else {
+                                                    uriHandler.openUri(urlAnnotation.item)
+                                                }
+                                            }
                                     }
                                 }
                             }
