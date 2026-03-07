@@ -1,1 +1,1 @@
-Bug fix: Reporting a message as spam now permanently hides the warning. Previously the scam alert would reappear when re-opening the conversation.
+Reporting spam is now a one-tap action: blocks the sender, moves the conversation to your spam folder, and takes you back to your inbox.

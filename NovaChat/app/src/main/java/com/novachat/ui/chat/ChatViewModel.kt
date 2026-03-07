@@ -245,16 +245,15 @@ class ChatViewModel @Inject constructor(
         )
         viewModelScope.launch {
             scamDetector.reportSpam(message.address, message.body, analysis?.category)
-            spamMessageDao.insertSpamMessage(
-                SpamMessageEntity(
-                    smsId = message.id,
-                    address = message.address,
-                    body = message.body,
-                    timestamp = message.timestamp,
-                    matchedRuleId = -1,
-                    matchedRuleType = "SCAM_REPORT"
+
+            try {
+                val ruleId = blockRepository.addRule(
+                    BlockRule(type = BlockType.NUMBER, value = message.address)
                 )
-            )
+                moveThreadToSpamAndClose(ruleId, "SCAM_REPORT")
+            } catch (_: BlockRuleLimitException) {
+                moveThreadToSpamAndClose(-1, "SCAM_REPORT")
+            }
         }
     }
 

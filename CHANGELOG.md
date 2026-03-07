@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.10.4] - 2026-03-07
+
+### Changed
+- "Report spam" now blocks the sender, moves the entire conversation to the spam folder, and navigates back to inbox
+
 ## [3.10.3] - 2026-03-07
 
 ### Fixed
