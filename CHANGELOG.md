@@ -3,6 +3,20 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.10.2] - 2026-03-07
+
+### Fixed
+- Hebrew spam rules made more flexible to catch natural text variations
+- Tax refund rules now accept singular/plural (החזר/החזרי) and bare numbers without shekel sign
+- Political spam: "איזו ממשלה" no longer requires exact verb form after it
+- "יו"ר" regex accepts both regular quotes and Hebrew gershayim (״)
+- Medical/disability rules split into independent patterns for better partial matching
+
+### Added
+- Political spam detection for Haredi/draft topics, law-enables-evasion clickbait, and named-person exposé patterns
+- Broader "tax refund + large number" rule for messages without shekel abbreviation
+- Standalone disability parking tag (תו נכה) and combo pattern detection
+
 ## [3.10.1] - 2026-03-07
 
 ### Fixed

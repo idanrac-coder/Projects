@@ -1,5 +1,6 @@
-Improved Hebrew spam detection:
+Smarter Hebrew spam detection:
 
-• Tax refund scam messages in Hebrew are now correctly caught
-• Shekel amounts written as ש"ח are now recognized
-• Better coverage for common Israeli scam patterns
+• Catches more text variations — scammers can't dodge by rewording
+• New detection for political spam and clickbait SMS
+• Better recognition of disability/parking scam messages
+• Tax refund and shekel amount detection improved
