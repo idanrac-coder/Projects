@@ -40,7 +40,9 @@ data class ChatWallpaper(
     val type: WallpaperType = WallpaperType.SOLID,
     val value: String = "",
     val primaryColor: Color = Color.Transparent,
-    val secondaryColor: Color = Color.Transparent
+    val secondaryColor: Color = Color.Transparent,
+    val isCustomBackground: Boolean = false,
+    val imageResName: String? = null
 )
 
 val LocalChatColors = compositionLocalOf {
@@ -351,7 +353,9 @@ fun NovaChatMaterialTheme(
             type = conversationBackgroundOverride.type,
             value = "",
             primaryColor = conversationBackgroundOverride.primaryColorCompose,
-            secondaryColor = conversationBackgroundOverride.secondaryColorCompose
+            secondaryColor = conversationBackgroundOverride.secondaryColorCompose,
+            isCustomBackground = true,
+            imageResName = conversationBackgroundOverride.imageResName
         )
         else -> ChatWallpaper(
             type = theme.wallpaperType,

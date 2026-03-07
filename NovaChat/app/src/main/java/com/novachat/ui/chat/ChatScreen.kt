@@ -20,6 +20,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -102,12 +103,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.AnnotatedString
@@ -556,10 +559,20 @@ fun ChatScreen(
 
             // Messages with wallpaper background
             val chatWallpaper = LocalChatWallpaper.current
+            val context = LocalContext.current
+            val gradientAlpha = if (chatWallpaper.isCustomBackground) 0.95f else 0.15f
+            val patternAlpha1 = if (chatWallpaper.isCustomBackground) 0.4f else 0.08f
+            val patternAlpha2 = if (chatWallpaper.isCustomBackground) 0.2f else 0.04f
             val wallpaperModifier = when (chatWallpaper.type) {
+                WallpaperType.IMAGE -> Modifier.background(
+                    chatWallpaper.primaryColor.takeIf { it != Color.Transparent } ?: Color.White
+                )
                 WallpaperType.GRADIENT -> Modifier.background(
                     Brush.verticalGradient(
-                        colors = listOf(chatWallpaper.primaryColor.copy(alpha = 0.15f), chatWallpaper.secondaryColor.copy(alpha = 0.15f))
+                        colors = listOf(
+                            chatWallpaper.primaryColor.copy(alpha = gradientAlpha),
+                            chatWallpaper.secondaryColor.copy(alpha = gradientAlpha)
+                        )
                     )
                 )
                 WallpaperType.SOLID -> if (chatWallpaper.primaryColor != Color.Transparent) {
@@ -571,20 +584,42 @@ fun ChatScreen(
                 WallpaperType.PATTERN_DOTS,
                 WallpaperType.PATTERN_LEAVES -> Modifier.background(
                     Brush.radialGradient(
-                        colors = listOf(chatWallpaper.primaryColor.copy(alpha = 0.08f), chatWallpaper.secondaryColor.copy(alpha = 0.04f))
+                        colors = listOf(
+                            chatWallpaper.primaryColor.copy(alpha = patternAlpha1),
+                            chatWallpaper.secondaryColor.copy(alpha = patternAlpha2)
+                        )
                     )
                 )
                 else -> Modifier
             }
 
-            PullToRefreshBox(
-                isRefreshing = uiState.isRefreshing,
-                onRefresh = { viewModel.pullToRefresh() },
+            Box(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
                     .then(wallpaperModifier)
             ) {
+                if (chatWallpaper.type == WallpaperType.IMAGE && chatWallpaper.imageResName != null) {
+                    val imageResId = context.resources.getIdentifier(
+                        chatWallpaper.imageResName,
+                        "drawable",
+                        context.packageName
+                    )
+                    if (imageResId != 0) {
+                        Image(
+                            painter = painterResource(imageResId),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop,
+                            alpha = 0.9f
+                        )
+                    }
+                }
+                PullToRefreshBox(
+                    isRefreshing = uiState.isRefreshing,
+                    onRefresh = { viewModel.pullToRefresh() },
+                    modifier = Modifier.fillMaxSize()
+                ) {
                 if (uiState.isLoading) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -638,6 +673,7 @@ fun ChatScreen(
                         }
                     }
                 }
+            }
             }
 
             // Reaction picker

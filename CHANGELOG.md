@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.13.0] - 2026-03-07
+
+### Added
+- 10 background images for conversations: Floral, Geometric, Leaves, Dots, Waves, Abstract, Minimal Lines, Nature, Marble, Stars (Settings → Themes → Conversation Backgrounds)
+
 ## [3.12.0] - 2026-03-07
 
 ### Added

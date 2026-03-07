@@ -155,7 +155,7 @@ private fun backgroundBrush(background: ConversationBackground): Brush {
                 MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
             )
         )
-        background.type == WallpaperType.GRADIENT -> Brush.verticalGradient(
+        background.type == WallpaperType.GRADIENT || background.type == WallpaperType.IMAGE -> Brush.verticalGradient(
             colors = listOf(
                 background.primaryColorCompose,
                 background.secondaryColorCompose
