@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spam-related strings -->
+    <string name="report_spam">דווח כספאם</string>
+    <string name="not_spam">לא ספאם</string>
+    <string name="suspicious_message">הודעה חשודה</string>
+    <string name="trust_sender">אשר שולח</string>
+    <string name="block_contact">חסום איש קשר</string>
+    <string name="blocked_spam">חסום / ספאם</string>
+    <string name="suspicious_link_hint">קישור חשוד – פתיחה רק לאחר סימון כלא ספאם</string>
+</resources>

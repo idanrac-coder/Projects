@@ -60,6 +60,7 @@ fun ThemesScreen(
     onBack: () -> Unit,
     onBackgroundsClick: () -> Unit = {},
     onEditTheme: () -> Unit,
+    onNavigateToPremium: () -> Unit = {},
     viewModel: ThemesViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -102,7 +103,9 @@ fun ThemesScreen(
             }
 
             item(span = { GridItemSpan(2) }) {
-                BackgroundsPicker(onClick = onBackgroundsClick)
+                BackgroundsPicker(
+                    onClick = { if (uiState.isPremium) onBackgroundsClick() else onNavigateToPremium() }
+                )
             }
 
             item(span = { GridItemSpan(2) }) {

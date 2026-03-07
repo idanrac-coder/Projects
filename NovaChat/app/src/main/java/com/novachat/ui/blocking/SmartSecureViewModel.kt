@@ -20,6 +20,7 @@ data class SmartSecureUiState(
     val spamCount: Int = 0,
     val latestSpam: SpamMessageEntity? = null,
     val scamDetectionEnabled: Boolean = true,
+    val filterInternationalSenders: Boolean = false,
     val agentStats: SpamAgentStats? = null
 )
 
@@ -36,12 +37,14 @@ class SmartSecureViewModel @Inject constructor(
         spamMessageDao.getSpamCount(),
         spamMessageDao.getAllSpamMessages(),
         preferencesRepository.scamDetectionEnabled,
+        preferencesRepository.filterInternationalSenders,
         _agentStats
-    ) { spamCount, spamMessages, scamEnabled, stats ->
+    ) { spamCount, spamMessages, scamEnabled, filterIntl, stats ->
         SmartSecureUiState(
             spamCount = spamCount,
             latestSpam = spamMessages.firstOrNull(),
             scamDetectionEnabled = scamEnabled,
+            filterInternationalSenders = filterIntl,
             agentStats = stats
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SmartSecureUiState())
@@ -59,6 +62,12 @@ class SmartSecureViewModel @Inject constructor(
     fun setScamDetectionEnabled(enabled: Boolean) {
         viewModelScope.launch {
             preferencesRepository.setScamDetectionEnabled(enabled)
+        }
+    }
+
+    fun setFilterInternationalSenders(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.setFilterInternationalSenders(enabled)
         }
     }
 }

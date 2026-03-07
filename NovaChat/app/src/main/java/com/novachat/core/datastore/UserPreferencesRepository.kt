@@ -111,4 +111,20 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun setConversationBackgroundId(backgroundId: String) {
         dataStore.edit { it[PreferencesKeys.CONVERSATION_BACKGROUND_ID] = backgroundId }
     }
+
+    val quickReplyEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[PreferencesKeys.QUICK_REPLY_ENABLED] ?: false
+    }
+
+    suspend fun setQuickReplyEnabled(enabled: Boolean) {
+        dataStore.edit { it[PreferencesKeys.QUICK_REPLY_ENABLED] = enabled }
+    }
+
+    val filterInternationalSenders: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[PreferencesKeys.FILTER_INTERNATIONAL_SENDERS] ?: false
+    }
+
+    suspend fun setFilterInternationalSenders(enabled: Boolean) {
+        dataStore.edit { it[PreferencesKeys.FILTER_INTERNATIONAL_SENDERS] = enabled }
+    }
 }

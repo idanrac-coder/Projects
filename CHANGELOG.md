@@ -3,10 +3,23 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## [3.14.0] - 2026-03-07
+## [3.15.0] - 2026-03-07
 
-### Security
-- Block link clicks in suspicious messages until user marks "Report spam" or "Not spam"; show warning toast instead
+### Added
+- Hebrew spam patterns: loan (קח הלוואה, בתנאים מיוחדים), OTP (קוד זמני, הזן את הקוד), delivery (איסוף, משלוח ממתין)
+- Hebrew heuristics: פעולה מיידית, יש לך הודעה, לחץ כאן
+- Quick replies disabled by default; enable in Settings → Notifications
+- Conversation background preview: tap a background to see preview before applying
+- Conversation backgrounds require Premium; non-premium users see upgrade prompt
+- Notification "Report spam" action when message is low-confidence spam
+- Spam Folder shows why each message was flagged (rule type or category)
+- International sender filter (opt-in): hide messages from numbers outside your country
+- Hebrew strings for spam UI (values-he/strings.xml)
+- Category-specific auto-block thresholds: OTP/Phishing 0.80, Political 0.95
+- Alphanumeric sender scrutiny: boost spam score for sender IDs like FREETAX, AMAZON
+
+### Changed
+- Themes: tapping "Conversation Backgrounds" when not Premium navigates to License screen
 
 ## [3.13.0] - 2026-03-07
 

@@ -21,7 +21,7 @@ data class NotificationSettingsUiState(
     val vibrationEnabled: Boolean = true,
     val popupStyle: PopupStyle = PopupStyle.HEADS_UP,
     val groupingMode: GroupingMode = GroupingMode.BY_CONTACT,
-    val quickReplyEnabled: Boolean = true,
+    val quickReplyEnabled: Boolean = false,
     val dndEnabled: Boolean = false,
     val dndStartHour: String = "22:00",
     val dndEndHour: String = "07:00"
@@ -47,7 +47,7 @@ class NotificationSettingsViewModel @Inject constructor(
                     groupingMode = GroupingMode.valueOf(
                         prefs[PreferencesKeys.GROUPING_MODE] ?: GroupingMode.BY_CONTACT.name
                     ),
-                    quickReplyEnabled = prefs[PreferencesKeys.QUICK_REPLY_ENABLED] ?: true,
+                    quickReplyEnabled = prefs[PreferencesKeys.QUICK_REPLY_ENABLED] ?: false,
                     dndEnabled = prefs[PreferencesKeys.DND_ENABLED] ?: false,
                     dndStartHour = prefs[PreferencesKeys.DND_START_HOUR] ?: "22:00",
                     dndEndHour = prefs[PreferencesKeys.DND_END_HOUR] ?: "07:00"

@@ -149,11 +149,12 @@ class ScamDetector @Inject constructor(
         PatternRule(Regex("זוהתה\\s*פעילות\\s*חריגה"), ScamCategory.PHISHING, 0.83f, "Hebrew: unusual activity detected"),
         PatternRule(Regex("שלח.*(לי\\s+)?את\\s*הקוד|תשלח.*הקוד"), ScamCategory.OTP_FRAUD, 0.90f, "Hebrew: send me the code"),
         PatternRule(Regex("קוד\\s*בן\\s*6\\s*ספרות"), ScamCategory.OTP_FRAUD, 0.88f, "Hebrew: 6-digit code"),
-        PatternRule(Regex("שלחתי.*קוד.*בטעות"), ScamCategory.OTP_FRAUD, 0.90f, "Hebrew: I sent code by mistake"),
-        PatternRule(Regex("החבילה.*ממתינה|חבילה.*למשלוח"), ScamCategory.DELIVERY_SCAM, 0.76f, "Hebrew: package waiting"),
+        PatternRule(Regex("שלחתי.*קוד.*בטעות|בטעות.*שלחתי.*קוד"), ScamCategory.OTP_FRAUD, 0.90f, "Hebrew: I sent code by mistake"),
+        PatternRule(Regex("קוד\\s*זמני|הזן\\s*את\\s*הקוד"), ScamCategory.OTP_FRAUD, 0.86f, "Hebrew: temporary code / enter code"),
+        PatternRule(Regex("החבילה.*ממתינה|חבילה.*למשלוח|איסוף\\s*חבילה|משלוח\\s*ממתין"), ScamCategory.DELIVERY_SCAM, 0.76f, "Hebrew: package waiting / pickup / delivery"),
         PatternRule(Regex("דואר\\s*ישראל.*חבילה"), ScamCategory.DELIVERY_SCAM, 0.78f, "Hebrew: Israel Post package"),
-        PatternRule(Regex("הלוואה\\s*מיידית"), ScamCategory.LOAN_SCAM, 0.78f, "Hebrew: instant loan"),
-        PatternRule(Regex("הלוואה.*אושרה|מאושר.*הלוואה"), ScamCategory.LOAN_SCAM, 0.78f, "Hebrew: loan approved"),
+        PatternRule(Regex("הלוואה\\s*מיידית|קח\\s*הלוואה|הלוואה\\s*היום"), ScamCategory.LOAN_SCAM, 0.78f, "Hebrew: instant loan / take loan today"),
+        PatternRule(Regex("בתנאים\\s*מיוחדים|הלוואה.*אושרה|מאושר.*הלוואה"), ScamCategory.LOAN_SCAM, 0.78f, "Hebrew: special conditions / loan approved"),
 
         // Israel-specific: tax refund, pension, political, money waiting, medical
         PatternRule(Regex("החזר\\s*מס.*בדיקה\\s*ללא\\s*תשלום"), ScamCategory.TAX_REFUND, 0.84f, "Hebrew: tax refund free check"),
@@ -279,6 +280,11 @@ class ScamDetector @Inject constructor(
             adjusted = (adjusted + 0.10f).coerceAtMost(0.98f)
         }
 
+        // Alphanumeric sender scrutiny: boost for sender IDs like FREETAX, AMAZON (common in spam)
+        if (isAlphanumericSender(address) && base.confidence > 0.3f) {
+            adjusted = (adjusted + 0.08f).coerceAtMost(0.98f)
+        }
+
         val rep = senderReputationCache[address]
         if (rep != null) {
             val total = rep.spamCount + rep.hamCount
@@ -309,6 +315,20 @@ class ScamDetector @Inject constructor(
     suspend fun getSenderReputation(address: String): SpamSenderReputationEntity? {
         ensureCacheLoaded()
         return senderReputationCache[address]
+    }
+
+    private fun isAlphanumericSender(address: String): Boolean {
+        val normalized = address.replace(Regex("[^A-Za-z0-9]"), "")
+        if (normalized.length < 4) return false
+        val letterCount = normalized.count { it.isLetter() }
+        val digitCount = normalized.count { it.isDigit() }
+        return letterCount >= 2 && digitCount < normalized.length
+    }
+
+    fun getAutoBlockThreshold(category: ScamCategory?): Float = when (category) {
+        ScamCategory.OTP_FRAUD, ScamCategory.PHISHING -> 0.80f
+        ScamCategory.POLITICAL_SPAM -> 0.95f
+        else -> 0.85f
     }
 
     // ── Learning / feedback ──────────────────────────────────────────────
@@ -446,7 +466,7 @@ class ScamDetector @Inject constructor(
         if (hasHebrew) {
             val hebrewInfoWords = listOf("תעודת זהות", "מספר כרטיס", "סיסמה", "קוד אימות", "פרטי חשבון", "כרטיס אשראי")
             infoRequests += hebrewInfoWords.count { body.contains(it) }
-            val hebrewUrgencyWords = listOf("דחוף", "מיד", "בהקדם", "מיידי", "תגיב", "אזהרה", "פג תוקף", "נדרשת פעולה", "ייחסם")
+            val hebrewUrgencyWords = listOf("דחוף", "מיד", "בהקדם", "מיידי", "תגיב", "אזהרה", "פג תוקף", "נדרשת פעולה", "ייחסם", "פעולה מיידית", "יש לך הודעה", "לחץ כאן")
             if (hebrewUrgencyWords.count { body.contains(it) } >= 2) {
                 score += 0.10f
                 signals.add("High Hebrew urgency word density")

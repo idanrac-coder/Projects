@@ -27,4 +27,5 @@ object PreferencesKeys {
     val ACTIVE_BUBBLE_SHAPE = stringPreferencesKey("active_bubble_shape")
     val SCAM_DETECTION_ENABLED = booleanPreferencesKey("scam_detection_enabled")
     val CONVERSATION_BACKGROUND_ID = stringPreferencesKey("conversation_background_id")
+    val FILTER_INTERNATIONAL_SENDERS = booleanPreferencesKey("filter_international_senders")
 }

@@ -136,12 +136,16 @@ fun NovaChatNavHost(
             ThemesScreen(
                 onBack = { navController.popBackStack() },
                 onBackgroundsClick = { navController.navigate(BackgroundsRoute) },
-                onEditTheme = { navController.navigate(ThemeEditorRoute) }
+                onEditTheme = { navController.navigate(ThemeEditorRoute) },
+                onNavigateToPremium = { navController.navigate(LicenseRoute) }
             )
         }
 
         composable<BackgroundsRoute> {
-            BackgroundsScreen(onBack = { navController.popBackStack() })
+            BackgroundsScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToPremium = { navController.navigate(LicenseRoute) }
+            )
         }
 
         composable<ThemeEditorRoute> {

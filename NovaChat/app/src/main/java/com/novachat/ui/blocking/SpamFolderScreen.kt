@@ -43,6 +43,17 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+private fun formatMatchedRuleType(ruleType: String): String = when {
+        ruleType.startsWith("SPAM_AGENT:") -> ruleType.removePrefix("SPAM_AGENT:").replace('_', ' ')
+        ruleType == "SCAM_REPORT" -> "Reported"
+        ruleType == "NUMBER" -> "Blocked by number"
+        ruleType == "SENDER_NAME" -> "Blocked by sender"
+        ruleType == "KEYWORD" -> "Blocked by keyword"
+        ruleType == "LANGUAGE" -> "Blocked by language"
+        ruleType == "INTERNATIONAL_FILTER" -> "International filter"
+        else -> ruleType
+    }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SpamFolderScreen(
@@ -120,10 +131,23 @@ fun SpamFolderScreen(
                             verticalAlignment = Alignment.Top
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = spam.address,
-                                    style = MaterialTheme.typography.titleSmall
-                                )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = spam.address,
+                                        style = MaterialTheme.typography.titleSmall
+                                    )
+                                    if (spam.matchedRuleType.isNotBlank()) {
+                                        Text(
+                                            text = formatMatchedRuleType(spam.matchedRuleType),
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
                                 Text(
                                     text = spam.body,
                                     style = MaterialTheme.typography.bodyMedium,

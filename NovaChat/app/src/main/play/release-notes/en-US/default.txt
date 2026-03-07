@@ -1,1 +1,1 @@
-Suspicious messages: Links are now blocked until you mark the message as spam or not spam. Tap "Report spam" or "Not spam" to act—links will work again after that.
+Quick replies are now off by default (enable in Settings → Notifications). Conversation backgrounds require Premium with a preview before applying. Report spam from notification. Spam Folder shows why each message was blocked. Improved Hebrew and loan spam detection.

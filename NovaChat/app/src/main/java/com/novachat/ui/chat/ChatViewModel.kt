@@ -14,6 +14,7 @@ import com.novachat.domain.model.Reaction
 import com.novachat.domain.repository.BlockRepository
 import com.novachat.domain.repository.BlockRuleLimitException
 import com.novachat.domain.repository.ConversationRepository
+import com.novachat.core.datastore.UserPreferencesRepository
 import com.novachat.core.database.dao.SpamMessageDao
 import com.novachat.core.database.entity.SpamMessageEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +23,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -73,7 +75,8 @@ class ChatViewModel @Inject constructor(
     private val blockRepository: BlockRepository,
     private val spamMessageDao: SpamMessageDao,
     private val whatsAppForwarder: WhatsAppForwarder,
-    private val scamDetector: ScamDetector
+    private val scamDetector: ScamDetector,
+    private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatUiState())
@@ -122,7 +125,8 @@ class ChatViewModel @Inject constructor(
                 val cached = conversationRepository.getCachedMessagesForThread(threadId)
                 if (cached != null && cached.isNotEmpty()) {
                     val pinnedMsgs = cached.filter { it.isPinned }
-                    val smartReplies = generateSmartReplies(cached)
+                    val quickReplyOn = userPreferencesRepository.quickReplyEnabled.first()
+                    val smartReplies = if (quickReplyOn) generateSmartReplies(cached) else emptyList()
                     _uiState.value = current.copy(
                         messages = cached,
                         isLoading = false,
@@ -156,7 +160,8 @@ class ChatViewModel @Inject constructor(
                     conversationRepository.markThreadAsRead(threadId)
                 }
                 val pinnedMsgs = messages.filter { it.isPinned }
-                val smartReplies = generateSmartReplies(messages)
+                val quickReplyOn = userPreferencesRepository.quickReplyEnabled.first()
+                val smartReplies = if (quickReplyOn) generateSmartReplies(messages) else emptyList()
                 val scamWarnings = analyzeForScams(messages)
                 val senderAddress = messages.firstOrNull { it.type == MessageType.RECEIVED }?.address
                 val allowlisted = if (senderAddress != null) scamDetector.isAllowlisted(senderAddress) else false
@@ -401,7 +406,8 @@ class ChatViewModel @Inject constructor(
                 val messages = conversationRepository.getMessagesForThread(currentThreadId)
                 conversationRepository.markThreadAsRead(currentThreadId)
                 val pinnedMsgs = messages.filter { it.isPinned }
-                val smartReplies = generateSmartReplies(messages)
+                val quickReplyOn = userPreferencesRepository.quickReplyEnabled.first()
+                val smartReplies = if (quickReplyOn) generateSmartReplies(messages) else emptyList()
                 _uiState.value = _uiState.value.copy(
                     messages = messages,
                     isRefreshing = false,

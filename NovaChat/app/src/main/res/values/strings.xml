@@ -24,4 +24,10 @@
     <string name="permission_required">Permission Required</string>
     <string name="sms_permission_rationale">Aura needs SMS permissions to read and send messages.</string>
     <string name="grant_permission">Grant Permission</string>
+    <string name="report_spam">Report spam</string>
+    <string name="not_spam">Not spam</string>
+    <string name="suspicious_message">Suspicious message</string>
+    <string name="trust_sender">Trust sender</string>
+    <string name="block_contact">Block contact</string>
+    <string name="suspicious_link_hint">Suspicious link – open only after marking as not spam</string>
 </resources>
