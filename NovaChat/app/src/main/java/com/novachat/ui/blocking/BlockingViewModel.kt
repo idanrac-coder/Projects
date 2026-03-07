@@ -1,12 +1,16 @@
 package com.novachat.ui.blocking
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.novachat.core.database.dao.SpamMessageDao
 import com.novachat.core.datastore.UserPreferencesRepository
+import com.novachat.core.sms.SmsProvider
 import com.novachat.domain.model.BlockRule
 import com.novachat.domain.model.BlockType
 import com.novachat.domain.repository.BlockRepository
 import com.novachat.domain.repository.BlockRuleLimitException
+import com.novachat.domain.repository.ConversationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -35,6 +39,9 @@ data class BlockingUiState(
 @HiltViewModel
 class BlockingViewModel @Inject constructor(
     private val blockRepository: BlockRepository,
+    private val spamMessageDao: SpamMessageDao,
+    private val smsProvider: SmsProvider,
+    private val conversationRepository: ConversationRepository,
     preferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
@@ -106,6 +113,18 @@ class BlockingViewModel @Inject constructor(
 
     fun deleteRule(id: Long) {
         viewModelScope.launch {
+            val spamMessages = spamMessageDao.getSpamMessagesByRuleId(id)
+            for (spam in spamMessages) {
+                try {
+                    smsProvider.insertIncomingSms(spam.address, spam.body, spam.timestamp)
+                } catch (e: Exception) {
+                    Log.w("BlockingVM", "Failed to restore message to inbox", e)
+                }
+            }
+            if (spamMessages.isNotEmpty()) {
+                spamMessageDao.deleteByRuleId(id)
+                conversationRepository.invalidateAllCaches()
+            }
             blockRepository.deleteRule(id)
         }
     }

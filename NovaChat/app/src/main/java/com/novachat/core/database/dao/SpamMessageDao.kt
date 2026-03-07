@@ -28,6 +28,12 @@ interface SpamMessageDao {
     @Query("SELECT smsId FROM spam_messages")
     suspend fun getReportedSmsIds(): List<Long>
 
+    @Query("SELECT * FROM spam_messages WHERE matchedRuleId = :ruleId")
+    suspend fun getSpamMessagesByRuleId(ruleId: Long): List<SpamMessageEntity>
+
+    @Query("DELETE FROM spam_messages WHERE matchedRuleId = :ruleId")
+    suspend fun deleteByRuleId(ruleId: Long)
+
     @Query("DELETE FROM spam_messages")
     suspend fun clearAll()
 }

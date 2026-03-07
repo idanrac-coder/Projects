@@ -1,1 +1,5 @@
-Reporting spam is now a one-tap action: blocks the sender, moves the conversation to your spam folder, and takes you back to your inbox.
+Unblock and restore: removing a block rule now brings all blocked messages back to your inbox.
+
+Bug fix: "Block by sender" now works correctly from inside conversations.
+
+Inbox now shows 2 lines of each message preview for easier browsing.

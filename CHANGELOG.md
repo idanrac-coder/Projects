@@ -3,6 +3,17 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.11.0] - 2026-03-07
+
+### Added
+- Removing a block rule now restores all associated messages from the spam folder back to the inbox
+
+### Fixed
+- "Block by sender" in chat conversation now works for unknown/alphanumeric senders (e.g. "FREETAX")
+
+### Changed
+- Inbox message preview now shows 2 lines instead of 1 for better readability
+
 ## [3.10.4] - 2026-03-07
 
 ### Changed

@@ -1167,11 +1167,7 @@ fun ChatScreen(
                 address = address,
                 hasContactName = hasContactName,
                 onBlockNumber = { viewModel.blockNumber(address) },
-                onBlockName = {
-                    if (contactName != null) {
-                        viewModel.blockName(contactName)
-                    }
-                },
+                onBlockName = { name -> viewModel.blockName(name) },
                 onBlockWords = { words -> viewModel.blockWords(words) },
                 onBlockLanguage = { lang -> viewModel.blockLanguage(lang) },
                 onDismiss = { viewModel.dismissBlockDialog() }
