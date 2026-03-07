@@ -43,6 +43,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -162,11 +163,29 @@ private fun BackgroundsPicker(onClick: () -> Unit) {
             }
             Spacer(modifier = Modifier.width(14.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "Conversation Backgrounds",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "Conversation Backgrounds",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = "Premium",
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            brush = Brush.horizontalGradient(
+                                colors = listOf(
+                                    Color(0xFFFFE066),
+                                    Color(0xFFD4AF37),
+                                    Color(0xFFB8860B)
+                                )
+                            ),
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
                 Text(
                     text = "Sky, Ocean, Aurora & more",
                     style = MaterialTheme.typography.bodySmall,

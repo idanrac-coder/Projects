@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.15.1] - 2026-03-07
+
+### Changed
+- Add "Premium" label with gold styling to Conversation Backgrounds in Themes screen
+
 ## [3.15.0] - 2026-03-07
 
 ### Added
