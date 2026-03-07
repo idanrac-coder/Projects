@@ -183,8 +183,10 @@ class ChatViewModel @Inject constructor(
 
     private suspend fun analyzeForScams(messages: List<Message>): Map<Long, ScamAnalysis> {
         val result = mutableMapOf<Long, ScamAnalysis>()
+        val reportedIds = spamMessageDao.getReportedSmsIds().toSet()
         val recent = messages.filter { it.type == MessageType.RECEIVED }.takeLast(20)
         for (msg in recent) {
+            if (msg.id in reportedIds) continue
             val analysis = scamDetector.analyzeWithReputation(msg.body, msg.address)
             if (analysis.isScam) {
                 result[msg.id] = analysis

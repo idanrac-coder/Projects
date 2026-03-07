@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.10.3] - 2026-03-07
+
+### Fixed
+- Scam warning no longer reappears on messages already reported as spam (persisted across chat re-entry)
+
 ## [3.10.2] - 2026-03-07
 
 ### Fixed

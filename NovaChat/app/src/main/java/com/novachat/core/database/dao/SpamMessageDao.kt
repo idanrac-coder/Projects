@@ -25,6 +25,9 @@ interface SpamMessageDao {
     @Query("DELETE FROM spam_messages WHERE id = :id")
     suspend fun deleteSpamMessageById(id: Long)
 
+    @Query("SELECT smsId FROM spam_messages")
+    suspend fun getReportedSmsIds(): List<Long>
+
     @Query("DELETE FROM spam_messages")
     suspend fun clearAll()
 }
