@@ -157,8 +157,10 @@ class ScamDetector @Inject constructor(
 
         // Israel-specific: tax refund, pension, political, money waiting, medical
         PatternRule(Regex("החזר\\s*מס.*בדיקה\\s*ללא\\s*תשלום"), ScamCategory.TAX_REFUND, 0.84f, "Hebrew: tax refund free check"),
-        PatternRule(Regex("ממוצע\\s*החזרי\\s*מס"), ScamCategory.TAX_REFUND, 0.82f, "Hebrew: average tax refunds"),
+        PatternRule(Regex("ממוצע\\s*החזרי\\s*מס|החזרי\\s*מס\\s*ממוצע"), ScamCategory.TAX_REFUND, 0.82f, "Hebrew: average tax refunds"),
         PatternRule(Regex("מגיע\\s*לך\\s*החזר\\s*מס"), ScamCategory.TAX_REFUND, 0.82f, "Hebrew: you're owed tax refund"),
+        PatternRule(Regex("החזר(י)?\\s*מס.*[\\d,]+\\s*ש[\"״]?ח"), ScamCategory.TAX_REFUND, 0.84f, "Hebrew: tax refund with shekel amount"),
+        PatternRule(Regex("החזר(י)?\\s*מס.*לאזרחי"), ScamCategory.TAX_REFUND, 0.82f, "Hebrew: tax refund for citizens"),
         PatternRule(Regex("למשוך\\s*פנסיה|פנסיה\\s*ופיצויים"), ScamCategory.PENSION_SEVERANCE, 0.80f, "Hebrew: withdraw pension/severance"),
         PatternRule(Regex("פיצויים.*ללא\\s*התפטרות"), ScamCategory.PENSION_SEVERANCE, 0.82f, "Hebrew: severance without resignation"),
         PatternRule(Regex("ביטוח\\s*לאומי.*מענק"), ScamCategory.PENSION_SEVERANCE, 0.80f, "Hebrew: Bituach Leumi grant scam"),
@@ -171,7 +173,7 @@ class ScamDetector @Inject constructor(
         PatternRule(Regex("בעיה\\s*רפואית.*תג\\s*חניה|תו\\s*נכה"), ScamCategory.MEDICAL_DISABILITY, 0.74f, "Hebrew: medical/disability parking"),
         PatternRule(Regex("נמאס\\s*להחנות\\s*רחוק"), ScamCategory.MEDICAL_DISABILITY, 0.72f, "Hebrew: tired of parking far"),
         PatternRule(Regex("להילחם\\s*במערכת\\s*לבד"), ScamCategory.MEDICAL_DISABILITY, 0.72f, "Hebrew: fighting the system alone"),
-        PatternRule(Regex("הלוואה\\s*מיידית.*\\d|עד\\s*\\d+.*שח"), ScamCategory.LOAN_SCAM, 0.78f, "Hebrew: loan up to X shekels"),
+        PatternRule(Regex("הלוואה\\s*מיידית.*\\d|עד\\s*\\d+.*ש[\"״]?ח"), ScamCategory.LOAN_SCAM, 0.78f, "Hebrew: loan up to X shekels"),
     )
 
     // ── Analysis ─────────────────────────────────────────────────────────
@@ -393,7 +395,7 @@ class ScamDetector @Inject constructor(
         }
 
         // Currency symbols + amounts (include shekel ₪ and שח)
-        val currencyPattern = Regex("[\\$€£₹₪]\\s*[\\d,]+\\.?\\d*|\\d+[\\$€£₹₪]|\\d+\\s*שח")
+        val currencyPattern = Regex("[\\$€£₹₪]\\s*[\\d,]+\\.?\\d*|\\d+[\\$€£₹₪]|[\\d,]+\\s*ש[\"״]?ח")
         val currencyMatches = currencyPattern.findAll(body).count()
         if (currencyMatches >= 2) {
             score += 0.08f

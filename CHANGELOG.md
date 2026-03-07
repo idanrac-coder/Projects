@@ -3,6 +3,13 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.10.1] - 2026-03-07
+
+### Fixed
+- Hebrew tax refund scam regex now matches both word orders ("החזרי מס ממוצע" and "ממוצע החזרי מס")
+- Shekel abbreviation ש"ח (with gershayim) now recognized in currency heuristic and loan scam rules
+- Added broader tax refund detection rules for shekel amounts and "citizens of Israel" phrasing
+
 ## [3.10.0] - 2026-03-07
 
 ### Added

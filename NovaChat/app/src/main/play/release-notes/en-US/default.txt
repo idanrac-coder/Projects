@@ -1,5 +1,5 @@
-Better spam detection for Hebrew and Israel:
+Improved Hebrew spam detection:
 
-• Detects Hebrew scams: tax refund, pension, loan, delivery, and political spam
-• Learns from your spam reports in Hebrew too
-• Fixed false alarms on normal Hebrew messages
+• Tax refund scam messages in Hebrew are now correctly caught
+• Shekel amounts written as ש"ח are now recognized
+• Better coverage for common Israeli scam patterns
