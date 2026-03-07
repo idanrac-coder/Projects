@@ -3,7 +3,17 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## [3.9.1] - 2026-03-04
+## [3.10.0] - 2026-03-07
+
+### Added
+- Hebrew spam detection: phishing, OTP fraud, delivery, loan scams in Hebrew
+- Israel-specific scam categories: tax refund, pension/severance, political spam, "money waiting," medical/disability parking
+- Hebrew and Israeli heuristic word lists for urgency and personal-info phrases
+- Keyword learning now supports Hebrew and other non-Latin scripts (Unicode letters kept)
+- Shekel (₪, שח) in currency heuristics
+
+### Fixed
+- ALL CAPS heuristic no longer triggers false positives for Hebrew (Hebrew has no uppercase; only Latin words are counted)
 
 ### Added
 - Unknown sender action banner in chat: Trust or Block an unsaved contact with one tap

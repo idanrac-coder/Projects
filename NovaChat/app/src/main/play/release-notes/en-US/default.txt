@@ -1,3 +1,5 @@
-New in conversations: when you open a chat from an unknown sender, a quick action bar appears at the top with Trust and Block buttons.
+Better spam detection for Hebrew and Israel:
 
-Tap Trust to whitelist the sender instantly, or Block to report them as spam. The bar only shows for unsaved contacts and goes away once you choose.
+• Detects Hebrew scams: tax refund, pension, loan, delivery, and political spam
+• Learns from your spam reports in Hebrew too
+• Fixed false alarms on normal Hebrew messages

@@ -35,7 +35,13 @@ enum class ScamCategory {
     TAX_SCAM,
     CRYPTO_SCAM,
     SUBSCRIPTION_SCAM,
-    LEARNED_SPAM
+    LEARNED_SPAM,
+    // Israel-specific
+    TAX_REFUND,
+    PENSION_SEVERANCE,
+    POLITICAL_SPAM,
+    MONEY_WAITING,
+    MEDICAL_DISABILITY
 }
 
 /**
@@ -134,6 +140,38 @@ class ScamDetector @Inject constructor(
 
         // Romance scam signals
         PatternRule(Regex("(?i)(send|wire|transfer)\\s+(money|funds|gift\\s+card|bitcoin).{0,30}(emergency|hospital|stuck|stranded|arrest)"), ScamCategory.ROMANCE_SCAM, 0.80f, "Emergency money request"),
+
+        // Hebrew phishing / OTP / delivery / loan
+        PatternRule(Regex("לקוח\\s*יקר"), ScamCategory.PHISHING, 0.80f, "Hebrew: dear customer"),
+        PatternRule(Regex("עדכון\\s*פרטים"), ScamCategory.PHISHING, 0.82f, "Hebrew: update details"),
+        PatternRule(Regex("קוד\\s*אימות"), ScamCategory.PHISHING, 0.84f, "Hebrew: authentication code"),
+        PatternRule(Regex("חשבון.*יחסם|חשבונך.*יחסם"), ScamCategory.PHISHING, 0.84f, "Hebrew: account will be blocked"),
+        PatternRule(Regex("זוהתה\\s*פעילות\\s*חריגה"), ScamCategory.PHISHING, 0.83f, "Hebrew: unusual activity detected"),
+        PatternRule(Regex("שלח.*(לי\\s+)?את\\s*הקוד|תשלח.*הקוד"), ScamCategory.OTP_FRAUD, 0.90f, "Hebrew: send me the code"),
+        PatternRule(Regex("קוד\\s*בן\\s*6\\s*ספרות"), ScamCategory.OTP_FRAUD, 0.88f, "Hebrew: 6-digit code"),
+        PatternRule(Regex("שלחתי.*קוד.*בטעות"), ScamCategory.OTP_FRAUD, 0.90f, "Hebrew: I sent code by mistake"),
+        PatternRule(Regex("החבילה.*ממתינה|חבילה.*למשלוח"), ScamCategory.DELIVERY_SCAM, 0.76f, "Hebrew: package waiting"),
+        PatternRule(Regex("דואר\\s*ישראל.*חבילה"), ScamCategory.DELIVERY_SCAM, 0.78f, "Hebrew: Israel Post package"),
+        PatternRule(Regex("הלוואה\\s*מיידית"), ScamCategory.LOAN_SCAM, 0.78f, "Hebrew: instant loan"),
+        PatternRule(Regex("הלוואה.*אושרה|מאושר.*הלוואה"), ScamCategory.LOAN_SCAM, 0.78f, "Hebrew: loan approved"),
+
+        // Israel-specific: tax refund, pension, political, money waiting, medical
+        PatternRule(Regex("החזר\\s*מס.*בדיקה\\s*ללא\\s*תשלום"), ScamCategory.TAX_REFUND, 0.84f, "Hebrew: tax refund free check"),
+        PatternRule(Regex("ממוצע\\s*החזרי\\s*מס"), ScamCategory.TAX_REFUND, 0.82f, "Hebrew: average tax refunds"),
+        PatternRule(Regex("מגיע\\s*לך\\s*החזר\\s*מס"), ScamCategory.TAX_REFUND, 0.82f, "Hebrew: you're owed tax refund"),
+        PatternRule(Regex("למשוך\\s*פנסיה|פנסיה\\s*ופיצויים"), ScamCategory.PENSION_SEVERANCE, 0.80f, "Hebrew: withdraw pension/severance"),
+        PatternRule(Regex("פיצויים.*ללא\\s*התפטרות"), ScamCategory.PENSION_SEVERANCE, 0.82f, "Hebrew: severance without resignation"),
+        PatternRule(Regex("ביטוח\\s*לאומי.*מענק"), ScamCategory.PENSION_SEVERANCE, 0.80f, "Hebrew: Bituach Leumi grant scam"),
+        PatternRule(Regex("איזו\\s*ממשלה\\s*הייתם\\s*רוצים"), ScamCategory.POLITICAL_SPAM, 0.68f, "Hebrew: which government would you want"),
+        PatternRule(Regex("חשיפה\\s*דרמטית"), ScamCategory.POLITICAL_SPAM, 0.66f, "Hebrew: dramatic expose"),
+        PatternRule(Regex("ראש\\s*האופוזיציה|יו\"ר\\s*יש\\s*עתיד"), ScamCategory.POLITICAL_SPAM, 0.66f, "Hebrew: political figures"),
+        PatternRule(Regex("מחכים\\s*לך.*שקלים|אלפי\\s*שקלים.*מחכים"), ScamCategory.MONEY_WAITING, 0.84f, "Hebrew: money waiting for you"),
+        PatternRule(Regex("הודעה\\s*דחופה.*שקלים"), ScamCategory.MONEY_WAITING, 0.82f, "Hebrew: urgent message about money"),
+        PatternRule(Regex("זכויות\\s*שלא\\s*קיבלת"), ScamCategory.MONEY_WAITING, 0.80f, "Hebrew: benefits you didn't receive"),
+        PatternRule(Regex("בעיה\\s*רפואית.*תג\\s*חניה|תו\\s*נכה"), ScamCategory.MEDICAL_DISABILITY, 0.74f, "Hebrew: medical/disability parking"),
+        PatternRule(Regex("נמאס\\s*להחנות\\s*רחוק"), ScamCategory.MEDICAL_DISABILITY, 0.72f, "Hebrew: tired of parking far"),
+        PatternRule(Regex("להילחם\\s*במערכת\\s*לבד"), ScamCategory.MEDICAL_DISABILITY, 0.72f, "Hebrew: fighting the system alone"),
+        PatternRule(Regex("הלוואה\\s*מיידית.*\\d|עד\\s*\\d+.*שח"), ScamCategory.LOAN_SCAM, 0.78f, "Hebrew: loan up to X shekels"),
     )
 
     // ── Analysis ─────────────────────────────────────────────────────────
@@ -325,6 +363,15 @@ class ScamDetector @Inject constructor(
 
     // ── Internals ────────────────────────────────────────────────────────
 
+    /** Normalize token: keep Unicode letters and digits, strip punctuation. Supports Hebrew and other non-Latin scripts. */
+    private fun normalizeToken(word: String): String = word.replace(Regex("[^\\p{L}\\p{N}]"), "")
+
+    /** Cache key for learned keywords: lowercase Latin-only tokens (backward compat), keep Hebrew/other as-is. */
+    private fun tokenCacheKey(token: String): String {
+        val normalized = normalizeToken(token)
+        return if (normalized.all { it in 'a'..'z' || it in 'A'..'Z' || it.isDigit() }) normalized.lowercase() else normalized
+    }
+
     private fun computeHeuristics(body: String, signals: MutableList<String>): Float {
         var score = 0f
         val words = body.split("\\s+".toRegex())
@@ -336,16 +383,17 @@ class ScamDetector @Inject constructor(
             signals.add("Excessive exclamation marks ($exclamationCount)")
         }
 
-        // ALL CAPS words ratio
-        val capsWords = words.count { it.length > 3 && it == it.uppercase() && it.any { c -> c.isLetter() } }
-        val capsRatio = if (words.isNotEmpty()) capsWords.toFloat() / words.size else 0f
+        // ALL CAPS words ratio (Hebrew has no case - only count words with Latin letters that have uppercase)
+        val latinWords = words.filter { it.any { c -> c in 'a'..'z' || c in 'A'..'Z' } }
+        val capsWords = latinWords.count { it.length > 3 && it == it.uppercase() && it.any { c -> c.isLetter() } }
+        val capsRatio = if (latinWords.isNotEmpty()) capsWords.toFloat() / latinWords.size else 0f
         if (capsRatio > 0.3f) {
             score += 0.12f
             signals.add("High ALL-CAPS ratio (${(capsRatio * 100).toInt()}%)")
         }
 
-        // Currency symbols + amounts
-        val currencyPattern = Regex("[\\$€£₹]\\s*[\\d,]+\\.?\\d*|\\d+[\\$€£₹]")
+        // Currency symbols + amounts (include shekel ₪ and שח)
+        val currencyPattern = Regex("[\\$€£₹₪]\\s*[\\d,]+\\.?\\d*|\\d+[\\$€£₹₪]|\\d+\\s*שח")
         val currencyMatches = currencyPattern.findAll(body).count()
         if (currencyMatches >= 2) {
             score += 0.08f
@@ -383,7 +431,19 @@ class ScamDetector @Inject constructor(
 
         // Personal info requests
         val infoRequestWords = listOf("ssn", "social security", "credit card", "bank account", "routing number", "date of birth", "mother's maiden")
-        val infoRequests = infoRequestWords.count { body.contains(it, ignoreCase = true) }
+        var infoRequests = infoRequestWords.count { body.contains(it, ignoreCase = true) }
+
+        // Hebrew personal-info / benefit phrases (when Hebrew present)
+        val hasHebrew = body.any { it in '\u0590'..'\u05FF' }
+        if (hasHebrew) {
+            val hebrewInfoWords = listOf("תעודת זהות", "מספר כרטיס", "סיסמה", "קוד אימות", "פרטי חשבון", "כרטיס אשראי")
+            infoRequests += hebrewInfoWords.count { body.contains(it) }
+            val hebrewUrgencyWords = listOf("דחוף", "מיד", "בהקדם", "מיידי", "תגיב", "אזהרה", "פג תוקף", "נדרשת פעולה", "ייחסם")
+            if (hebrewUrgencyWords.count { body.contains(it) } >= 2) {
+                score += 0.10f
+                signals.add("High Hebrew urgency word density")
+            }
+        }
         if (infoRequests > 0) {
             score += 0.15f
             signals.add("Requests sensitive personal information")
@@ -394,12 +454,15 @@ class ScamDetector @Inject constructor(
 
     private fun computeLearnedKeywordScore(body: String): Float {
         if (keywordWeightCache.isEmpty()) return 0f
-        val bodyLower = body.lowercase()
-        val tokens = bodyLower.split("\\s+".toRegex()).filter { it.length >= 3 }
+        val tokens = body.split("\\s+".toRegex())
+            .filter { it.length >= 3 }
+            .map { normalizeToken(it) }
+            .filter { it.isNotBlank() }
         var totalWeight = 0f
         var matchCount = 0
         for (token in tokens) {
-            val w = keywordWeightCache[token]
+            val key = tokenCacheKey(token)
+            val w = keywordWeightCache[key]
             if (w != null && w > 0.3f) {
                 totalWeight += w
                 matchCount++
@@ -421,16 +484,16 @@ class ScamDetector @Inject constructor(
     }
 
     private suspend fun updateKeywordWeights(body: String, isSpam: Boolean) {
-        val tokens = body.lowercase()
-            .split("\\s+".toRegex())
+        val tokens = body.split("\\s+".toRegex())
             .filter { it.length >= 3 }
-            .map { it.replace(Regex("[^a-z0-9]"), "") }
+            .map { normalizeToken(it) }
             .filter { it.isNotBlank() }
             .distinct()
 
         for (token in tokens) {
-            val existing = learningDao.getKeywordWeight(token)
-                ?: SpamKeywordWeightEntity(keyword = token)
+            val key = tokenCacheKey(token)
+            val existing = learningDao.getKeywordWeight(key)
+                ?: SpamKeywordWeightEntity(keyword = key)
             val updated = if (isSpam) {
                 existing.copy(spamOccurrences = existing.spamOccurrences + 1)
             } else {
@@ -440,7 +503,7 @@ class ScamDetector @Inject constructor(
             val weight = if (total > 0) updated.spamOccurrences.toFloat() / total else 0f
             val final_ = updated.copy(weight = weight)
             learningDao.upsertKeywordWeight(final_)
-            keywordWeightCache[token] = weight
+            keywordWeightCache[key] = weight
         }
     }
 
