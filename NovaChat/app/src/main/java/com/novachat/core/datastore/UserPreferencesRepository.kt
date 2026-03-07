@@ -103,4 +103,12 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun setScamDetectionEnabled(enabled: Boolean) {
         dataStore.edit { it[PreferencesKeys.SCAM_DETECTION_ENABLED] = enabled }
     }
+
+    val conversationBackgroundId: Flow<String> = dataStore.data.map { prefs ->
+        prefs[PreferencesKeys.CONVERSATION_BACKGROUND_ID] ?: "default"
+    }
+
+    suspend fun setConversationBackgroundId(backgroundId: String) {
+        dataStore.edit { it[PreferencesKeys.CONVERSATION_BACKGROUND_ID] = backgroundId }
+    }
 }

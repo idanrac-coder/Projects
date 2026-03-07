@@ -25,6 +25,7 @@ import com.novachat.ui.scheduled.ScheduledMessagesScreen
 import com.novachat.ui.search.SearchScreen
 import com.novachat.ui.settings.SettingsScreen
 import com.novachat.ui.swipe.SwipeActionsScreen
+import com.novachat.ui.themes.BackgroundsScreen
 import com.novachat.ui.themes.ThemeEditorScreen
 import com.novachat.ui.themes.ThemesScreen
 
@@ -134,8 +135,13 @@ fun NovaChatNavHost(
         composable<ThemesRoute> {
             ThemesScreen(
                 onBack = { navController.popBackStack() },
+                onBackgroundsClick = { navController.navigate(BackgroundsRoute) },
                 onEditTheme = { navController.navigate(ThemeEditorRoute) }
             )
+        }
+
+        composable<BackgroundsRoute> {
+            BackgroundsScreen(onBack = { navController.popBackStack() })
         }
 
         composable<ThemeEditorRoute> {

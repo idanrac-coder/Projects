@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.12.0] - 2026-03-07
+
+### Added
+- Conversation backgrounds: choose from 15 presets (Sky Blue, Sunset, Ocean, Aurora, Midnight, Forest, Lavender, Minimal White/Gray, Warm Sand, Coral, Mint, Storm, Twilight) under Settings → Themes
+
 ## [3.11.0] - 2026-03-07
 
 ### Added

@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.novachat.domain.model.BubbleShape
+import com.novachat.domain.model.ConversationBackground
 import com.novachat.domain.model.NovaChatTheme
 import com.novachat.domain.model.WallpaperType
 
@@ -160,6 +161,7 @@ fun NovaChatMaterialTheme(
     activeTheme: NovaChatTheme? = null,
     useDynamicColor: Boolean = false,
     bubbleShapeOverride: BubbleShape? = null,
+    conversationBackgroundOverride: ConversationBackground? = null,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
@@ -344,12 +346,20 @@ fun NovaChatMaterialTheme(
 
     val chatShapes = bubbleShapeFor(bubbleShapeOverride ?: theme.bubbleShape)
 
-    val chatWallpaper = ChatWallpaper(
-        type = theme.wallpaperType,
-        value = theme.wallpaperValue,
-        primaryColor = Color(theme.primaryColor),
-        secondaryColor = Color(theme.secondaryColor)
-    )
+    val chatWallpaper = when {
+        conversationBackgroundOverride != null && conversationBackgroundOverride.id != "default" -> ChatWallpaper(
+            type = conversationBackgroundOverride.type,
+            value = "",
+            primaryColor = conversationBackgroundOverride.primaryColorCompose,
+            secondaryColor = conversationBackgroundOverride.secondaryColorCompose
+        )
+        else -> ChatWallpaper(
+            type = theme.wallpaperType,
+            value = theme.wallpaperValue,
+            primaryColor = Color(theme.primaryColor),
+            secondaryColor = Color(theme.secondaryColor)
+        )
+    }
 
     CompositionLocalProvider(
         LocalChatColors provides chatColors,

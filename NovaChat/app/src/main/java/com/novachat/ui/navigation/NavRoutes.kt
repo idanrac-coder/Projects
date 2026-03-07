@@ -27,6 +27,9 @@ object SpamFolderRoute
 object ThemesRoute
 
 @Serializable
+object BackgroundsRoute
+
+@Serializable
 object ThemeEditorRoute
 
 @Serializable

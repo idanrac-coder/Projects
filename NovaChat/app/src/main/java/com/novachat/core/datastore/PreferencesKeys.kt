@@ -26,4 +26,5 @@ object PreferencesKeys {
     val LAST_BACKUP_TIME = longPreferencesKey("last_backup_time")
     val ACTIVE_BUBBLE_SHAPE = stringPreferencesKey("active_bubble_shape")
     val SCAM_DETECTION_ENABLED = booleanPreferencesKey("scam_detection_enabled")
+    val CONVERSATION_BACKGROUND_ID = stringPreferencesKey("conversation_background_id")
 }

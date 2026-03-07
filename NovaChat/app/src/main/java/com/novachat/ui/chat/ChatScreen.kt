@@ -562,6 +562,9 @@ fun ChatScreen(
                         colors = listOf(chatWallpaper.primaryColor.copy(alpha = 0.15f), chatWallpaper.secondaryColor.copy(alpha = 0.15f))
                     )
                 )
+                WallpaperType.SOLID -> if (chatWallpaper.primaryColor != Color.Transparent) {
+                    Modifier.background(chatWallpaper.primaryColor)
+                } else Modifier
                 WallpaperType.PATTERN_BOTANICAL,
                 WallpaperType.PATTERN_GEOMETRIC,
                 WallpaperType.PATTERN_WAVES,

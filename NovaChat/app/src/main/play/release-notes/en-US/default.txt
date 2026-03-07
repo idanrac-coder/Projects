@@ -1,5 +1,3 @@
-Unblock and restore: removing a block rule now brings all blocked messages back to your inbox.
+Customize your chat! Choose from 15 conversation backgrounds—Sky Blue, Sunset, Ocean, Aurora, Midnight, and more.
 
-Bug fix: "Block by sender" now works correctly from inside conversations.
-
-Inbox now shows 2 lines of each message preview for easier browsing.
+Settings → Themes → Conversation Backgrounds.

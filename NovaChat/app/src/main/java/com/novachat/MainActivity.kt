@@ -109,7 +109,12 @@ class MainActivity : ComponentActivity() {
                 .collectAsState(initial = 1L)
             val bubbleShapeOverride by userPreferencesRepository.activeBubbleShape
                 .collectAsState(initial = null)
+            val conversationBackgroundId by userPreferencesRepository.conversationBackgroundId
+                .collectAsState(initial = "default")
             var activeTheme by remember { mutableStateOf<NovaChatTheme?>(null) }
+            val conversationBackgroundOverride = remember(conversationBackgroundId) {
+                com.novachat.domain.model.BuiltInBackgrounds.findById(conversationBackgroundId)
+            }
 
             LaunchedEffect(Unit) {
                 themeRepository.seedBuiltInThemes()
@@ -121,7 +126,8 @@ class MainActivity : ComponentActivity() {
 
             NovaChatMaterialTheme(
                 activeTheme = activeTheme,
-                bubbleShapeOverride = bubbleShapeOverride
+                bubbleShapeOverride = bubbleShapeOverride,
+                conversationBackgroundOverride = conversationBackgroundOverride
             ) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     val isFirstLaunch by userPreferencesRepository.isFirstLaunch
