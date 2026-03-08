@@ -1,6 +1,6 @@
 Smarter spam protection with a new three-layer system:
 
-- Catches phishing links (bit.ly, suspicious domains) and urgent/OTP scams faster
-- Hebrew tax refund scam messages (החזרי מס) from unknown senders now blocked as spam
-- Trusted banks and delivery services get whitelisted to reduce false alarms
-- Spam goes to Shadow Inbox without notification; suspicious messages show a warning
+- Catches phishing links and urgent/OTP scams
+- Hebrew tax refund and political survey spam now blocked
+- Trusted senders whitelisted to reduce false alarms
+- Spam goes to Shadow Inbox; suspicious messages show a warning

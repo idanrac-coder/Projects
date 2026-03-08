@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.19.2] - 2026-03-08
+
+### Added
+- Survey/political spam (להסרה: השיבו) from unknown senders now blocked as SPAM
+
 ## [3.19.1] - 2026-03-08
 
 ### Added

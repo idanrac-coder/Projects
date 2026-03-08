@@ -3,7 +3,8 @@ package com.novachat.core.sms
 /**
  * Layer 1: High-performance deterministic regex engine for common phishing patterns.
  * Catches shortened URLs, suspicious TLDs, urgent keywords, OTP/Verify patterns,
- * and Hebrew tax refund scams (החזרי/החזר מס). Runs first before heuristic/semantic layers.
+ * Hebrew tax refund scams (החזרי/החזר מס), and survey/political spam (להסרה: השיבו).
+ * Runs first before heuristic/semantic layers.
  */
 object DeterministicSpamLayer {
 
@@ -27,6 +28,8 @@ object DeterministicSpamLayer {
     )
     // Hebrew tax refund scam (unsolicited SMS from unknown senders)
     private val taxRefundScamRegex = Regex("החזרי?\\s*מס")
+    // Survey/political spam with unsubscribe reply (common in bulk SMS)
+    private val surveyUnsubscribeRegex = Regex("להסרה:\\s*השיבו")
 
     data class MatchResult(
         val matched: Boolean,
@@ -56,6 +59,8 @@ object DeterministicSpamLayer {
                 return MatchResult(true, "OTP_VERIFY_HE", 25)
             taxRefundScamRegex.containsMatchIn(body) ->
                 return MatchResult(true, "TAX_REFUND_SCAM", 25)
+            surveyUnsubscribeRegex.containsMatchIn(body) ->
+                return MatchResult(true, "SURVEY_UNSUBSCRIBE", 35)
         }
         return MatchResult(false, null, 0)
     }
