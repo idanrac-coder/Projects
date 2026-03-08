@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.17.1] - 2026-03-08
+
+### Fixed
+- Nebula theme chat background now correctly displays white instead of purple
+
 ## [3.17.0] - 2026-03-08
 
 ### Added

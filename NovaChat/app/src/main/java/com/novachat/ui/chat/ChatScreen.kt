@@ -591,9 +591,10 @@ fun ChatScreen(
                         )
                     )
                 )
-                WallpaperType.SOLID -> if (chatWallpaper.primaryColor != Color.Transparent) {
-                    Modifier.background(chatWallpaper.primaryColor)
-                } else Modifier
+                WallpaperType.SOLID -> {
+                    val solidColor = chatWallpaper.backgroundColor ?: chatWallpaper.primaryColor
+                    if (solidColor != Color.Transparent) Modifier.background(solidColor) else Modifier
+                }
                 WallpaperType.PATTERN_BOTANICAL,
                 WallpaperType.PATTERN_GEOMETRIC,
                 WallpaperType.PATTERN_WAVES,
@@ -703,7 +704,7 @@ fun ChatScreen(
                         exit = fadeOut() + scaleOut()
                     ) {
                         Surface(
-                            onClick = { scope.launch { listState.animateScrollToItem(chatItems.size - 1) } },
+                            onClick = { scope.launch { listState.scrollToItem(chatItems.size - 1) } },
                         shape = CircleShape,
                         shadowElevation = 4.dp,
                         color = MaterialTheme.colorScheme.primary

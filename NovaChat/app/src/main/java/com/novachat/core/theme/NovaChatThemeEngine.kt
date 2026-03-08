@@ -41,6 +41,7 @@ data class ChatWallpaper(
     val value: String = "",
     val primaryColor: Color = Color.Transparent,
     val secondaryColor: Color = Color.Transparent,
+    val backgroundColor: Color? = null,
     val isCustomBackground: Boolean = false,
     val imageResName: String? = null
 )
@@ -361,7 +362,8 @@ fun NovaChatMaterialTheme(
             type = theme.wallpaperType,
             value = theme.wallpaperValue,
             primaryColor = Color(theme.primaryColor),
-            secondaryColor = Color(theme.secondaryColor)
+            secondaryColor = Color(theme.secondaryColor),
+            backgroundColor = Color(theme.backgroundColor)
         )
     }
 

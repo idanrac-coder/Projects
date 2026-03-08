@@ -1,5 +1,1 @@
-New: Scroll-to-bottom button — tap the arrow when viewing older messages to jump back to the latest.
-
-Improvements:
-- Background preview now shows the actual pattern (Stars, Marble, etc.) before applying
-- Fixed Cancel button layout in the message long-press menu
+Fix: Nebula theme chat background now correctly shows white.
