@@ -1853,6 +1853,8 @@ private fun formatDate(timestamp: Long): String {
             cal.get(Calendar.YEAR) == today.get(Calendar.YEAR) -> "Today"
         today.get(Calendar.DATE) - cal.get(Calendar.DATE) == 1 &&
             cal.get(Calendar.YEAR) == today.get(Calendar.YEAR) -> "Yesterday"
+        cal.get(Calendar.YEAR) != today.get(Calendar.YEAR) ->
+            SimpleDateFormat("EEEE, MMM d, yyyy", Locale.getDefault()).format(Date(timestamp))
         else -> SimpleDateFormat("EEEE, MMM d", Locale.getDefault()).format(Date(timestamp))
     }
 }

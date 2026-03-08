@@ -41,7 +41,8 @@ enum class ScamCategory {
     PENSION_SEVERANCE,
     POLITICAL_SPAM,
     MONEY_WAITING,
-    MEDICAL_DISABILITY
+    MEDICAL_DISABILITY,
+    PROPAGANDA
 }
 
 /**
@@ -181,6 +182,10 @@ class ScamDetector @Inject constructor(
         PatternRule(Regex("להילחם\\s*במערכת"), ScamCategory.MEDICAL_DISABILITY, 0.72f, "Hebrew: fighting the system"),
         PatternRule(Regex("(נמאס|בעיה\\s*רפואית).{0,40}(להילחם|במערכת|להחנות)"), ScamCategory.MEDICAL_DISABILITY, 0.74f, "Hebrew: disability parking combo"),
         PatternRule(Regex("הלוואה\\s*מיידית.*\\d|עד\\s*\\d+.*ש[\"״]?ח"), ScamCategory.LOAN_SCAM, 0.78f, "Hebrew: loan up to X shekels"),
+
+        // Propaganda/disinformation: broad structural patterns, low base score
+        PatternRule(Regex("משקרים.*לכם|משקרות.*לכם"), ScamCategory.PROPAGANDA, 0.62f, "Hebrew: authority lying to you"),
+        PatternRule(Regex("תברח|אף\\s*\\S+\\s*לא\\s*יכול\\s*לספק"), ScamCategory.PROPAGANDA, 0.65f, "Hebrew: flee / no X can provide"),
     )
 
     // ── Analysis ─────────────────────────────────────────────────────────
@@ -327,7 +332,7 @@ class ScamDetector @Inject constructor(
 
     fun getAutoBlockThreshold(category: ScamCategory?): Float = when (category) {
         ScamCategory.OTP_FRAUD, ScamCategory.PHISHING -> 0.80f
-        ScamCategory.POLITICAL_SPAM -> 0.95f
+        ScamCategory.POLITICAL_SPAM, ScamCategory.PROPAGANDA -> 0.95f
         else -> 0.85f
     }
 
@@ -403,6 +408,14 @@ class ScamDetector @Inject constructor(
     private fun computeHeuristics(body: String, signals: MutableList<String>): Float {
         var score = 0f
         val words = body.split("\\s+".toRegex())
+
+        // Line-fragmentation: propaganda often uses short, punchy lines (one claim per line)
+        val lines = body.split("\n").map { it.trim() }.filter { it.isNotEmpty() }
+        val avgLineLen = if (lines.isNotEmpty()) body.length.toFloat() / lines.size else 0f
+        if (lines.size >= 4 && avgLineLen < 60f) {
+            score += 0.10f
+            signals.add("Fragmented line structure (common in propaganda)")
+        }
 
         // Excessive exclamation marks
         val exclamationCount = body.count { it == '!' }

@@ -1,1 +1,3 @@
-Quick replies off by default (enable in Settings → Notifications). Conversation backgrounds now show a Premium badge. Preview before applying. Report spam from notification. Spam Folder shows why each message was blocked.
+Improved spam detection for propaganda-style messages using structural signals.
+
+Date headers in chats now show the year when messages are from a previous year.

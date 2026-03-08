@@ -3,6 +3,13 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.16.0] - 2026-03-08
+
+### Added
+- Structural spam heuristics: line-fragmentation detection (common in propaganda/disinformation)
+- PROPAGANDA category with broad Hebrew patterns (authority-undermining, flee/survival advice)
+- Year in date headers when messages are from a different year (chat screen and conversation list)
+
 ## [3.15.1] - 2026-03-07
 
 ### Changed

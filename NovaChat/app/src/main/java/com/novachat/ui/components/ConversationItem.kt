@@ -307,6 +307,8 @@ private fun formatTimestamp(timestamp: Long): String {
             now.get(Calendar.YEAR) == msgTime.get(Calendar.YEAR) -> {
             SimpleDateFormat("EEE", Locale.getDefault()).format(Date(timestamp))
         }
+        now.get(Calendar.YEAR) != msgTime.get(Calendar.YEAR) ->
+            SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(Date(timestamp))
         else -> SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(timestamp))
     }
 }
