@@ -7,6 +7,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.provider.Telephony
 import android.util.Log
+import com.novachat.BuildConfig
 import com.novachat.domain.model.Conversation
 import com.novachat.domain.model.Message
 import com.novachat.domain.model.MessageType
@@ -29,7 +30,7 @@ class SmsProvider @Inject constructor(
     }
 
     suspend fun getConversations(): List<Conversation> = withContext(Dispatchers.IO) {
-        Log.d("NC_DEBUG", "*** SmsProvider.getConversations() querying content://sms")
+        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "*** SmsProvider.getConversations() querying content://sms")
         data class ThreadAccum(
             var address: String = "",
             var snippet: String = "",
@@ -82,8 +83,8 @@ class SmsProvider @Inject constructor(
             }
         }
 
-        Log.d("NC_DEBUG", "*** SmsProvider.getConversations() found ${threadMap.size} threads")
-        threadMap.forEach { (tid, acc) ->
+        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "*** SmsProvider.getConversations() found ${threadMap.size} threads")
+        if (BuildConfig.DEBUG) threadMap.forEach { (tid, acc) ->
             Log.d("NC_DEBUG", "***   thread=$tid addr=${acc.address} msgs=${acc.messageCount} unread=${acc.unreadCount} snippet=${acc.snippet.take(20)}")
         }
 
@@ -105,7 +106,7 @@ class SmsProvider @Inject constructor(
     }
 
     suspend fun getMessagesForThread(threadId: Long): List<Message> = withContext(Dispatchers.IO) {
-        Log.d("NC_DEBUG", "*** SmsProvider.getMessagesForThread($threadId) querying")
+        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "*** SmsProvider.getMessagesForThread($threadId) querying")
         val messages = mutableListOf<Message>()
         val cursor = contentResolver.query(
             Telephony.Sms.CONTENT_URI,
@@ -128,7 +129,7 @@ class SmsProvider @Inject constructor(
                 messages.add(cursorToMessage(it))
             }
         }
-        Log.d("NC_DEBUG", "*** SmsProvider.getMessagesForThread($threadId) found ${messages.size} messages")
+        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "*** SmsProvider.getMessagesForThread($threadId) found ${messages.size} messages")
         messages
     }
 

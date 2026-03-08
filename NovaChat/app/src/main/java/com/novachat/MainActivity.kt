@@ -1,6 +1,7 @@
 package com.novachat
 
 import android.Manifest
+import com.novachat.BuildConfig
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -78,6 +79,7 @@ class MainActivity : ComponentActivity() {
         Manifest.permission.READ_SMS,
         Manifest.permission.SEND_SMS,
         Manifest.permission.RECEIVE_SMS,
+        Manifest.permission.RECEIVE_MMS,
         Manifest.permission.READ_CONTACTS,
         Manifest.permission.READ_PHONE_STATE,
         Manifest.permission.POST_NOTIFICATIONS
@@ -217,12 +219,12 @@ class MainActivity : ComponentActivity() {
         intent ?: return
         val threadId = intent.getLongExtra("threadId", -1L)
         val address = intent.getStringExtra("address")
-        android.util.Log.d("NC_DEBUG", "+++ MainActivity.handleNotificationIntent threadId=$threadId address=$address")
+        if (BuildConfig.DEBUG) android.util.Log.d("NC_DEBUG", "+++ MainActivity.handleNotificationIntent threadId=$threadId address=$address")
         if (address != null) {
             pendingChatThreadId = if (threadId > 0) threadId else 0L
             pendingChatAddress = address
             pendingChatContactName = intent.getStringExtra("contactName")
-            android.util.Log.d("NC_DEBUG", "+++ MainActivity: set pending tid=$pendingChatThreadId addr=$pendingChatAddress")
+            if (BuildConfig.DEBUG) android.util.Log.d("NC_DEBUG", "+++ MainActivity: set pending tid=$pendingChatThreadId addr=$pendingChatAddress")
             intent.removeExtra("threadId")
             intent.removeExtra("address")
             intent.removeExtra("contactName")

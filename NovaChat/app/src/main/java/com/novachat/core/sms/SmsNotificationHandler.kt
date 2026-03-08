@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.novachat.BuildConfig
 import com.novachat.MainActivity
 import com.novachat.core.database.dao.SpamMessageDao
 import com.novachat.core.database.entity.SpamMessageEntity
@@ -36,6 +37,7 @@ class SmsNotificationHandler @Inject constructor(
         const val CHANNEL_ID = "novachat_messages"
         const val CHANNEL_NAME = "Messages"
         const val NOTIFICATION_GROUP = "com.novachat.MESSAGES"
+        private const val NOTIFICATION_ID_MMS = 999998
     }
 
     init {
@@ -108,7 +110,7 @@ class SmsNotificationHandler @Inject constructor(
         timestamp: Long,
         isDefaultApp: Boolean = false
     ) {
-        Log.d("NC_DEBUG", "=== handleIncomingSms START === address=$address isDefaultApp=$isDefaultApp body=${body.take(30)}")
+        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== handleIncomingSms START === address=$address isDefaultApp=$isDefaultApp body=${body.take(30)}")
         val contactName = contactResolver.getContactName(address)
 
         val isSystemBlocked = try {
@@ -199,22 +201,22 @@ class SmsNotificationHandler @Inject constructor(
 
         var threadId = 0L
         if (isDefaultApp) {
-            Log.d("NC_DEBUG", "=== Handler: inserting SMS (we are default app)")
+            if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== Handler: inserting SMS (we are default app)")
             val result = smsProvider.insertIncomingSms(address, body, timestamp)
             threadId = result.threadId
-            Log.d("NC_DEBUG", "=== Handler: insert result uri=${result.uri} threadId=$threadId")
+            if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== Handler: insert result uri=${result.uri} threadId=$threadId")
             if (result.uri == null) {
-                Log.d("NC_DEBUG", "=== Handler: insert returned null, retrying after 300ms")
+                if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== Handler: insert returned null, retrying after 300ms")
                 kotlinx.coroutines.delay(300)
                 val retry = smsProvider.insertIncomingSms(address, body, timestamp)
-                Log.d("NC_DEBUG", "=== Handler: retry result uri=${retry.uri}")
+                if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== Handler: retry result uri=${retry.uri}")
             }
         } else {
-            Log.d("NC_DEBUG", "=== Handler: NOT default app, skipping insert (stock app will write)")
+            if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== Handler: NOT default app, skipping insert (stock app will write)")
         }
         if (threadId == 0L) {
             threadId = smsProvider.getThreadIdForAddress(address)
-            Log.d("NC_DEBUG", "=== Handler: fallback getThreadIdForAddress=$threadId")
+            if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== Handler: fallback getThreadIdForAddress=$threadId")
         }
 
         val lowConfidenceSpam = if (!isKnownContact) {
@@ -233,7 +235,7 @@ class SmsNotificationHandler @Inject constructor(
             body
         }
 
-        Log.d("NC_DEBUG", "=== Handler: showing notification threadId=$threadId address=$address")
+        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== Handler: showing notification threadId=$threadId address=$address")
         showNotification(
             title = notifTitle,
             body = notifBody,
@@ -246,10 +248,10 @@ class SmsNotificationHandler @Inject constructor(
         )
 
         val effectiveThreadId = if (threadId != 0L) threadId else -1L
-        Log.d("NC_DEBUG", "=== Handler: invalidateAllCaches + notifyNewMessage($effectiveThreadId)")
+        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== Handler: invalidateAllCaches + notifyNewMessage($effectiveThreadId)")
         conversationRepository.invalidateAllCaches()
         conversationRepository.notifyNewMessage(effectiveThreadId)
-        Log.d("NC_DEBUG", "=== handleIncomingSms END ===")
+        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== handleIncomingSms END ===")
     }
 
     private suspend fun handleBlockedMessage(
@@ -278,8 +280,25 @@ class SmsNotificationHandler @Inject constructor(
         } catch (_: Exception) { }
     }
 
+    /**
+     * Handles incoming MMS with notification-only support.
+     * Full MMS parsing (PduParser, content://mms) is not implemented. This shows a generic
+     * notification and invalidates caches so the user is prompted to open the app. The system
+     * may have already written the MMS to the provider when we are the default SMS app.
+     */
     fun handleIncomingMms() {
-        // Placeholder for MMS notification handling
+        conversationRepository.invalidateAllCaches()
+        conversationRepository.notifyNewMessage(-1L)
+        showNotification(
+            title = "New MMS",
+            body = "You have received a new multimedia message. Open the app to view.",
+            notificationId = NOTIFICATION_ID_MMS,
+            threadId = -1L,
+            address = null,
+            contactName = null,
+            lowConfidenceSpam = null,
+            spamBody = null
+        )
     }
 
     private fun showNotification(

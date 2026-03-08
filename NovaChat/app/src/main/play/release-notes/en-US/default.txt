@@ -1,1 +1,6 @@
-Fix: Nebula theme chat background now correctly shows white.
+Security and reliability improvements:
+
+- Better backup control: app settings backed up, databases excluded from cloud backup
+- New MMS notification: you'll get alerted when you receive a multimedia message
+- Privacy: debug logging disabled in release builds
+- Bug fixes and performance improvements

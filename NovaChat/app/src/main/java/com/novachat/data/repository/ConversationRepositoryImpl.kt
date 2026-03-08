@@ -1,6 +1,7 @@
 package com.novachat.data.repository
 
 import android.util.Log
+import com.novachat.BuildConfig
 import com.novachat.core.database.dao.ConversationMetaDao
 import com.novachat.core.database.dao.CustomCategoryDao
 import com.novachat.core.database.dao.MessageReactionDao
@@ -74,13 +75,13 @@ class ConversationRepositoryImpl @Inject constructor(
 
     override fun notifyNewMessage(threadId: Long) {
         val emitted = _refreshTrigger.tryEmit(threadId)
-        Log.d("NC_DEBUG", "### Repo.notifyNewMessage($threadId) emitted=$emitted subscriberCount=${_refreshTrigger.subscriptionCount.value}")
+        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "### Repo.notifyNewMessage($threadId) emitted=$emitted subscriberCount=${_refreshTrigger.subscriptionCount.value}")
     }
 
     override suspend fun getConversations(): List<Conversation> {
-        Log.d("NC_DEBUG", "### Repo.getConversations() START")
+        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "### Repo.getConversations() START")
         val conversations = smsProvider.getConversations()
-        Log.d("NC_DEBUG", "### Repo.getConversations() smsProvider returned ${conversations.size} conversations")
+        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "### Repo.getConversations() smsProvider returned ${conversations.size} conversations")
         val allMetas = conversationMetaDao.getAllMetas().associateBy { it.threadId }
         val result = conversations
             .map { conversation ->
@@ -153,9 +154,9 @@ class ConversationRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getMessagesForThread(threadId: Long): List<Message> {
-        Log.d("NC_DEBUG", "### Repo.getMessagesForThread($threadId) START")
+        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "### Repo.getMessagesForThread($threadId) START")
         val messages = smsProvider.getMessagesForThread(threadId)
-        Log.d("NC_DEBUG", "### Repo.getMessagesForThread($threadId) returned ${messages.size} messages")
+        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "### Repo.getMessagesForThread($threadId) returned ${messages.size} messages")
         val messageIds = messages.map { it.id }
         val reactions = getReactionsForMessages(messageIds)
         val pinnedIds = pinnedMessageDao.getPinnedMessageIds(threadId).toSet()

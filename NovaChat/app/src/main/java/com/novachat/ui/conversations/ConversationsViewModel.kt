@@ -1,6 +1,7 @@
 package com.novachat.ui.conversations
 
 import android.util.Log
+import com.novachat.BuildConfig
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.novachat.core.datastore.UserPreferencesRepository
@@ -100,9 +101,9 @@ class ConversationsViewModel @Inject constructor(
 
     private fun observeIncomingMessages() {
         viewModelScope.launch {
-            Log.d("NC_DEBUG", "@@@ ConvVM: observeIncomingMessages() STARTED collecting")
+            if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "@@@ ConvVM: observeIncomingMessages() STARTED collecting")
             conversationRepository.refreshTrigger.collect { threadId ->
-                Log.d("NC_DEBUG", "@@@ ConvVM: refreshTrigger RECEIVED threadId=$threadId -> invalidateAllCaches + loadConversations")
+                if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "@@@ ConvVM: refreshTrigger RECEIVED threadId=$threadId -> invalidateAllCaches + loadConversations")
                 conversationRepository.invalidateAllCaches()
                 loadConversations()
             }
@@ -142,7 +143,7 @@ class ConversationsViewModel @Inject constructor(
     fun loadConversations() {
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
-            Log.d("NC_DEBUG", "@@@ ConvVM: loadConversations() START")
+            if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "@@@ ConvVM: loadConversations() START")
             val current = _uiState.value
             val hasCachedData = current.conversations.isNotEmpty()
 
@@ -169,8 +170,8 @@ class ConversationsViewModel @Inject constructor(
             try {
                 val conversations = conversationRepository.getConversations()
                     .filter { !it.isArchived }
-                Log.d("NC_DEBUG", "@@@ ConvVM: loadConversations() got ${conversations.size} non-archived conversations")
-                conversations.forEach { c ->
+                if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "@@@ ConvVM: loadConversations() got ${conversations.size} non-archived conversations")
+                if (BuildConfig.DEBUG) conversations.forEach { c ->
                     Log.d("NC_DEBUG", "@@@ ConvVM:   thread=${c.threadId} addr=${c.address} snippet=${c.snippet.take(20)} unread=${c.unreadCount}")
                 }
                 val latest = _uiState.value
@@ -178,16 +179,16 @@ class ConversationsViewModel @Inject constructor(
                     conversations, latest.selectedCategory,
                     latest.selectedCustomCategory, latest.searchQuery
                 )
-                Log.d("NC_DEBUG", "@@@ ConvVM: filtered=${filtered.size} category=${latest.selectedCategory} customCat=${latest.selectedCustomCategory}")
+                if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "@@@ ConvVM: filtered=${filtered.size} category=${latest.selectedCategory} customCat=${latest.selectedCustomCategory}")
                 _uiState.value = latest.copy(
                     conversations = conversations,
                     filteredConversations = filtered,
                     isLoading = false,
                     error = null
                 )
-                Log.d("NC_DEBUG", "@@@ ConvVM: UI STATE UPDATED with ${conversations.size} conversations, ${filtered.size} filtered")
+                if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "@@@ ConvVM: UI STATE UPDATED with ${conversations.size} conversations, ${filtered.size} filtered")
             } catch (e: Exception) {
-                Log.e("NC_DEBUG", "@@@ ConvVM: loadConversations() EXCEPTION", e)
+                if (BuildConfig.DEBUG) Log.e("NC_DEBUG", "@@@ ConvVM: loadConversations() EXCEPTION", e)
                 val stillEmpty = _uiState.value.conversations.isEmpty()
                 if (stillEmpty) {
                     kotlinx.coroutines.delay(600)

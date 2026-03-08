@@ -1,6 +1,7 @@
 package com.novachat.ui.chat
 
 import android.util.Log
+import com.novachat.BuildConfig
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.novachat.core.sms.ScamAnalysis
@@ -99,22 +100,22 @@ class ChatViewModel @Inject constructor(
 
     private fun observeIncomingMessages() {
         viewModelScope.launch {
-            Log.d("NC_DEBUG", "$$$ ChatVM: observeIncomingMessages() STARTED collecting")
+            if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "$$$ ChatVM: observeIncomingMessages() STARTED collecting")
             conversationRepository.refreshTrigger.collect { threadId ->
-                Log.d("NC_DEBUG", "$$$ ChatVM: refreshTrigger RECEIVED threadId=$threadId currentThreadId=$currentThreadId")
+                if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "$$$ ChatVM: refreshTrigger RECEIVED threadId=$threadId currentThreadId=$currentThreadId")
                 if (currentThreadId != -1L && (threadId == currentThreadId || threadId == -1L)) {
-                    Log.d("NC_DEBUG", "$$$ ChatVM: MATCH -> invalidateMessagesCache + refreshMessages")
+                    if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "$$$ ChatVM: MATCH -> invalidateMessagesCache + refreshMessages")
                     conversationRepository.invalidateMessagesCache(currentThreadId)
                     refreshMessages()
                 } else {
-                    Log.d("NC_DEBUG", "$$$ ChatVM: NO MATCH (currentThreadId=$currentThreadId, received=$threadId)")
+                    if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "$$$ ChatVM: NO MATCH (currentThreadId=$currentThreadId, received=$threadId)")
                 }
             }
         }
     }
 
     fun loadMessages(threadId: Long) {
-        Log.d("NC_DEBUG", "$$$ ChatVM: loadMessages($threadId) START")
+        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "$$$ ChatVM: loadMessages($threadId) START")
         currentThreadId = threadId
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
@@ -142,20 +143,20 @@ class ChatViewModel @Inject constructor(
             try {
                 conversationRepository.invalidateMessagesCache(threadId)
                 var messages = conversationRepository.getMessagesForThread(threadId)
-                Log.d("NC_DEBUG", "$$$ ChatVM: loadMessages($threadId) initial query returned ${messages.size} messages")
+                if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "$$$ ChatVM: loadMessages($threadId) initial query returned ${messages.size} messages")
 
                 if (messages.isEmpty()) {
-                    Log.d("NC_DEBUG", "$$$ ChatVM: messages empty, starting retry loop")
+                    if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "$$$ ChatVM: messages empty, starting retry loop")
                     for (attempt in 1..3) {
                         delay(500L * attempt)
                         conversationRepository.invalidateMessagesCache(threadId)
                         messages = conversationRepository.getMessagesForThread(threadId)
-                        Log.d("NC_DEBUG", "$$$ ChatVM: retry #$attempt returned ${messages.size} messages")
+                        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "$$$ ChatVM: retry #$attempt returned ${messages.size} messages")
                         if (messages.isNotEmpty()) break
                     }
                 }
 
-                Log.d("NC_DEBUG", "$$$ ChatVM: loadMessages($threadId) FINAL count=${messages.size}")
+                if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "$$$ ChatVM: loadMessages($threadId) FINAL count=${messages.size}")
                 if (messages.isNotEmpty()) {
                     conversationRepository.markThreadAsRead(threadId)
                 }

@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.Telephony
 import android.util.Log
+import com.novachat.BuildConfig
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.novachat.domain.repository.ConversationRepository
@@ -42,14 +43,14 @@ class NovaChatApplication : Application(), Configuration.Provider {
             override fun onChange(selfChange: Boolean, uri: Uri?) {
                 super.onChange(selfChange, uri)
                 val now = System.currentTimeMillis()
-                Log.d("NC_DEBUG", "~~~ ContentObserver.onChange uri=$uri timeSinceLast=${now - lastNotifyTime}ms")
+                if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "~~~ ContentObserver.onChange uri=$uri timeSinceLast=${now - lastNotifyTime}ms")
                 if (now - lastNotifyTime > 200) {
                     lastNotifyTime = now
-                    Log.d("NC_DEBUG", "~~~ ContentObserver: FIRING invalidateAllCaches + notifyNewMessage(-1)")
+                    if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "~~~ ContentObserver: FIRING invalidateAllCaches + notifyNewMessage(-1)")
                     conversationRepository.invalidateAllCaches()
                     conversationRepository.notifyNewMessage(-1L)
                 } else {
-                    Log.d("NC_DEBUG", "~~~ ContentObserver: THROTTLED (too soon)")
+                    if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "~~~ ContentObserver: THROTTLED (too soon)")
                 }
             }
         }

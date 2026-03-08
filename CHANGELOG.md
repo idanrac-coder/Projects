@@ -3,6 +3,22 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.18.0] - 2026-03-08
+
+### Security
+- Guard all NC_DEBUG logs with BuildConfig.DEBUG (no PII in release builds)
+- Add fullBackupContent and dataExtractionRules to exclude databases from automatic cloud backup
+- Remove misleading "Encrypt backup" toggle (was not implemented)
+- Strip verbose/debug/info logs in release via ProGuard assumenosideeffects
+
+### Added
+- RECEIVE_MMS in runtime permission request
+- Notification-only MMS handling (generic "New MMS" notification + cache refresh)
+- Remove WorkManagerInitializer when using Configuration.Provider (lint fix)
+
+### Changed
+- Backup rules: include only shared prefs; databases excluded from Auto Backup
+
 ## [3.17.1] - 2026-03-08
 
 ### Fixed
