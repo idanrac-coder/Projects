@@ -3,6 +3,13 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.16.1] - 2026-03-08
+
+### Added
+- Low punctuation ratio heuristic (propaganda often has very few punctuation marks)
+- Additional PROPAGANDA patterns: missiles on way, authority claim, shelter safety, imperative flee
+- Hebrew fear/catastrophe framing signal (2+ of: השמדה, הטילים, מקלט, משקרים, etc.)
+
 ## [3.16.0] - 2026-03-08
 
 ### Added

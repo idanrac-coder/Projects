@@ -186,6 +186,9 @@ class ScamDetector @Inject constructor(
         // Propaganda/disinformation: broad structural patterns, low base score
         PatternRule(Regex("משקרים.*לכם|משקרות.*לכם"), ScamCategory.PROPAGANDA, 0.62f, "Hebrew: authority lying to you"),
         PatternRule(Regex("תברח|אף\\s*\\S+\\s*לא\\s*יכול\\s*לספק"), ScamCategory.PROPAGANDA, 0.65f, "Hebrew: flee / no X can provide"),
+        PatternRule(Regex("הטילים\\s*בדרך|משמרות\\s*המהפכה"), ScamCategory.PROPAGANDA, 0.63f, "Hebrew: missiles on way / authority claim"),
+        PatternRule(Regex("מקלט.*ביטחון|ביטחון.*מקלט"), ScamCategory.PROPAGANDA, 0.60f, "Hebrew: shelter safety framing"),
+        PatternRule(Regex("תברחו|ברחו\\s*מהארץ"), ScamCategory.PROPAGANDA, 0.64f, "Hebrew: imperative flee plural"),
     )
 
     // ── Analysis ─────────────────────────────────────────────────────────
@@ -417,6 +420,14 @@ class ScamDetector @Inject constructor(
             signals.add("Fragmented line structure (common in propaganda)")
         }
 
+        // Low punctuation ratio: spam/disinformation often has very few punctuation marks
+        val punctuationCount = body.count { it in ".,;:!?—–-\"'" }
+        val punctRatio = if (body.length >= 20) punctuationCount.toFloat() / body.length else 0f
+        if (punctRatio < 0.015f && lines.size >= 3) {
+            score += 0.07f
+            signals.add("Very low punctuation (common in propaganda)")
+        }
+
         // Excessive exclamation marks
         val exclamationCount = body.count { it == '!' }
         if (exclamationCount > 3) {
@@ -483,6 +494,12 @@ class ScamDetector @Inject constructor(
             if (hebrewUrgencyWords.count { body.contains(it) } >= 2) {
                 score += 0.10f
                 signals.add("High Hebrew urgency word density")
+            }
+            // Fear/catastrophe framing (authority claim + threat)
+            val hebrewFearWords = listOf("השמדה", "הטילים", "בדרך", "מקלט", "ביטחון", "משמרות", "תברח", "משקרים")
+            if (hebrewFearWords.count { body.contains(it) } >= 2) {
+                score += 0.08f
+                signals.add("Hebrew fear/catastrophe framing")
             }
         }
         if (infoRequests > 0) {
