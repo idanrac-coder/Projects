@@ -3,6 +3,15 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.17.0] - 2026-03-08
+
+### Added
+- Scroll-to-bottom floating button when viewing older messages in chat (tap to jump to latest)
+
+### Fixed
+- Background preview in Conversation Backgrounds now shows actual pattern/image (e.g. Stars, Marble)
+- Cancel button in message long-press context menu no longer wraps or misaligns
+
 ## [3.16.1] - 2026-03-08
 
 ### Added

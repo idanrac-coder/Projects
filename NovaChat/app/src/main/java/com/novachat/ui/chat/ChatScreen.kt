@@ -2,6 +2,7 @@ package com.novachat.ui.chat
 
 import com.novachat.ui.blocking.BlockRuleLimitDialog
 import androidx.compose.animation.AnimatedVisibility
+import kotlinx.coroutines.launch
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -36,6 +37,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -89,6 +91,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -96,6 +99,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -162,6 +166,18 @@ fun ChatScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var messageText by rememberSaveable { mutableStateOf("") }
     val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+    val showScrollToBottom by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val totalItems = layoutInfo.totalItemsCount
+            if (totalItems <= 1) false
+            else {
+                val lastVisibleIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+                lastVisibleIndex < totalItems - 2
+            }
+        }
+    }
     var showOverflowMenu by remember { mutableStateOf(false) }
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
@@ -673,7 +689,36 @@ fun ChatScreen(
                         }
                     }
                 }
-            }
+                }
+
+                // Scroll to bottom FAB
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 14.dp, bottom = 12.dp)
+                ) {
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = showScrollToBottom && !uiState.isLoading,
+                        enter = fadeIn() + scaleIn(),
+                        exit = fadeOut() + scaleOut()
+                    ) {
+                        Surface(
+                            onClick = { scope.launch { listState.animateScrollToItem(chatItems.size - 1) } },
+                        shape = CircleShape,
+                        shadowElevation = 4.dp,
+                        color = MaterialTheme.colorScheme.primary
+                    ) {
+                        Icon(
+                            Icons.Default.KeyboardArrowDown,
+                            contentDescription = "Scroll to last message",
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .size(24.dp),
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                }
+                }
             }
 
             // Reaction picker
@@ -801,10 +846,13 @@ fun ChatScreen(
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text("Delete", color = MaterialTheme.colorScheme.error)
                                 }
-                                TextButton(onClick = { viewModel.hideReactionPicker() }) {
+                                TextButton(
+                                    onClick = { viewModel.hideReactionPicker() },
+                                    modifier = Modifier.widthIn(min = 72.dp)
+                                ) {
                                     Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(18.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Cancel")
+                                    Text("Cancel", maxLines = 1)
                                 }
                             }
                         }

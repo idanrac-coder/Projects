@@ -1,3 +1,5 @@
-Improved spam detection for propaganda-style messages: punctuation analysis, more Hebrew patterns, and fear/catastrophe framing signals.
+New: Scroll-to-bottom button — tap the arrow when viewing older messages to jump back to the latest.
 
-Date headers in chats now show the year when messages are from a previous year.
+Improvements:
+- Background preview now shows the actual pattern (Stars, Marble, etc.) before applying
+- Fixed Cancel button layout in the message long-press menu

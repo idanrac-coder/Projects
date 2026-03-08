@@ -1,5 +1,6 @@
 package com.novachat.ui.themes
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -38,12 +39,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -140,6 +143,22 @@ fun BackgroundsScreen(
                             .background(backgroundBrush(bg), RoundedCornerShape(12.dp))
                             .padding(12.dp)
                     ) {
+                        if (bg.type == WallpaperType.IMAGE && bg.imageResName != null) {
+                            val imageResId = context.resources.getIdentifier(
+                                bg.imageResName,
+                                "drawable",
+                                context.packageName
+                            )
+                            if (imageResId != 0) {
+                                Image(
+                                    painter = painterResource(imageResId),
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop,
+                                    alpha = 0.9f
+                                )
+                            }
+                        }
                         Column(
                             modifier = Modifier.fillMaxSize(),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
