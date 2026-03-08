@@ -3,6 +3,21 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.19.0] - 2026-03-08
+
+### Added
+- Zero-Trust three-layer spam filter: deterministic regex, heuristic scoring, semantic (ML Kit + short-code whitelist)
+- Layer 1: bit.ly/shortened URLs, suspicious TLDs, urgent/OTP keywords (English + Hebrew)
+- Layer 2: weighted scoring (unknown sender +40, URL +30, OTP/Verify +20, high special chars +15); thresholds Spam >75, Suspicious 40–74
+- Layer 3: ML Kit Entity Extraction for Financial/Package detection; short-code whitelist for known senders; Hebrew keyword fallback
+- Short-code whitelist table and DAO for trusted bank/delivery sender IDs
+- Shadow Inbox: spam messages stored without notification; Suspicious shows warning + Report spam action
+
+### Changed
+- Replace ScamDetector.analyzeWithReputation with SpamFilter.classify in SmsNotificationHandler
+- SpamFilter orchestrates DeterministicSpamLayer, HeuristicSpamLayer, SemanticSpamLayer
+- ScamDetector retained for user feedback (reportSpam/reportNotSpam) and learning
+
 ## [3.18.0] - 2026-03-08
 
 ### Security

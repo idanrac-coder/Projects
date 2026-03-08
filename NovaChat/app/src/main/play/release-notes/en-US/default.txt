@@ -1,6 +1,7 @@
-Security and reliability improvements:
+Smarter spam protection with a new three-layer system:
 
-- Better backup control: app settings backed up, databases excluded from cloud backup
-- New MMS notification: you'll get alerted when you receive a multimedia message
-- Privacy: debug logging disabled in release builds
-- Bug fixes and performance improvements
+- Catches phishing links (bit.ly, suspicious domains) and urgent/OTP scams faster
+- Scores messages based on unknown senders, URLs, and suspicious patterns
+- Trusted banks and delivery services get whitelisted to reduce false alarms
+- Hebrew spam detection supported alongside English
+- Spam goes to a quiet Shadow Inbox without notification; suspicious messages show a warning

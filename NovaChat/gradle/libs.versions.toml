@@ -19,6 +19,7 @@ appcompat = "1.7.0"
 work = "2.10.0"
 hiltWork = "1.2.0"
 mlkitLanguageId = "17.0.6"
+mlkitEntityExtraction = "16.0.0-beta6"
 playServicesCoroutines = "1.9.0"
 
 [libraries]
@@ -76,6 +77,8 @@ androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", vers
 
 # ML Kit Language ID
 mlkit-language-id = { group = "com.google.mlkit", name = "language-id", version.ref = "mlkitLanguageId" }
+# ML Kit Entity Extraction (Financial/Package semantic detection)
+mlkit-entity-extraction = { group = "com.google.mlkit", name = "entity-extraction", version.ref = "mlkitEntityExtraction" }
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "playServicesCoroutines" }
 
 [plugins]

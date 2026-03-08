@@ -14,6 +14,7 @@ import com.novachat.core.database.dao.NotificationProfileDao
 import com.novachat.core.database.dao.PinnedMessageDao
 import com.novachat.core.database.dao.ScheduledMessageDao
 import com.novachat.core.database.dao.SpamLearningDao
+import com.novachat.core.database.dao.ShortCodeWhitelistDao
 import com.novachat.core.database.dao.SpamMessageDao
 import com.novachat.core.database.dao.ThemeDao
 import dagger.Module
@@ -22,6 +23,19 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+
+val MIGRATION_10_11 = object : Migration(10, 11) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS short_code_whitelist (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                address TEXT NOT NULL,
+                label TEXT,
+                createdAt INTEGER NOT NULL
+            )
+        """.trimIndent())
+    }
+}
 
 val MIGRATION_9_10 = object : Migration(9, 10) {
     override fun migrate(db: SupportSQLiteDatabase) {
@@ -196,7 +210,7 @@ object DatabaseModule {
             context,
             NovaChatDatabase::class.java,
             "novachat.db"
-        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10).build()
+        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11).build()
     }
 
     @Provides
@@ -231,4 +245,7 @@ object DatabaseModule {
 
     @Provides
     fun provideSpamLearningDao(db: NovaChatDatabase): SpamLearningDao = db.spamLearningDao()
+
+    @Provides
+    fun provideShortCodeWhitelistDao(db: NovaChatDatabase): ShortCodeWhitelistDao = db.shortCodeWhitelistDao()
 }

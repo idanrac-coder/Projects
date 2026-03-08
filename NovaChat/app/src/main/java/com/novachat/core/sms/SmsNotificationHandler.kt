@@ -28,6 +28,7 @@ class SmsNotificationHandler @Inject constructor(
     private val spamMessageDao: SpamMessageDao,
     private val smsProvider: SmsProvider,
     private val conversationRepository: ConversationRepository,
+    private val spamFilter: SpamFilter,
     private val scamDetector: ScamDetector,
     private val userPreferencesRepository: UserPreferencesRepository
 ) {
@@ -129,7 +130,7 @@ class SmsNotificationHandler @Inject constructor(
         val isKnownContact = contactName != null
 
         val filterInternational = userPreferencesRepository.filterInternationalSenders.first()
-        if (filterInternational && !isKnownContact && !scamDetector.isAllowlisted(address)) {
+        if (filterInternational && !isKnownContact && !spamFilter.isAllowlisted(address)) {
             val userCountry = try {
                 @Suppress("DEPRECATION")
                 context.resources.configuration.locale?.country ?: Locale.getDefault().country
@@ -154,8 +155,9 @@ class SmsNotificationHandler @Inject constructor(
             }
         }
         val scamDetectionEnabled = userPreferencesRepository.scamDetectionEnabled.first()
-        val isSenderAllowlisted = scamDetector.isAllowlisted(address)
+        val isSenderAllowlisted = spamFilter.isAllowlisted(address)
 
+        var spamClassificationResult: SpamFilter.ClassificationResult? = null
         if (isKnownContact || !scamDetectionEnabled || isSenderAllowlisted) {
             when {
                 isKnownContact -> Log.d(TAG, "Contact trust: $address is a known contact ($contactName), skipping spam analysis")
@@ -163,11 +165,9 @@ class SmsNotificationHandler @Inject constructor(
                 else -> Log.d(TAG, "Scam detection disabled by user, skipping spam analysis")
             }
         } else {
-            // Run the learning spam agent — high-confidence spam is auto-blocked.
-            val spamAnalysis = scamDetector.analyzeWithReputation(body, address, isKnownContact = false)
-            val autoBlockThreshold = scamDetector.getAutoBlockThreshold(spamAnalysis.category)
-            if (spamAnalysis.isScam && spamAnalysis.confidence >= autoBlockThreshold) {
-                Log.d(TAG, "Spam agent auto-blocked: confidence=${spamAnalysis.confidence} category=${spamAnalysis.category}")
+            spamClassificationResult = spamFilter.classify(address, body, isKnownContact)
+            if (spamClassificationResult.classification == SpamFilter.SpamClassification.SPAM) {
+                Log.d(TAG, "Spam filter: score=${spamClassificationResult.score} rule=${spamClassificationResult.matchedRuleType}, moving to Shadow Inbox")
                 spamMessageDao.insertSpamMessage(
                     SpamMessageEntity(
                         smsId = System.currentTimeMillis(),
@@ -175,10 +175,10 @@ class SmsNotificationHandler @Inject constructor(
                         body = body,
                         timestamp = timestamp,
                         matchedRuleId = -1,
-                        matchedRuleType = "SPAM_AGENT:${spamAnalysis.category?.name ?: "UNKNOWN"}"
+                        matchedRuleType = "SPAM_FILTER:${spamClassificationResult.matchedRuleType ?: "SCORE_${spamClassificationResult.score}"}"
                     )
                 )
-                scamDetector.reportSpam(address, body, spamAnalysis.category)
+                spamFilter.reportSpam(address, body, ScamCategory.SUSPICIOUS_LINK)
 
                 // Repeat offender auto-block: permanently block after 2+ spam flags
                 val reputation = scamDetector.getSenderReputation(address)
@@ -219,9 +219,8 @@ class SmsNotificationHandler @Inject constructor(
             if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== Handler: fallback getThreadIdForAddress=$threadId")
         }
 
-        val lowConfidenceSpam = if (!isKnownContact) {
-            val analysis = scamDetector.analyzeWithReputation(body, address, isKnownContact = false)
-            if (analysis.isScam) analysis else null
+        val lowConfidenceSpam = if (spamClassificationResult?.classification == SpamFilter.SpamClassification.SUSPICIOUS) {
+            ScamAnalysis(isScam = true, confidence = 0.5f, reason = "Suspicious", category = ScamCategory.SUSPICIOUS_LINK, signals = emptyList())
         } else null
 
         val notifTitle = if (lowConfidenceSpam != null) {
