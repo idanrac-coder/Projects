@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.19.1] - 2026-03-08
+
+### Added
+- Hebrew tax refund scam pattern (החזרי/החזר מס): unsolicited messages now blocked as SPAM
+
 ## [3.19.0] - 2026-03-08
 
 ### Added
