@@ -11,7 +11,7 @@ import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MarkEmailRead
 import androidx.compose.material.icons.filled.PushPin
-import androidx.compose.material.icons.filled.VolumeOff
+import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SwipeToDismissBox
@@ -95,7 +95,7 @@ fun swipeActionIcon(action: SwipeAction): ImageVector = when (action) {
     SwipeAction.DELETE -> Icons.Default.Delete
     SwipeAction.PIN -> Icons.Default.PushPin
     SwipeAction.MARK_READ_UNREAD -> Icons.Default.MarkEmailRead
-    SwipeAction.MUTE -> Icons.Default.VolumeOff
+    SwipeAction.MUTE -> Icons.AutoMirrored.Filled.VolumeOff
     SwipeAction.BLOCK -> Icons.Default.Block
     SwipeAction.OFF -> Icons.Default.Archive
 }

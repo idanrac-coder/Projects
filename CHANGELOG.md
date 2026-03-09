@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.19.5] - 2026-03-09
+
+### Fixed
+- Replace deprecated Material icons with AutoMirrored versions (Forward, VolumeOff, Label, InsertDriveFile)
+
 ## [3.19.4] - 2026-03-08
 
 ### Added

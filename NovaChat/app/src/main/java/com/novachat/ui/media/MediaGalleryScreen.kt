@@ -21,7 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AudioFile
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.InsertDriveFile
+import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -98,7 +98,7 @@ fun MediaGalleryScreen(
                     )
                     3 -> MediaGrid(
                         emptyPlaceholder = "No files shared yet",
-                        icon = Icons.Default.InsertDriveFile
+                        icon = Icons.AutoMirrored.Filled.InsertDriveFile
                     )
                 }
             }

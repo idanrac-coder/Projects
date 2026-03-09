@@ -45,7 +45,7 @@ import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Label
+import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PhoneDisabled
 import androidx.compose.material.icons.filled.RemoveCircleOutline
@@ -173,7 +173,7 @@ fun ConversationsScreen(
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     IconButton(onClick = { viewModel.showCategoryAssignDialog() }) {
-                        Icon(Icons.Default.Label, contentDescription = "Category", tint = MaterialTheme.colorScheme.inverseOnSurface)
+                        Icon(Icons.AutoMirrored.Filled.Label, contentDescription = "Category", tint = MaterialTheme.colorScheme.inverseOnSurface)
                     }
                     IconButton(onClick = { viewModel.showBlockDialogForSelected() }) {
                         Icon(Icons.Default.Block, contentDescription = "Block", tint = MaterialTheme.colorScheme.inverseOnSurface)
@@ -975,7 +975,7 @@ private fun CategoryAssignDialog(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    Icons.Default.Label,
+                    Icons.AutoMirrored.Filled.Label,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
@@ -1012,7 +1012,7 @@ private fun CategoryAssignDialog(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
-                                    Icons.Default.Label,
+                                    Icons.AutoMirrored.Filled.Label,
                                     contentDescription = null,
                                     modifier = Modifier.size(20.dp),
                                     tint = MaterialTheme.colorScheme.primary
@@ -1093,7 +1093,7 @@ private fun ManageCategoriesDialog(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                Icons.Default.Label,
+                                Icons.AutoMirrored.Filled.Label,
                                 contentDescription = null,
                                 modifier = Modifier.size(20.dp),
                                 tint = MaterialTheme.colorScheme.primary

@@ -56,7 +56,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.EmojiEmotions
-import androidx.compose.material.icons.filled.Forward
+import androidx.compose.material.icons.automirrored.filled.Forward
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Mic
@@ -649,6 +649,11 @@ fun ChatScreen(
                         )
                     }
                 } else {
+                    val lastScamWarningMessageId = remember(chatItems, uiState.scamWarnings, uiState.dismissedScamWarnings) {
+                        chatItems
+                            .mapNotNull { (it as? ChatListItem.MessageRow)?.message?.id }
+                            .lastOrNull { id -> id in uiState.scamWarnings && id !in uiState.dismissedScamWarnings }
+                    }
                     LazyColumn(
                         state = listState,
                         modifier = Modifier
@@ -679,6 +684,7 @@ fun ChatScreen(
                                     SwipeableMessageItem(
                                         message = item.message,
                                         uiState = uiState,
+                                        showScamBannerForThisMessage = item.message.id == lastScamWarningMessageId,
                                         hapticFeedback = hapticFeedback,
                                         clipboardManager = clipboardManager,
                                         context = context,
@@ -797,7 +803,7 @@ fun ChatScreen(
                                         context.startActivity(Intent.createChooser(sendIntent, "Forward message"))
                                     }
                                 }) {
-                                    Icon(Icons.Default.Forward, contentDescription = null, modifier = Modifier.size(18.dp))
+                                    Icon(Icons.AutoMirrored.Filled.Forward, contentDescription = null, modifier = Modifier.size(18.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text("Forward")
                                 }
@@ -1330,6 +1336,7 @@ private fun DateSeparator(label: String) {
 private fun SwipeableMessageItem(
     message: Message,
     uiState: ChatUiState,
+    showScamBannerForThisMessage: Boolean = true,
     hapticFeedback: androidx.compose.ui.hapticfeedback.HapticFeedback,
     clipboardManager: androidx.compose.ui.platform.ClipboardManager,
     context: android.content.Context,
@@ -1398,9 +1405,11 @@ private fun SwipeableMessageItem(
                    else MaterialTheme.colorScheme.primary.copy(alpha = swipeAlpha)
         )
 
-        val scamWarning = remember(message.id, uiState.scamWarnings, uiState.dismissedScamWarnings) {
-            uiState.scamWarnings[message.id]
-                ?.takeIf { message.id !in uiState.dismissedScamWarnings }
+        val scamWarning = remember(message.id, uiState.scamWarnings, uiState.dismissedScamWarnings, showScamBannerForThisMessage) {
+            if (showScamBannerForThisMessage) {
+                uiState.scamWarnings[message.id]
+                    ?.takeIf { message.id !in uiState.dismissedScamWarnings }
+            } else null
         }
 
         MessageBubble(
