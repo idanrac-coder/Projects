@@ -33,6 +33,16 @@ object DeterministicSpamLayer {
     private val surveyUnsubscribeRegex = Regex("להסרה:\\s*השיבו")
     // Political polls: survey or Knesset mandates (Israeli political context)
     private val politicalPollRegex = Regex("סקר|מנדטים")
+    // Israeli bank phishing (normalized: ם→מ, ן→נ)
+    private val israeliBankRegex = Regex("בנק.*(נחסמ|ננעל)|כרטיס.*נחסמ|חשבנ.*נחסמ|לאומי|הפועלים|דיסקונט|מזרחי")
+    // Israeli delivery scam
+    private val israeliDeliveryRegex = Regex("חבילה.*ממתינה|דואר.*ישראל|משלוח.*מחכה|חבילתך")
+    // Israeli tax/gov
+    private val israeliGovRegex = Regex("רשות המיסים|משטרה|פיקוד העורף|מבקר המדינה")
+    // Panic / war
+    private val israeliPanicRegex = Regex("מתקפת טילים|חפש מקלט|אזהרה.*טילים|אזעקה")
+    // Crypto
+    private val israeliCryptoRegex = Regex("קריפטו|השקעה מובטחת|ביטקוין")
 
     data class MatchResult(
         val matched: Boolean,
@@ -66,6 +76,16 @@ object DeterministicSpamLayer {
                 return MatchResult(true, "SURVEY_UNSUBSCRIBE", 35)
             politicalPollRegex.containsMatchIn(body) ->
                 return MatchResult(true, "POLITICAL_POLL", 35)
+            israeliBankRegex.containsMatchIn(body) ->
+                return MatchResult(true, "ISRAELI_BANK", 25)
+            israeliDeliveryRegex.containsMatchIn(body) ->
+                return MatchResult(true, "ISRAELI_DELIVERY", 25)
+            israeliGovRegex.containsMatchIn(body) ->
+                return MatchResult(true, "ISRAELI_GOV", 25)
+            israeliPanicRegex.containsMatchIn(body) ->
+                return MatchResult(true, "ISRAELI_PANIC", 30)
+            israeliCryptoRegex.containsMatchIn(body) ->
+                return MatchResult(true, "ISRAELI_CRYPTO", 25)
         }
         return MatchResult(false, null, 0)
     }

@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "examples": [
+    {"text": "חשבון הבנק שלך נחסם. לחץ כאן לעדכון פרטים", "label": 1, "category": "bank_phishing"},
+    {"text": "החבילה שלך ממתינה לאישור מכס", "label": 1, "category": "delivery_scam"},
+    {"text": "אזהרה: מתקפת טילים בדרך חפש מקלט עכשיו", "label": 1, "category": "panic_disinformation"},
+    {"text": "מגיע לך החזר מס. בדוק כאן: bit.ly/xxx", "label": 1, "category": "tax_refund_scam"},
+    {"text": "קריפטו השקעה מובטחת. הצטרף: t.me/crypto", "label": 1, "category": "crypto_scam"},
+    {"text": "אמא אני מגיע עוד חצי שעה", "label": 0, "category": "legitimate"},
+    {"text": "הקוד שלך לכניסה הוא 483221", "label": 0, "category": "legitimate"},
+    {"text": "פגישה נדחתה למחר", "label": 0, "category": "legitimate"},
+    {"text": "ח ש ב ו ן הבנק נחסם", "label": 1, "category": "bank_phishing"},
+    {"text": "חשב0ן הנק שלך נחסם", "label": 1, "category": "bank_phishing"}
+  ]
+}

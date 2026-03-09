@@ -3,6 +3,23 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.20.0] - 2026-03-09
+
+### Added
+- Hebrew/Israeli SMS spam detection engine for Hebrew messages
+- HebrewTextNormalizer: anti-obfuscation (homoglyphs, spacing, emoji, niqqud, number-letter substitution)
+- HebrewKeywordScorer, LinkRiskAnalyzer, PhoneHeuristics for Israeli scam patterns
+- HebrewSpamMlLayer (TF-IDF + char n-grams; model asset placeholder)
+- CampaignDetector for bulk spam campaign detection
+- HebrewSpamEngine orchestrating full pipeline; integrates with SpamFilter when body contains Hebrew
+- DeterministicSpamLayer: Israeli bank, delivery, tax/gov, panic, crypto patterns
+- SpamFilter: optional 50ms timeout on Hebrew engine; fallback to existing pipeline
+- AllowlistChecker interface; SmsSpamModule (Hilt) for Hebrew engine DI
+- Training dataset (hebrew_spam_training.json), regression tests, SpamDetectionBenchmark
+
+### Changed
+- SpamFilter injects HebrewSpamEngine; maps SpamResult (DEFINITE_SPAM/SUSPECTED_SPAM/SAFE) to SpamClassification
+
 ## [3.19.5] - 2026-03-09
 
 ### Fixed

@@ -1,7 +1,10 @@
 package com.novachat.core.sms
 
+import com.novachat.core.sms.hebrew.HebrewSpamEngine
+import com.novachat.core.sms.hebrew.SpamCategory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -10,12 +13,14 @@ import javax.inject.Singleton
  * Layer 1: Deterministic regex
  * Layer 2: Weighted heuristic scoring
  * Layer 3: Semantic (ML Kit + short-code whitelist)
+ * When body contains Hebrew, runs HebrewSpamEngine first; maps result to SpamClassification.
  * Integrates with ScamDetector for user feedback (reportSpam / reportNotSpam).
  */
 @Singleton
 class SpamFilter @Inject constructor(
     private val scamDetector: ScamDetector,
-    private val semanticSpamLayer: SemanticSpamLayer
+    private val semanticSpamLayer: SemanticSpamLayer,
+    private val hebrewSpamEngine: HebrewSpamEngine
 ) {
 
     data class ClassificationResult(
@@ -55,6 +60,28 @@ class SpamFilter @Inject constructor(
             )
         }
 
+        val hasHebrew = body.any { it in '\u0590'..'\u05FF' }
+        if (hasHebrew) {
+            val hebrewResult = withTimeoutOrNull(50L) {
+                hebrewSpamEngine.analyze(address, body, isKnownContact, null)
+            }
+            if (hebrewResult != null) {
+                val classification = when (hebrewResult.category) {
+                    SpamCategory.DEFINITE_SPAM -> SpamClassification.SPAM
+                    SpamCategory.SUSPECTED_SPAM -> SpamClassification.SUSPICIOUS
+                    SpamCategory.SAFE -> SpamClassification.SAFE
+                }
+                val score = (hebrewResult.score * 100).toInt().coerceIn(0, 100)
+                val ruleType = hebrewResult.reasons.firstOrNull() ?: "HEBREW:${hebrewResult.score}"
+                return@withContext ClassificationResult(
+                    classification = classification,
+                    score = score,
+                    matchedRuleType = "HEBREW:$ruleType",
+                    isLowConfidence = classification == SpamClassification.SUSPICIOUS
+                )
+            }
+        }
+
         val deterministicResult = DeterministicSpamLayer.analyze(body)
         val deterministicBonus = if (deterministicResult.matched) deterministicResult.contributesToScore else 0
 
@@ -70,7 +97,7 @@ class SpamFilter @Inject constructor(
 
         val classification = when {
             finalScore > 75 -> SpamClassification.SPAM
-            finalScore >= 40 -> SpamClassification.SUSPICIOUS
+            finalScore >= 55 -> SpamClassification.SUSPICIOUS  // 55 = require 2+ signals (unknown alone=40 stays Safe)
             else -> SpamClassification.SAFE
         }
 

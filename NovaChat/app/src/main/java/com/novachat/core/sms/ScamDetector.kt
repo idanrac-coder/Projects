@@ -45,6 +45,11 @@ enum class ScamCategory {
     PROPAGANDA
 }
 
+/** Allows checking if a sender is allowlisted (e.g. by ScamDetector). Used by HebrewSpamEngine. */
+interface AllowlistChecker {
+    suspend fun isAllowlisted(address: String): Boolean
+}
+
 /**
  * Learning spam/scam detection agent.
  *
@@ -55,7 +60,7 @@ enum class ScamCategory {
 @Singleton
 class ScamDetector @Inject constructor(
     private val learningDao: SpamLearningDao
-) {
+) : AllowlistChecker {
     private val mutex = Mutex()
 
     // Cached learned data — refreshed from DB lazily.
@@ -244,7 +249,7 @@ class ScamDetector @Inject constructor(
         )
     }
 
-    suspend fun isAllowlisted(address: String): Boolean {
+    override suspend fun isAllowlisted(address: String): Boolean {
         return try {
             learningDao.isAllowlisted(address)
         } catch (e: Exception) {

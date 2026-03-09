@@ -15,8 +15,8 @@ android {
         applicationId = "com.novachat"
         minSdk = 31
         targetSdk = 35
-        versionCode = 96
-        versionName = "3.19.5"
+        versionCode = 97
+        versionName = "3.20.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -113,4 +113,6 @@ dependencies {
     // ML Kit Entity Extraction (Financial/Package semantic detection)
     implementation(libs.mlkit.entity.extraction)
     implementation(libs.kotlinx.coroutines.play.services)
+
+    testImplementation("junit:junit:4.13.2")
 }
