@@ -3,6 +3,15 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.21.0] - 2026-03-09
+
+### Added
+- Integrate ScamDetector into SpamFilter.classify() as first layer; loan, political, tax refund, phishing, and other scam types now routed to spam folder
+- Hebrew patterns: "הצביעו עכשיו", "זכאות להלוואה", "כנסו מהר" for vote-now campaigns and loan-eligibility scams
+
+### Changed
+- SpamFilter runs ScamDetector.analyze() before Hebrew/Deterministic layers; high-confidence scams (≥0.72) go to Shadow Inbox, lower-confidence (0.55–0.72) marked Suspicious
+
 ## [3.20.1] - 2026-03-09
 
 ### Fixed

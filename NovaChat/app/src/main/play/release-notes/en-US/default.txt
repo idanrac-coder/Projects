@@ -1,3 +1,3 @@
-Fix: Tax refund spam (e.g. "החזרי מס") is now correctly blocked.
+Stronger scam detection! Loan, political, tax refund, and phishing messages are now automatically moved to the spam folder.
 
-Spam messages no longer appear in the main inbox when another app is set as the default SMS app.
+Improved detection of Hebrew vote-now campaigns and loan-eligibility scams.

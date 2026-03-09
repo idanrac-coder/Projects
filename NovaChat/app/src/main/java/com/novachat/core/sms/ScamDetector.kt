@@ -160,6 +160,7 @@ class ScamDetector @Inject constructor(
         PatternRule(Regex("החבילה.*ממתינה|חבילה.*למשלוח|איסוף\\s*חבילה|משלוח\\s*ממתין"), ScamCategory.DELIVERY_SCAM, 0.76f, "Hebrew: package waiting / pickup / delivery"),
         PatternRule(Regex("דואר\\s*ישראל.*חבילה"), ScamCategory.DELIVERY_SCAM, 0.78f, "Hebrew: Israel Post package"),
         PatternRule(Regex("הלוואה\\s*מיידית|קח\\s*הלוואה|הלוואה\\s*היום"), ScamCategory.LOAN_SCAM, 0.78f, "Hebrew: instant loan / take loan today"),
+        PatternRule(Regex("זכאות\\s*להלוואה|כנסו\\s*מהר"), ScamCategory.LOAN_SCAM, 0.78f, "Hebrew: loan eligibility / enter quickly"),
         PatternRule(Regex("בתנאים\\s*מיוחדים|הלוואה.*אושרה|מאושר.*הלוואה"), ScamCategory.LOAN_SCAM, 0.78f, "Hebrew: special conditions / loan approved"),
 
         // Israel-specific: tax refund, pension, political, money waiting, medical
@@ -172,6 +173,7 @@ class ScamDetector @Inject constructor(
         PatternRule(Regex("למשוך\\s*פנסיה|פנסיה\\s*ופיצויים"), ScamCategory.PENSION_SEVERANCE, 0.80f, "Hebrew: withdraw pension/severance"),
         PatternRule(Regex("פיצויים.*ללא\\s*התפטרות"), ScamCategory.PENSION_SEVERANCE, 0.82f, "Hebrew: severance without resignation"),
         PatternRule(Regex("ביטוח\\s*לאומי.*מענק"), ScamCategory.PENSION_SEVERANCE, 0.80f, "Hebrew: Bituach Leumi grant scam"),
+        PatternRule(Regex("הצביעו\\s*עכשיו|להצביע\\s*עכשיו"), ScamCategory.POLITICAL_SPAM, 0.78f, "Hebrew: vote now campaign"),
         PatternRule(Regex("איזו\\s*ממשלה"), ScamCategory.POLITICAL_SPAM, 0.68f, "Hebrew: which government poll"),
         PatternRule(Regex("חשיפה\\s*דרמטית"), ScamCategory.POLITICAL_SPAM, 0.66f, "Hebrew: dramatic expose"),
         PatternRule(Regex("ראש\\s*האופוזיציה|יו[\"״]ר\\s*יש\\s*עתיד"), ScamCategory.POLITICAL_SPAM, 0.66f, "Hebrew: political figures"),

@@ -60,6 +60,22 @@ class SpamFilter @Inject constructor(
             )
         }
 
+        val scamAnalysis = scamDetector.analyze(body)
+        if (scamAnalysis.isScam) {
+            val scoreInt = (scamAnalysis.confidence * 100).toInt().coerceIn(0, 100)
+            val classification = if (scamAnalysis.confidence >= 0.72f) {
+                SpamClassification.SPAM
+            } else {
+                SpamClassification.SUSPICIOUS
+            }
+            return@withContext ClassificationResult(
+                classification = classification,
+                score = scoreInt,
+                matchedRuleType = "SCAM:${scamAnalysis.category?.name ?: "UNKNOWN"}",
+                isLowConfidence = classification == SpamClassification.SUSPICIOUS
+            )
+        }
+
         val hasHebrew = body.any { it in '\u0590'..'\u05FF' }
         if (hasHebrew) {
             val detRaw = DeterministicSpamLayer.analyze(body)
