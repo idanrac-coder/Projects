@@ -2,6 +2,7 @@ package com.novachat.core.sms
 
 import android.app.role.RoleManager
 import android.content.ContentResolver
+import android.content.ContentUris
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
@@ -219,6 +220,14 @@ class SmsProvider @Inject constructor(
     suspend fun deleteThread(threadId: Long): Int = withContext(Dispatchers.IO) {
         contentResolver.delete(
             Uri.parse("content://mms-sms/conversations/$threadId"),
+            null,
+            null
+        )
+    }
+
+    suspend fun deleteMessage(messageId: Long): Int = withContext(Dispatchers.IO) {
+        contentResolver.delete(
+            ContentUris.withAppendedId(Telephony.Sms.CONTENT_URI, messageId),
             null,
             null
         )

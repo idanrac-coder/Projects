@@ -5,7 +5,9 @@ import com.novachat.BuildConfig
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.novachat.core.sms.ScamAnalysis
+import com.novachat.core.sms.ScamCategory
 import com.novachat.core.sms.ScamDetector
+import com.novachat.core.sms.SpamFilter
 import com.novachat.core.sms.WhatsAppForwarder
 import com.novachat.domain.model.BlockRule
 import com.novachat.domain.model.BlockType
@@ -77,6 +79,7 @@ class ChatViewModel @Inject constructor(
     private val spamMessageDao: SpamMessageDao,
     private val whatsAppForwarder: WhatsAppForwarder,
     private val scamDetector: ScamDetector,
+    private val spamFilter: SpamFilter,
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
@@ -191,11 +194,31 @@ class ChatViewModel @Inject constructor(
         val result = mutableMapOf<Long, ScamAnalysis>()
         val reportedIds = spamMessageDao.getReportedSmsIds().toSet()
         val recent = messages.filter { it.type == MessageType.RECEIVED }.takeLast(20)
+        val scamDetectionEnabled = userPreferencesRepository.scamDetectionEnabled.first()
         for (msg in recent) {
             if (msg.id in reportedIds) continue
-            val analysis = scamDetector.analyzeWithReputation(msg.body, msg.address)
-            if (analysis.isScam) {
-                result[msg.id] = analysis
+            if (!scamDetectionEnabled) continue
+            if (scamDetector.isAllowlisted(msg.address)) continue
+            val classification = spamFilter.classify(msg.address, msg.body, isKnownContact = false)
+            if (classification.classification == SpamFilter.SpamClassification.SUSPICIOUS) {
+                val category = when {
+                    classification.matchedRuleType?.contains("URL") == true ||
+                    classification.matchedRuleType?.contains("SHORTENED") == true ||
+                    classification.matchedRuleType?.contains("TLD") == true ||
+                    classification.matchedRuleType?.contains("contains_url") == true ->
+                        ScamCategory.SUSPICIOUS_LINK
+                    classification.matchedRuleType?.contains("OTP") == true ||
+                    classification.matchedRuleType?.contains("otp_verify") == true ->
+                        ScamCategory.OTP_FRAUD
+                    else -> null
+                }
+                result[msg.id] = ScamAnalysis(
+                    isScam = true,
+                    confidence = 0.5f,
+                    reason = "Possible spam",
+                    category = category,
+                    signals = emptyList()
+                )
             }
         }
         return result
@@ -634,7 +657,7 @@ class ChatViewModel @Inject constructor(
     fun deleteMessage(messageId: Long) {
         viewModelScope.launch {
             try {
-                conversationRepository.invalidateMessagesCache(currentThreadId)
+                conversationRepository.deleteMessage(messageId)
                 loadMessages(currentThreadId)
             } catch (_: Exception) { }
         }

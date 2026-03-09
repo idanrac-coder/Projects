@@ -3,6 +3,13 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.21.1] - 2026-03-09
+
+### Fixed
+- Message delete not working: now actually deletes from SMS provider
+- Cancel button cut off on narrow screens: replaced with header close (X) icon in message action menu
+- Block dialog: show only applicable options (block by number when number exists; block by sender when contact name exists)
+
 ## [3.21.0] - 2026-03-09
 
 ### Added

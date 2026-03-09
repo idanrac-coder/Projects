@@ -210,6 +210,14 @@ class ConversationRepositoryImpl @Inject constructor(
         return deleted
     }
 
+    override suspend fun deleteMessage(messageId: Long) {
+        pinnedMessageDao.unpin(messageId)
+        messageReactionDao.removeAllForMessage(messageId)
+        smsProvider.deleteMessage(messageId)
+        cachedMessages.keys.toList().forEach { invalidateMessagesCache(it) }
+        _refreshTrigger.tryEmit(-1L)
+    }
+
     override suspend fun pinConversation(threadId: Long, pinned: Boolean) {
         ensureMetaExists(threadId)
         conversationMetaDao.setPinned(threadId, pinned)

@@ -24,6 +24,7 @@ interface ConversationRepository {
     suspend fun markThreadAsRead(threadId: Long)
     fun isDefaultSmsApp(): Boolean
     suspend fun deleteThread(threadId: Long): Boolean
+    suspend fun deleteMessage(messageId: Long)
     suspend fun pinConversation(threadId: Long, pinned: Boolean)
     suspend fun archiveConversation(threadId: Long, archived: Boolean)
     suspend fun muteConversation(threadId: Long, muted: Boolean)
