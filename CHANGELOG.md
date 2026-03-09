@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.19.3] - 2026-03-08
+
+### Added
+- Political poll pattern (סקר, מנדטים): block regardless of unsubscribe wording
+
 ## [3.19.2] - 2026-03-08
 
 ### Added
