@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.21.2] - 2026-03-09
+
+### Fixed
+- Messages disappearing from main inbox: only filter spam addresses when NovaChat is not the default SMS app; when default, show all conversations
+
 ## [3.21.1] - 2026-03-09
 
 ### Fixed

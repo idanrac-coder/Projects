@@ -82,19 +82,27 @@ class ConversationRepositoryImpl @Inject constructor(
 
     override suspend fun getConversations(): List<Conversation> {
         if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "### Repo.getConversations() START")
-        val spamAddresses = spamMessageDao.getSpamAddresses().toSet()
-        val normalizeAddress: (String) -> String = { a ->
-            a.replace(Regex("[^0-9]"), "").let { d ->
-                if (d.startsWith("972") && d.length >= 12) "0" + d.drop(3) else d
+        val rawConversations = smsProvider.getConversations()
+        // Only filter by spam_messages when NOT default SMS app: when Google Messages is default,
+        // it writes all SMS to the system; we hide spam threads we've flagged. When we ARE default,
+        // we control what's written (spam not inserted, blocked deleted) so no filtering needed.
+        // Filtering when default would incorrectly hide legitimate threads (e.g. after switching apps).
+        val conversations = if (smsProvider.isDefaultSmsApp()) {
+            rawConversations
+        } else {
+            val spamAddresses = spamMessageDao.getSpamAddresses().toSet()
+            val normalizeAddress: (String) -> String = { a ->
+                a.replace(Regex("[^0-9]"), "").let { d ->
+                    if (d.startsWith("972") && d.length >= 12) "0" + d.drop(3) else d
+                }
+            }
+            val spamNormalized = spamAddresses.map { normalizeAddress(it) }.toSet()
+            rawConversations.filter { conv ->
+                val norm = normalizeAddress(conv.address)
+                norm !in spamNormalized && !spamAddresses.contains(conv.address)
             }
         }
-        val spamNormalized = spamAddresses.map { normalizeAddress(it) }.toSet()
-        val rawConversations = smsProvider.getConversations()
-        val conversations = rawConversations.filter { conv ->
-            val norm = normalizeAddress(conv.address)
-            norm !in spamNormalized && !spamAddresses.contains(conv.address)
-        }
-        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "### Repo.getConversations() raw=${rawConversations.size} filtered=${conversations.size} spamAddrs=${spamAddresses.size}")
+        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "### Repo.getConversations() raw=${rawConversations.size} filtered=${conversations.size}")
         val allMetas = conversationMetaDao.getAllMetas().associateBy { it.threadId }
         val result = conversations
             .map { conversation ->

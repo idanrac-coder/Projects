@@ -1,3 +1,1 @@
-• Message delete now works correctly
-• Message action menu: close button no longer cut off on small screens
-• Block dialog shows only options that apply (e.g. block by number only when a number is available)
+Fixed: Messages no longer disappear from your inbox when NovaChat is set as your default SMS app. All your conversations should now be visible.
