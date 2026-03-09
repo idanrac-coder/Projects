@@ -72,14 +72,26 @@ class SemanticSpamLayer @Inject constructor(
 
     private fun detectFinancialOrPackageHebrew(body: String): Pair<Boolean, Boolean> {
         val financialKeywords = listOf(
-            "החזר מס", "חשבון", "העברה", "תשלום", "מס", "שקלים", "בנק", "כרטיס"
+            "החזר מס", "חשבון", "העברה", "תשלום", "מס", "שקלים", "בנק", "כרטיס",
+            "פנסיה", "פיצויים"
         )
         val packageKeywords = listOf(
             "משלוח", "חבילה", "מעקב", "איסוף", "דואר", "ממתין"
         )
-        val isFinancial = financialKeywords.any { body.contains(it) }
-        val isPackageDelivery = packageKeywords.any { body.contains(it) }
+        val isFinancial = financialKeywords.any { containsAsWholeWord(body, it) }
+        val isPackageDelivery = packageKeywords.any { containsAsWholeWord(body, it) }
         return isFinancial to isPackageDelivery
+    }
+
+    /**
+     * Matches keyword as a whole word (or phrase), not as a substring.
+     * E.g. "מס" matches "מס" but not "מסיבה" (party).
+     */
+    private fun containsAsWholeWord(text: String, keyword: String): Boolean {
+        if (keyword.isBlank()) return false
+        val escaped = Regex.escape(keyword)
+        val pattern = "(?:^|[^\\p{L}\\p{N}])$escaped(?=[^\\p{L}\\p{N}]|$)"
+        return Regex(pattern).containsMatchIn(text)
     }
 
     private suspend fun detectFinancialOrPackageMlKit(body: String): Pair<Boolean, Boolean> {

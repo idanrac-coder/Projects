@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.19.4] - 2026-03-08
+
+### Added
+- Add פנסיה, פיצויים to Hebrew financial keywords (pension/severance scam detection)
+
 ## [3.19.3] - 2026-03-08
 
 ### Added

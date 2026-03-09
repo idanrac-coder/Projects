@@ -1,6 +1,6 @@
 Smarter spam protection with a new three-layer system:
 
 - Catches phishing links and urgent/OTP scams
-- Hebrew tax refund and political poll spam now blocked
+- Hebrew tax refund, political poll, and pension scam spam now blocked
 - Trusted senders whitelisted to reduce false alarms
 - Spam goes to Shadow Inbox; suspicious messages show a warning
