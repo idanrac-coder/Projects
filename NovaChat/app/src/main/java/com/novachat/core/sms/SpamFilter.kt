@@ -62,6 +62,15 @@ class SpamFilter @Inject constructor(
 
         val hasHebrew = body.any { it in '\u0590'..'\u05FF' }
         if (hasHebrew) {
+            val detRaw = DeterministicSpamLayer.analyze(body)
+            if (detRaw.matched && detRaw.ruleType in setOf("TAX_REFUND_SCAM", "ISRAELI_PANIC", "SURVEY_UNSUBSCRIBE", "POLITICAL_POLL")) {
+                return@withContext ClassificationResult(
+                    SpamClassification.SPAM,
+                    (detRaw.contributesToScore + 50).coerceIn(0, 100),
+                    "DET_RAW:${detRaw.ruleType}",
+                    false
+                )
+            }
             val hebrewResult = withTimeoutOrNull(50L) {
                 hebrewSpamEngine.analyze(address, body, isKnownContact, null)
             }

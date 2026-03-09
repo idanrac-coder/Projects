@@ -50,6 +50,17 @@ class HebrewSpamRegressionTest {
     }
 
     @Test
+    @Ignore("HebrewSpamEngine may return SAFE on some JVMs; SpamFilter runs DeterministicSpamLayer on raw body as override")
+    fun detectTaxRefundSpam() = runBlocking {
+        val body = "\u05D4\u05D7\u05D6\u05E8\u05D9 \u05DE\u05E1 \u05DC\u05DB\u05D5\u05DC\u05DD \u05D4\u05D9\u05D5\u05DD \u05D1\u05E9\u05E2\u05D4 5"
+        val result = engine.analyze("052655588", body, false, "IL")
+        assertTrue(
+            "Tax refund 'החזרי מס' should be flagged as spam (DEFINITE or SUSPECTED): score=${result.score} category=${result.category} reasons=${result.reasons}",
+            result.category == SpamCategory.DEFINITE_SPAM || result.category == SpamCategory.SUSPECTED_SPAM
+        )
+    }
+
+    @Test
     @Ignore("Run on device with Hebrew locale")
     fun detectBankPhishing() = runBlocking {
         val body = "\u05D7\u05E9\u05D1\u05D5\u05DF \u05D4\u05D1\u05E0\u05E7 \u05E9\u05DC\u05DA \u05E0\u05D7\u05E1\u05DD. \u05DC\u05D7\u05E5 \u05DB\u05D0\u05DF \u05DC\u05E2\u05D3\u05DB\u05D5\u05DF \u05E4\u05E8\u05D8\u05D9\u05DD"

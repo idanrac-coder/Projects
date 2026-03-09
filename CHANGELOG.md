@@ -3,6 +3,12 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.20.1] - 2026-03-09
+
+### Fixed
+- Tax refund spam not blocked: run DeterministicSpamLayer on raw body for Hebrew before HebrewSpamEngine; override to SPAM when TAX_REFUND_SCAM, ISRAELI_PANIC, etc. match
+- Spam threads appearing in main inbox when NovaChat is not default SMS app: filter conversation list to exclude addresses in spam_messages table
+
 ## [3.20.0] - 2026-03-09
 
 ### Added

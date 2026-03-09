@@ -14,6 +14,7 @@ import com.novachat.core.database.entity.MessageReactionEntity
 import com.novachat.core.database.entity.MessageReminderEntity
 import com.novachat.core.database.entity.PinnedMessageEntity
 import com.novachat.core.database.entity.ScheduledMessageEntity
+import com.novachat.core.database.dao.SpamMessageDao
 import com.novachat.core.sms.SmsSender
 import com.novachat.core.sms.SmsProvider
 import com.novachat.domain.model.Conversation
@@ -35,6 +36,7 @@ import javax.inject.Singleton
 @Singleton
 class ConversationRepositoryImpl @Inject constructor(
     private val smsProvider: SmsProvider,
+    private val spamMessageDao: SpamMessageDao,
     private val smsSender: SmsSender,
     private val conversationMetaDao: ConversationMetaDao,
     private val customCategoryDao: CustomCategoryDao,
@@ -80,8 +82,19 @@ class ConversationRepositoryImpl @Inject constructor(
 
     override suspend fun getConversations(): List<Conversation> {
         if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "### Repo.getConversations() START")
-        val conversations = smsProvider.getConversations()
-        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "### Repo.getConversations() smsProvider returned ${conversations.size} conversations")
+        val spamAddresses = spamMessageDao.getSpamAddresses().toSet()
+        val normalizeAddress: (String) -> String = { a ->
+            a.replace(Regex("[^0-9]"), "").let { d ->
+                if (d.startsWith("972") && d.length >= 12) "0" + d.drop(3) else d
+            }
+        }
+        val spamNormalized = spamAddresses.map { normalizeAddress(it) }.toSet()
+        val rawConversations = smsProvider.getConversations()
+        val conversations = rawConversations.filter { conv ->
+            val norm = normalizeAddress(conv.address)
+            norm !in spamNormalized && !spamAddresses.contains(conv.address)
+        }
+        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "### Repo.getConversations() raw=${rawConversations.size} filtered=${conversations.size} spamAddrs=${spamAddresses.size}")
         val allMetas = conversationMetaDao.getAllMetas().associateBy { it.threadId }
         val result = conversations
             .map { conversation ->
