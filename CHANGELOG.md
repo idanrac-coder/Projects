@@ -3,6 +3,14 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.21.2] - 2026-03-09
+
+### Fixed
+- Trusted senders' conversations no longer disappear from main inbox (previously hidden when address had prior spam entries)
+- Allowlist matching now supports address format variants (e.g. +972... vs 05...)
+- SmsReceiver uses RoleManager for default-app detection (consistent with SmsProvider)
+- When adding a sender to trusted list, remove their entries from spam folder
+
 ## [3.21.1] - 2026-03-09
 
 ### Fixed

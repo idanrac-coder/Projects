@@ -37,6 +37,9 @@ interface SpamMessageDao {
     @Query("DELETE FROM spam_messages")
     suspend fun clearAll()
 
+    @Query("DELETE FROM spam_messages WHERE address = :address")
+    suspend fun deleteByAddress(address: String)
+
     @Query("SELECT DISTINCT address FROM spam_messages")
     suspend fun getSpamAddresses(): List<String>
 }

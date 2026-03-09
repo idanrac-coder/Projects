@@ -1,5 +1,6 @@
 package com.novachat.core.sms
 
+import android.app.role.RoleManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -28,8 +29,9 @@ class SmsReceiver : BroadcastReceiver() {
             return
         }
 
+        // Use RoleManager (same as SmsProvider) for consistent default-app detection
+        val isDefaultApp = context.getSystemService(RoleManager::class.java)?.isRoleHeld(RoleManager.ROLE_SMS) == true
         val defaultPkg = Telephony.Sms.getDefaultSmsPackage(context)
-        val isDefaultApp = defaultPkg == context.packageName
         val noDefaultApp = defaultPkg == null
         val shouldWriteSms = isDefaultApp || noDefaultApp
         if (BuildConfig.DEBUG) Log.d("NC_DEBUG", ">>> SmsReceiver: defaultPkg=$defaultPkg myPkg=${context.packageName} isDefault=$isDefaultApp noDefault=$noDefaultApp shouldWrite=$shouldWriteSms")

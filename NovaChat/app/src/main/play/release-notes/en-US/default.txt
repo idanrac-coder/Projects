@@ -1,3 +1,3 @@
-• Message delete now works correctly
-• Message action menu: close button no longer cut off on small screens
-• Block dialog shows only options that apply (e.g. block by number only when a number is available)
+• Trusted senders' conversations now always appear in your inbox (even if they were previously in spam)
+• Trusted senders work correctly regardless of phone number format (e.g. +972 vs 05...)
+• Improved reliability when NovaChat is set as your default messaging app

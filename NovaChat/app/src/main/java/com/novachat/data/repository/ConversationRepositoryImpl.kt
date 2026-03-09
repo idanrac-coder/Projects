@@ -14,6 +14,7 @@ import com.novachat.core.database.entity.MessageReactionEntity
 import com.novachat.core.database.entity.MessageReminderEntity
 import com.novachat.core.database.entity.PinnedMessageEntity
 import com.novachat.core.database.entity.ScheduledMessageEntity
+import com.novachat.core.database.dao.SpamLearningDao
 import com.novachat.core.database.dao.SpamMessageDao
 import com.novachat.core.sms.SmsSender
 import com.novachat.core.sms.SmsProvider
@@ -37,6 +38,7 @@ import javax.inject.Singleton
 class ConversationRepositoryImpl @Inject constructor(
     private val smsProvider: SmsProvider,
     private val spamMessageDao: SpamMessageDao,
+    private val spamLearningDao: SpamLearningDao,
     private val smsSender: SmsSender,
     private val conversationMetaDao: ConversationMetaDao,
     private val customCategoryDao: CustomCategoryDao,
@@ -89,12 +91,17 @@ class ConversationRepositoryImpl @Inject constructor(
             }
         }
         val spamNormalized = spamAddresses.map { normalizeAddress(it) }.toSet()
+        // Trusted senders (allowlist): always show their conversations in main inbox even if in spam_messages
+        val allowlistedNorm = spamLearningDao.getAllAllowlisted().map { normalizeAddress(it.address) }.toSet()
+        val allowlistedRaw = spamLearningDao.getAllAllowlisted().map { it.address }.toSet()
         val rawConversations = smsProvider.getConversations()
         val conversations = rawConversations.filter { conv ->
             val norm = normalizeAddress(conv.address)
-            norm !in spamNormalized && !spamAddresses.contains(conv.address)
+            val isTrusted = norm in allowlistedNorm || conv.address in allowlistedRaw
+            val isSpam = norm in spamNormalized || spamAddresses.contains(conv.address)
+            isTrusted || !isSpam
         }
-        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "### Repo.getConversations() raw=${rawConversations.size} filtered=${conversations.size} spamAddrs=${spamAddresses.size}")
+        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "### Repo.getConversations() raw=${rawConversations.size} filtered=${conversations.size} spamAddrs=${spamAddresses.size} allowlisted=${allowlistedNorm.size}")
         val allMetas = conversationMetaDao.getAllMetas().associateBy { it.threadId }
         val result = conversations
             .map { conversation ->

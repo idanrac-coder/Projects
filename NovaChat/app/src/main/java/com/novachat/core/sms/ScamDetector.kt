@@ -2,6 +2,7 @@ package com.novachat.core.sms
 
 import android.util.Log
 import com.novachat.core.database.dao.SpamLearningDao
+import com.novachat.core.database.dao.SpamMessageDao
 import com.novachat.core.database.entity.SpamKeywordWeightEntity
 import com.novachat.core.database.entity.SpamLearningEntity
 import com.novachat.core.database.entity.SpamSenderReputationEntity
@@ -59,7 +60,8 @@ interface AllowlistChecker {
  */
 @Singleton
 class ScamDetector @Inject constructor(
-    private val learningDao: SpamLearningDao
+    private val learningDao: SpamLearningDao,
+    private val spamMessageDao: SpamMessageDao
 ) : AllowlistChecker {
     private val mutex = Mutex()
 
@@ -253,17 +255,38 @@ class ScamDetector @Inject constructor(
 
     override suspend fun isAllowlisted(address: String): Boolean {
         return try {
-            learningDao.isAllowlisted(address)
+            // Exact match first (fast path)
+            if (learningDao.isAllowlisted(address)) return true
+            // Normalized match: +972501234567 and 0501234567 should both match
+            val norm = normalizeForMatching(address)
+            val all = learningDao.getAllAllowlisted()
+            all.any { normalizeForMatching(it.address) == norm }
         } catch (e: Exception) {
             false
         }
     }
+
+    private fun normalizeForMatching(a: String): String =
+        a.replace(Regex("[^0-9]"), "").let { d ->
+            if (d.startsWith("972") && d.length >= 12) "0" + d.drop(3) else d
+        }
 
     suspend fun addToAllowlist(address: String) {
         mutex.withLock {
             learningDao.addToAllowlist(
                 com.novachat.core.database.entity.SenderAllowlistEntity(address = address)
             )
+            // Clear spam entries so conversation shows in main inbox
+            spamMessageDao.deleteByAddress(address)
+            val norm = normalizeForMatching(address)
+            if (norm.startsWith("0") && norm.length >= 9) {
+                spamMessageDao.deleteByAddress("+972" + norm.drop(1))
+                spamMessageDao.deleteByAddress("972" + norm.drop(1))
+            } else if (norm.startsWith("972") && norm.length >= 12) {
+                val local = "0" + norm.drop(3)
+                spamMessageDao.deleteByAddress(local)
+                spamMessageDao.deleteByAddress("+$norm")
+            }
         }
     }
 
