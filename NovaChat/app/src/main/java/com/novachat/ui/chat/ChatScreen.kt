@@ -23,6 +23,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -127,7 +128,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.novachat.core.theme.AuroraColors
 import com.novachat.core.theme.GradientAvatar
+import com.novachat.core.theme.LocalActiveTheme
 import com.novachat.core.theme.LocalChatWallpaper
+import com.novachat.core.theme.LocalIsComicMode
 import com.novachat.domain.model.Message
 import com.novachat.domain.model.MessageType
 import com.novachat.domain.model.ReactionEmojis
@@ -306,6 +309,34 @@ fun ChatScreen(
                     }
                 },
                 actions = {
+                    val chatActiveTheme = LocalActiveTheme.current
+                    val showComicBadge = chatActiveTheme.bubbleShape == com.novachat.domain.model.BubbleShape.COMIC
+                    if (showComicBadge) {
+                        androidx.compose.material3.Surface(
+                            shape = RoundedCornerShape(16.dp),
+                            color = Color(0xFF22C55E).copy(alpha = 0.15f),
+                            modifier = Modifier.padding(end = 4.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(0xFF22C55E))
+                                )
+                                Text(
+                                    text = "COMIC MODE",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                    }
                     IconButton(onClick = {
                         val callIntent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$address"))
                         try { context.startActivity(callIntent) } catch (_: Exception) {}
@@ -599,7 +630,8 @@ fun ChatScreen(
                 WallpaperType.PATTERN_GEOMETRIC,
                 WallpaperType.PATTERN_WAVES,
                 WallpaperType.PATTERN_DOTS,
-                WallpaperType.PATTERN_LEAVES -> Modifier.background(
+                WallpaperType.PATTERN_LEAVES,
+                WallpaperType.PATTERN_HALFTONE -> Modifier.background(
                     Brush.radialGradient(
                         colors = listOf(
                             chatWallpaper.primaryColor.copy(alpha = patternAlpha1),
@@ -609,6 +641,9 @@ fun ChatScreen(
                 )
                 else -> Modifier
             }
+
+            val activeTheme = com.novachat.core.theme.LocalActiveTheme.current
+            val isComicMode = activeTheme.bubbleShape == com.novachat.domain.model.BubbleShape.COMIC
 
             Box(
                 modifier = Modifier
@@ -631,6 +666,16 @@ fun ChatScreen(
                             alpha = 0.9f
                         )
                     }
+                }
+                if (chatWallpaper.type == WallpaperType.PATTERN_HALFTONE) {
+                    com.novachat.ui.components.HalftoneBackground(
+                        dotColor = Color.Black,
+                        dotAlpha = 0.1f,
+                        spacing = 14f
+                    )
+                }
+                if (isComicMode) {
+                    com.novachat.ui.components.ComicActionOverlay(alpha = 0.1f)
                 }
                 PullToRefreshBox(
                     isRefreshing = uiState.isRefreshing,
@@ -1154,8 +1199,10 @@ fun ChatScreen(
                     }
 
                     // Send / Mic button with animated transition
+                    val inputComicMode = LocalIsComicMode.current
                     val sendButtonColor = if (messageText.isNotBlank()) {
                         if (uiState.sendViaWhatsApp) Color(0xFF25D366)
+                        else if (inputComicMode) Color(0xFF2563EB)
                         else MaterialTheme.colorScheme.primary
                     } else MaterialTheme.colorScheme.surfaceVariant
 
@@ -1173,9 +1220,17 @@ fun ChatScreen(
                                 }
                             }
                         },
-                        shape = CircleShape,
+                        shape = if (inputComicMode) RoundedCornerShape(14.dp) else CircleShape,
                         color = sendButtonColor,
-                        modifier = Modifier.size(48.dp),
+                        modifier = Modifier
+                            .size(48.dp)
+                            .then(
+                                if (inputComicMode) Modifier.border(
+                                    1.5.dp,
+                                    Color.Black,
+                                    RoundedCornerShape(14.dp)
+                                ) else Modifier
+                            ),
                         enabled = !uiState.isSending
                     ) {
                         Box(contentAlignment = Alignment.Center) {

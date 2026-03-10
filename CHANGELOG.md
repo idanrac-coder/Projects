@@ -3,6 +3,13 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.22.0] - 2026-03-10
+
+### Added
+- Visual Storytelling (Comic Mode) theme: comic-style speech bubbles (blue sent, white received), halftone dot background, POW!/BAM! action overlays
+- Comic mode badge in chat header when Comic theme is active
+- Comic-style send button with jagged border when Comic theme is active
+
 ## [3.21.3] - 2026-03-10
 
 ### Fixed

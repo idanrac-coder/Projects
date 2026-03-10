@@ -227,6 +227,16 @@ object BuiltInThemes {
             sentBubbleColor = 0xFFFDCB6E, receivedBubbleColor = 0xFF2A2218,
             sentTextColor = 0xFF1A1008, receivedTextColor = 0xFFE8DCC8,
             bubbleShape = BubbleShape.MINIMAL
+        ),
+        NovaChatTheme(
+            name = "Visual Storytelling (Comic Mode)",
+            isBuiltIn = true, isPremium = false,
+            primaryColor = 0xFF2563EB, secondaryColor = 0xFFFCD34D,
+            surfaceColor = 0xFFF5F0E4, backgroundColor = 0xFFEDE8D5,
+            sentBubbleColor = 0xFF2563EB, receivedBubbleColor = 0xFFFFFFFF,
+            sentTextColor = 0xFFFFFFFF, receivedTextColor = 0xFF1A1B2E,
+            bubbleShape = BubbleShape.COMIC,
+            wallpaperType = WallpaperType.PATTERN_HALFTONE
         )
     )
 }

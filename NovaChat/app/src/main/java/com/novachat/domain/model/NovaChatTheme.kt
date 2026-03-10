@@ -27,7 +27,8 @@ enum class BubbleShape {
     ROUNDED,
     SQUARE,
     CLOUD,
-    MINIMAL
+    MINIMAL,
+    COMIC
 }
 
 @Serializable
@@ -39,5 +40,6 @@ enum class WallpaperType {
     PATTERN_GEOMETRIC,
     PATTERN_WAVES,
     PATTERN_DOTS,
-    PATTERN_LEAVES
+    PATTERN_LEAVES,
+    PATTERN_HALFTONE
 }

@@ -1,2 +1,1 @@
-• Block list now shows each number, word, sender, and language only once—no more duplicates
-• Automatically cleaned up any duplicate entries you may have had
+New Visual Storytelling (Comic Mode) theme! Turn your chats into a comic strip with blue and white speech bubbles, halftone backgrounds, and fun POW!/BAM! action graphics.
