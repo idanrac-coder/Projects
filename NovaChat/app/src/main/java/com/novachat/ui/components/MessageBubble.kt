@@ -2,7 +2,6 @@ package com.novachat.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -54,7 +52,6 @@ import androidx.compose.ui.unit.sp
 import android.widget.Toast
 import com.novachat.core.theme.LocalChatColors
 import com.novachat.core.theme.LocalChatShapes
-import com.novachat.core.theme.LocalIsComicMode
 import com.novachat.core.theme.sentBubbleGradient
 import com.novachat.core.sms.ScamAnalysis
 import com.novachat.domain.model.Message
@@ -106,7 +103,6 @@ fun MessageBubble(
 ) {
     val chatColors = LocalChatColors.current
     val chatShapes = LocalChatShapes.current
-    val isComicMode = LocalIsComicMode.current
     val isSent = message.type == MessageType.SENT
     val maxBubbleWidth = LocalConfiguration.current.screenWidthDp.dp * 0.80f
 
@@ -114,8 +110,8 @@ fun MessageBubble(
     val textColor = if (isSent) chatColors.sentText else chatColors.receivedText
     val bubbleShape = if (isSent) chatShapes.sentBubbleShape else chatShapes.receivedBubbleShape
 
-    val bubbleBackground = remember(isSent, bubbleColor, isComicMode) {
-        if (isSent && !isComicMode) sentBubbleGradient(bubbleColor) else null
+    val bubbleBackground = remember(isSent, bubbleColor) {
+        if (isSent) sentBubbleGradient(bubbleColor) else null
     }
     val emojiOnly = remember(message.body) { isEmojiOnly(message.body) }
     val formattedTime = remember(message.timestamp) { formatTime(message.timestamp) }
@@ -131,10 +127,6 @@ fun MessageBubble(
                 .then(
                     if (bubbleBackground != null) Modifier.background(bubbleBackground)
                     else Modifier.background(bubbleColor)
-                )
-                .then(
-                    if (isComicMode) Modifier.border(1.5.dp, Color.Black, bubbleShape)
-                    else Modifier
                 )
                 .combinedClickable(
                     onClick = {
@@ -322,37 +314,57 @@ private fun ScamWarningBanner(
 ) {
     Surface(
         shape = RoundedCornerShape(8.dp),
-        color = Color(0xFFFF6B6B).copy(alpha = 0.12f),
-        modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)
+        color = Color(0xFFFF6B6B).copy(alpha = 0.15f),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = "\u26A0\uFE0F", fontSize = 12.sp)
-            Spacer(modifier = Modifier.width(6.dp))
-            Text(
-                text = scamAnalysis.reason ?: "Suspicious message",
-                style = MaterialTheme.typography.labelSmall,
-                fontWeight = FontWeight.Medium,
-                color = Color(0xFFC62828),
-                modifier = Modifier.weight(1f)
-            )
-            TextButton(
-                onClick = onDismissScamWarning,
-                modifier = Modifier.height(28.dp),
-                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
-            ) {
-                Text("Not spam", style = MaterialTheme.typography.labelSmall, color = textColor.copy(alpha = 0.6f), fontSize = 11.sp)
+        Column(modifier = Modifier.padding(8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = "\u26A0\uFE0F", fontSize = 14.sp)
+                Spacer(modifier = Modifier.width(6.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = scamAnalysis.reason ?: "Suspicious message",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFFFF6B6B)
+                    )
+                    Text(
+                        text = "${(scamAnalysis.confidence * 100).toInt()}% confidence" +
+                            (scamAnalysis.category?.let { " \u2022 ${it.name.replace('_', ' ').lowercase().replaceFirstChar { c -> c.uppercase() }}" } ?: ""),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color(0xFFFF6B6B).copy(alpha = 0.7f),
+                        fontSize = 10.sp
+                    )
+                }
             }
-            TextButton(
-                onClick = onConfirmSpam,
-                modifier = Modifier.height(28.dp),
-                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
             ) {
-                Text("Report spam", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold, color = Color(0xFFC62828), fontSize = 11.sp)
+                TextButton(
+                    onClick = onDismissScamWarning,
+                    modifier = Modifier.height(28.dp)
+                ) {
+                    Text(
+                        "Not spam",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = textColor.copy(alpha = 0.6f),
+                        fontSize = 10.sp
+                    )
+                }
+                Spacer(modifier = Modifier.width(4.dp))
+                TextButton(
+                    onClick = onConfirmSpam,
+                    modifier = Modifier.height(28.dp)
+                ) {
+                    Text(
+                        "Report spam",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFFF6B6B),
+                        fontSize = 10.sp
+                    )
+                }
             }
         }
     }

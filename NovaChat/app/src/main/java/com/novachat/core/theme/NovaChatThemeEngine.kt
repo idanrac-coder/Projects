@@ -66,8 +66,6 @@ val LocalChatWallpaper = compositionLocalOf { ChatWallpaper() }
 
 val LocalActiveTheme = compositionLocalOf { BuiltInThemes.all.first() }
 
-val LocalIsComicMode = compositionLocalOf { false }
-
 private val AuroraTypography = Typography(
     displayLarge = TextStyle(
         fontWeight = FontWeight.Bold,
@@ -369,14 +367,11 @@ fun NovaChatMaterialTheme(
         )
     }
 
-    val isComicMode = (bubbleShapeOverride ?: theme.bubbleShape) == BubbleShape.COMIC
-
     CompositionLocalProvider(
         LocalChatColors provides chatColors,
         LocalChatShapes provides chatShapes,
         LocalChatWallpaper provides chatWallpaper,
-        LocalActiveTheme provides theme,
-        LocalIsComicMode provides isComicMode
+        LocalActiveTheme provides theme
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
@@ -402,9 +397,5 @@ fun bubbleShapeFor(shape: BubbleShape): ChatShapes = when (shape) {
     BubbleShape.MINIMAL -> ChatShapes(
         sentBubbleShape = RoundedCornerShape(12.dp),
         receivedBubbleShape = RoundedCornerShape(12.dp)
-    )
-    BubbleShape.COMIC -> ChatShapes(
-        sentBubbleShape = ComicSentBubbleShape,
-        receivedBubbleShape = ComicReceivedBubbleShape
     )
 }
