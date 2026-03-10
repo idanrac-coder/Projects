@@ -3,11 +3,6 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## [3.22.2] - 2026-03-10
-
-### Fixed
-- Comic Mode not applying: seed now inserts missing built-in themes (e.g. Comic) for existing users; Comic bubble selection applies theme correctly
-
 ## [3.22.1] - 2026-03-10
 
 ### Changed

@@ -55,9 +55,8 @@ class ThemeRepositoryImpl @Inject constructor(
 
     override suspend fun seedBuiltInThemes() {
         val existing = themeDao.getBuiltInThemes().first()
-        val existingNames = existing.map { it.name }.toSet()
-        BuiltInThemes.all.forEach { theme ->
-            if (theme.name !in existingNames) {
+        if (existing.isEmpty()) {
+            BuiltInThemes.all.forEach { theme ->
                 themeDao.insertTheme(ThemeEntity.fromDomainModel(theme))
             }
         }
