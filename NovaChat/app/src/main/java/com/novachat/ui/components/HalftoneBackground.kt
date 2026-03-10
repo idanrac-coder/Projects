@@ -10,15 +10,15 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.dp
 
 /**
- * Halftone (Ben-Day) dot pattern overlay for comic mode background.
- * Denser dots, warm brown/beige tint, classic comic printing feel.
+ * Halftone dot pattern overlay for comic mode background.
+ * Draws a grid of dots resembling classic comic book printing.
  */
 @Composable
 fun HalftoneBackground(
     modifier: Modifier = Modifier,
-    dotColor: Color = Color(0xFF6B5344),
-    dotAlpha: Float = 0.12f,
-    spacing: Float = 8f
+    dotColor: Color = Color.Black,
+    dotAlpha: Float = 0.08f,
+    spacing: Float = 12f
 ) {
     Canvas(modifier = modifier.fillMaxSize()) {
         drawHalftoneDots(
@@ -34,15 +34,12 @@ private fun DrawScope.drawHalftoneDots(
     alpha: Float,
     spacing: Float
 ) {
-    val baseRadius = (spacing * 0.4f).coerceAtLeast(1f)
-    var yi = 0
+    val radius = (spacing * 0.35f).coerceAtLeast(1f)
     var y = spacing
     while (y < size.height + spacing) {
-        val offsetX = if (yi % 2 == 0) 0f else spacing / 2f
+        val offsetX = if ((y / spacing).toInt() % 2 == 0) 0f else spacing / 2f
         var x = offsetX
-        var xi = 0
         while (x < size.width + spacing) {
-            val radius = baseRadius * (0.8f + (xi + yi) % 3 * 0.1f)
             drawCircle(
                 color = color,
                 radius = radius,
@@ -50,9 +47,7 @@ private fun DrawScope.drawHalftoneDots(
                 alpha = alpha
             )
             x += spacing
-            xi++
         }
         y += spacing
-        yi++
     }
 }

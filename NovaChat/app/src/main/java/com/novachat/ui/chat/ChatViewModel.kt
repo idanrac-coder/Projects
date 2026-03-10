@@ -14,11 +14,9 @@ import com.novachat.domain.model.BlockType
 import com.novachat.domain.model.Message
 import com.novachat.domain.model.MessageType
 import com.novachat.domain.model.Reaction
-import com.novachat.domain.model.BubbleShape
 import com.novachat.domain.repository.BlockRepository
 import com.novachat.domain.repository.BlockRuleLimitException
 import com.novachat.domain.repository.ConversationRepository
-import com.novachat.domain.repository.ThemeRepository
 import com.novachat.core.datastore.UserPreferencesRepository
 import com.novachat.core.database.dao.SpamMessageDao
 import com.novachat.core.database.entity.SpamMessageEntity
@@ -82,8 +80,7 @@ class ChatViewModel @Inject constructor(
     private val whatsAppForwarder: WhatsAppForwarder,
     private val scamDetector: ScamDetector,
     private val spamFilter: SpamFilter,
-    private val userPreferencesRepository: UserPreferencesRepository,
-    private val themeRepository: ThemeRepository
+    private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatUiState())
@@ -102,22 +99,6 @@ class ChatViewModel @Inject constructor(
             isWhatsAppAvailable = whatsAppForwarder.isWhatsAppInstalled()
         )
         observeIncomingMessages()
-    }
-
-    fun setComicMode(enabled: Boolean) {
-        viewModelScope.launch {
-            if (enabled) {
-                themeRepository.seedBuiltInThemes()
-                val comicTheme = themeRepository.getThemeByBubbleShape(BubbleShape.COMIC)
-                comicTheme?.let {
-                    userPreferencesRepository.setActiveThemeId(it.id)
-                }
-                userPreferencesRepository.setBubbleShape(BubbleShape.COMIC)
-            } else {
-                userPreferencesRepository.setActiveThemeId(1L)
-                userPreferencesRepository.setBubbleShape(null)
-            }
-        }
     }
 
     private fun observeIncomingMessages() {

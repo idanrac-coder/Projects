@@ -3,11 +3,6 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## [3.22.3] - 2026-03-10
-
-### Fixed
-- Comic Mode Switch lambda resolving correctly for toggle state
-
 ## [3.22.2] - 2026-03-10
 
 ### Fixed
