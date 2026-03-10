@@ -60,6 +60,7 @@ class ThemesViewModel @Inject constructor(
         viewModelScope.launch {
             preferencesRepository.setBubbleShape(shape)
             if (shape == BubbleShape.COMIC) {
+                themeRepository.seedBuiltInThemes()
                 val comicTheme = themeRepository.getThemeByBubbleShape(BubbleShape.COMIC)
                 comicTheme?.let {
                     preferencesRepository.setActiveThemeId(it.id)
