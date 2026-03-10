@@ -3,7 +3,6 @@ package com.novachat.data.repository
 import com.novachat.core.database.dao.ThemeDao
 import com.novachat.core.database.entity.ThemeEntity
 import com.novachat.core.theme.BuiltInThemes
-import com.novachat.domain.model.BubbleShape
 import com.novachat.domain.model.NovaChatTheme
 import com.novachat.domain.repository.ThemeRepository
 import kotlinx.coroutines.flow.Flow
@@ -16,12 +15,6 @@ import javax.inject.Singleton
 class ThemeRepositoryImpl @Inject constructor(
     private val themeDao: ThemeDao
 ) : ThemeRepository {
-
-    override suspend fun getThemeByBubbleShape(shape: BubbleShape): NovaChatTheme? {
-        return themeDao.getBuiltInThemes().map { entities ->
-            entities.map { it.toDomainModel() }.find { it.bubbleShape == shape }
-        }.first()
-    }
 
     override fun getAllThemes(): Flow<List<NovaChatTheme>> {
         return themeDao.getAllThemes().map { entities ->
