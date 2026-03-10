@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.22.1] - 2026-03-10
+
+### Changed
+- Comic Mode one-click: selecting "Comic" in Bubble Style now applies the full Visual Storytelling theme (colors, halftone, overlays) in a single tap
+
 ## [3.22.0] - 2026-03-10
 
 ### Added
