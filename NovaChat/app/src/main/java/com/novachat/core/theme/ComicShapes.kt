@@ -41,12 +41,38 @@ val ComicSentBubbleShape: Shape = GenericShape { size, _ ->
 }
 
 /**
- * Cloud-style shape for comic mode received bubbles.
- * Softer, rounded outline like classic comic speech clouds.
+ * Irregular cloud-style shape for comic mode received bubbles.
+ * Jagged outline like classic comic speech clouds.
  */
-val ComicReceivedBubbleShape: Shape = RoundedCornerShape(
-    topStart = 24.dp,
-    topEnd = 24.dp,
-    bottomStart = 24.dp,
-    bottomEnd = 4.dp
+val ComicReceivedBubbleShape: Shape = GenericShape { size, _ ->
+    val w = size.width
+    val h = size.height
+    val bump = 6f
+    moveTo(12f, h * 0.5f)
+    lineTo(12f, h - 12f)
+    lineTo(w * 0.2f, h - 6f)
+    lineTo(w * 0.35f, h)
+    lineTo(w * 0.5f, h - 8f)
+    lineTo(w * 0.65f, h)
+    lineTo(w * 0.8f, h - 6f)
+    lineTo(w - 12f, h - 12f)
+    lineTo(w - 12f, h * 0.6f)
+    lineTo(w - 6f, 12f)
+    lineTo(w * 0.8f, 6f)
+    lineTo(w * 0.6f, 12f)
+    lineTo(w * 0.5f, 6f)
+    lineTo(w * 0.35f, 12f)
+    lineTo(w * 0.2f, 6f)
+    lineTo(12f, 12f)
+    close()
+}
+
+/**
+ * Irregular speech bubble shape for comic mode input field.
+ */
+val ComicInputBubbleShape: Shape = RoundedCornerShape(
+    topStart = 20.dp,
+    topEnd = 20.dp,
+    bottomStart = 20.dp,
+    bottomEnd = 8.dp
 )

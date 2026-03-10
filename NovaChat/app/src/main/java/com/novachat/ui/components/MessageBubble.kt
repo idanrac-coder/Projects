@@ -133,7 +133,11 @@ fun MessageBubble(
                     else Modifier.background(bubbleColor)
                 )
                 .then(
-                    if (isComicMode) Modifier.border(1.5.dp, Color.Black, bubbleShape)
+                    if (isComicMode) Modifier.border(
+                        2.dp,
+                        if (isSent) Color.White else Color.Black,
+                        bubbleShape
+                    )
                     else Modifier
                 )
                 .combinedClickable(

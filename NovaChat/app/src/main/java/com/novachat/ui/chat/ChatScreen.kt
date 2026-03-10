@@ -70,6 +70,7 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Sms
 import androidx.compose.material.icons.outlined.Create
+import androidx.compose.material.icons.outlined.PanTool
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -85,6 +86,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -270,6 +272,8 @@ fun ChatScreen(
                 },
                 title = {
                     val context = LocalContext.current
+                    val chatTheme = LocalActiveTheme.current
+                    val isComic = chatTheme.bubbleShape == com.novachat.domain.model.BubbleShape.COMIC
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.clickable {
@@ -290,51 +294,79 @@ fun ChatScreen(
                             size = 36
                         )
                         Spacer(modifier = Modifier.width(12.dp))
-                        Column {
-                            Text(
-                                text = contactName ?: address,
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onBackground,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Text(
-                                text = address,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
+                        if (isComic) {
+                            androidx.compose.material3.Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = Color.White,
+                                border = androidx.compose.foundation.BorderStroke(1.5.dp, Color.Black)
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                ) {
+                                    Text(
+                                        text = contactName ?: address,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = Color.Black,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    Text(
+                                        text = address,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+                            }
+                        } else {
+                            Column {
+                                Text(
+                                    text = contactName ?: address,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Text(
+                                    text = address,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
                         }
                     }
                 },
                 actions = {
                     val chatActiveTheme = LocalActiveTheme.current
-                    val showComicBadge = chatActiveTheme.bubbleShape == com.novachat.domain.model.BubbleShape.COMIC
-                    if (showComicBadge) {
-                        androidx.compose.material3.Surface(
-                            shape = RoundedCornerShape(16.dp),
-                            color = Color(0xFF22C55E).copy(alpha = 0.15f),
-                            modifier = Modifier.padding(end = 4.dp)
+                    val isComicMode = chatActiveTheme.bubbleShape == com.novachat.domain.model.BubbleShape.COMIC
+                    androidx.compose.material3.Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color.White,
+                        border = androidx.compose.foundation.BorderStroke(1.5.dp, Color.Black),
+                        modifier = Modifier.padding(end = 4.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(6.dp)
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(8.dp)
-                                        .clip(CircleShape)
-                                        .background(Color(0xFF22C55E))
+                            Text(
+                                text = "Comic Mode",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                                color = Color.Black
+                            )
+                            Switch(
+                                checked = isComicMode,
+                                onCheckedChange = { enabled -> viewModel.setComicMode(enabled) },
+                                colors = androidx.compose.material3.SwitchDefaults.colors(
+                                    checkedThumbColor = Color.White,
+                                    checkedTrackColor = Color(0xFF22C55E)
                                 )
-                                Text(
-                                    text = "COMIC MODE",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
+                            )
                         }
                     }
                     IconButton(onClick = {
@@ -669,13 +701,14 @@ fun ChatScreen(
                 }
                 if (chatWallpaper.type == WallpaperType.PATTERN_HALFTONE) {
                     com.novachat.ui.components.HalftoneBackground(
-                        dotColor = Color.Black,
-                        dotAlpha = 0.1f,
-                        spacing = 14f
+                        dotColor = Color(0xFF6B5344),
+                        dotAlpha = 0.12f,
+                        spacing = 8f
                     )
                 }
                 if (isComicMode) {
-                    com.novachat.ui.components.ComicActionOverlay(alpha = 0.1f)
+                    com.novachat.ui.components.ComicActionOverlay(alpha = 0.45f)
+                    com.novachat.ui.components.ComicPanelOverlay()
                 }
                 PullToRefreshBox(
                     isRefreshing = uiState.isRefreshing,
@@ -1110,10 +1143,12 @@ fun ChatScreen(
                     verticalAlignment = Alignment.Bottom,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    val inputComic = LocalIsComicMode.current
                     Surface(
                         modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(24.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        shape = if (inputComic) com.novachat.core.theme.ComicInputBubbleShape else RoundedCornerShape(24.dp),
+                        color = if (inputComic) Color.White else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        border = if (inputComic) androidx.compose.foundation.BorderStroke(1.5.dp, Color.Black) else null
                     ) {
                         TextField(
                             value = messageText,
@@ -1121,7 +1156,8 @@ fun ChatScreen(
                             modifier = Modifier.fillMaxWidth(),
                             placeholder = {
                                 Text(
-                                    if (uiState.sendViaWhatsApp) "WhatsApp message" else "Message",
+                                    if (inputComic) "Type message..."
+                                    else if (uiState.sendViaWhatsApp) "WhatsApp message" else "Message",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                                     style = MaterialTheme.typography.bodyMedium
                                 )
@@ -1199,12 +1235,14 @@ fun ChatScreen(
                     }
 
                     // Send / Mic button with animated transition
-                    val inputComicMode = LocalIsComicMode.current
                     val sendButtonColor = if (messageText.isNotBlank()) {
                         if (uiState.sendViaWhatsApp) Color(0xFF25D366)
-                        else if (inputComicMode) Color(0xFF2563EB)
+                        else if (inputComic) Color(0xFF2563EB)
                         else MaterialTheme.colorScheme.primary
                     } else MaterialTheme.colorScheme.surfaceVariant
+
+                    val sendButtonSurfaceColor = if (inputComic && messageText.isBlank())
+                        Color.White else sendButtonColor
 
                     Surface(
                         onClick = {
@@ -1220,17 +1258,10 @@ fun ChatScreen(
                                 }
                             }
                         },
-                        shape = if (inputComicMode) RoundedCornerShape(14.dp) else CircleShape,
-                        color = sendButtonColor,
-                        modifier = Modifier
-                            .size(48.dp)
-                            .then(
-                                if (inputComicMode) Modifier.border(
-                                    1.5.dp,
-                                    Color.Black,
-                                    RoundedCornerShape(14.dp)
-                                ) else Modifier
-                            ),
+                        shape = if (inputComic) com.novachat.core.theme.ComicInputBubbleShape else CircleShape,
+                        color = sendButtonSurfaceColor,
+                        border = if (inputComic) androidx.compose.foundation.BorderStroke(1.5.dp, Color.Black) else null,
+                        modifier = Modifier.size(48.dp),
                         enabled = !uiState.isSending
                     ) {
                         Box(contentAlignment = Alignment.Center) {
@@ -1260,9 +1291,9 @@ fun ChatScreen(
                                         modifier = Modifier.size(20.dp)
                                     )
                                     else -> Icon(
-                                        Icons.Default.Mic,
+                                        if (inputComic) Icons.Outlined.PanTool else Icons.Default.Mic,
                                         contentDescription = "Voice",
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        tint = if (inputComic) Color(0xFF92400E) else MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
