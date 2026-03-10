@@ -40,12 +40,16 @@ class BlockRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addRule(rule: BlockRule): Long {
+        val trimmedValue = rule.value.trim()
+        val existing = blockRuleDao.getRuleByTypeAndValue(rule.type.name, trimmedValue)
+        if (existing != null) return existing.id
+
         val count = blockRuleDao.getRuleCount().first()
         val isPremium = preferencesRepository.isPremium.first()
         if (!isPremium && count >= BlockRepository.FREE_RULE_LIMIT) {
             throw BlockRuleLimitException()
         }
-        return blockRuleDao.insertRule(BlockRuleEntity.fromDomainModel(rule))
+        return blockRuleDao.insertRule(BlockRuleEntity.fromDomainModel(rule.copy(value = trimmedValue)))
     }
 
     override suspend fun deleteRule(id: Long) {

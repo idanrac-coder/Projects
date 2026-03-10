@@ -49,7 +49,7 @@ import com.novachat.core.database.entity.ThemeEntity
         SenderAllowlistEntity::class,
         ShortCodeWhitelistEntity::class
     ],
-    version = 11,
+    version = 12,
     exportSchema = true
 )
 abstract class NovaChatDatabase : RoomDatabase() {

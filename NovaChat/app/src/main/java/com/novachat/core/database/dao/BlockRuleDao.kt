@@ -20,6 +20,9 @@ interface BlockRuleDao {
     @Query("SELECT * FROM block_rules WHERE id = :id")
     suspend fun getRuleById(id: Long): BlockRuleEntity?
 
+    @Query("SELECT * FROM block_rules WHERE type = :type AND value = :value LIMIT 1")
+    suspend fun getRuleByTypeAndValue(type: String, value: String): BlockRuleEntity?
+
     @Query("SELECT COUNT(*) FROM block_rules")
     fun getRuleCount(): Flow<Int>
 

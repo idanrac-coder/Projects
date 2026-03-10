@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.21.3] - 2026-03-10
+
+### Fixed
+- Block list no longer shows duplicate entries; numbers, words, senders, and languages are now unique per category
+
 ## [3.21.2] - 2026-03-09
 
 ### Fixed

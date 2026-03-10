@@ -1,3 +1,2 @@
-• Trusted senders' conversations now always appear in your inbox (even if they were previously in spam)
-• Trusted senders work correctly regardless of phone number format (e.g. +972 vs 05...)
-• Improved reliability when NovaChat is set as your default messaging app
+• Block list now shows each number, word, sender, and language only once—no more duplicates
+• Automatically cleaned up any duplicate entries you may have had

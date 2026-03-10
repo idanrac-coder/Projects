@@ -24,6 +24,28 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+val MIGRATION_11_12 = object : Migration(11, 12) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("""
+            CREATE TABLE _dedup_keep AS
+            SELECT type, value, MIN(id) as keep_id FROM block_rules GROUP BY type, value
+        """.trimIndent())
+        db.execSQL("""
+            UPDATE spam_messages SET matchedRuleId = (
+                SELECT k.keep_id FROM _dedup_keep k
+                INNER JOIN block_rules r ON r.id = spam_messages.matchedRuleId
+                    AND r.type = k.type AND r.value = k.value
+            )
+            WHERE matchedRuleId IN (
+                SELECT r.id FROM block_rules r
+                INNER JOIN _dedup_keep k ON r.type = k.type AND r.value = k.value AND r.id != k.keep_id
+            )
+        """.trimIndent())
+        db.execSQL("DELETE FROM block_rules WHERE id NOT IN (SELECT keep_id FROM _dedup_keep)")
+        db.execSQL("DROP TABLE _dedup_keep")
+    }
+}
+
 val MIGRATION_10_11 = object : Migration(10, 11) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("""
@@ -210,7 +232,7 @@ object DatabaseModule {
             context,
             NovaChatDatabase::class.java,
             "novachat.db"
-        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11).build()
+        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12).build()
     }
 
     @Provides
