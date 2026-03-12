@@ -1,1 +1,1 @@
-Fix message order when replying to automated texts (e.g. appointment reminders). Messages now appear in the correct chronological order.
+New: Turn off undo send in Settings > Messages. When disabled, messages send immediately without the undo option.

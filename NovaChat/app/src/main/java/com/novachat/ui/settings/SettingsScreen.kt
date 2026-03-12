@@ -75,6 +75,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val whatsAppForwardEnabled by viewModel.whatsAppForwardEnabled.collectAsState()
+    val undoSendEnabled by viewModel.undoSendEnabled.collectAsState()
     val isPremium by viewModel.isPremium.collectAsState()
     val uriHandler = LocalUriHandler.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -212,6 +213,13 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column {
+                    SettingsToggleItem(
+                        title = "Undo send",
+                        subtitle = "Allow undoing a sent message for a few seconds",
+                        checked = undoSendEnabled,
+                        onCheckedChange = { viewModel.setUndoSendEnabled(it) }
+                    )
+                    SettingsDivider()
                     SettingsItem(
                         icon = Icons.Default.Notifications,
                         title = "Notifications",

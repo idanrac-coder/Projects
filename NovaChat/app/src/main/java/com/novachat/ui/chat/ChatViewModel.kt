@@ -326,19 +326,26 @@ class ChatViewModel @Inject constructor(
             sendViaWhatsAppDelayed(address, body)
             return
         }
-        undoJob?.cancel()
-        val pending = PendingSend(
-            address = address,
-            body = body,
-            sendAtMillis = System.currentTimeMillis() + UNDO_SEND_DELAY_MS
-        )
-        _uiState.value = _uiState.value.copy(
-            pendingSendMessage = pending,
-            replyToMessage = null
-        )
-        undoJob = viewModelScope.launch {
-            delay(UNDO_SEND_DELAY_MS)
-            executeSend(address, body)
+        viewModelScope.launch {
+            if (!userPreferencesRepository.undoSendEnabled.first()) {
+                _uiState.value = _uiState.value.copy(replyToMessage = null)
+                executeSend(address, body)
+                return@launch
+            }
+            undoJob?.cancel()
+            val pending = PendingSend(
+                address = address,
+                body = body,
+                sendAtMillis = System.currentTimeMillis() + UNDO_SEND_DELAY_MS
+            )
+            _uiState.value = _uiState.value.copy(
+                pendingSendMessage = pending,
+                replyToMessage = null
+            )
+            undoJob = viewModelScope.launch {
+                delay(UNDO_SEND_DELAY_MS)
+                executeSend(address, body)
+            }
         }
     }
 
@@ -365,25 +372,36 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun sendViaWhatsAppDelayed(address: String, body: String) {
-        undoJob?.cancel()
-        val pending = PendingSend(
-            address = address,
-            body = body,
-            sendAtMillis = System.currentTimeMillis() + UNDO_SEND_DELAY_MS,
-            isWhatsApp = true
-        )
-        _uiState.value = _uiState.value.copy(
-            pendingSendMessage = pending,
-            replyToMessage = null
-        )
-        undoJob = viewModelScope.launch {
-            delay(UNDO_SEND_DELAY_MS)
-            _uiState.value = _uiState.value.copy(pendingSendMessage = null, isSending = true)
-            val success = whatsAppForwarder.sendMessage(address, body)
-            _uiState.value = _uiState.value.copy(
-                isSending = false,
-                error = if (!success) "WhatsApp is not available" else null
+        viewModelScope.launch {
+            if (!userPreferencesRepository.undoSendEnabled.first()) {
+                _uiState.value = _uiState.value.copy(replyToMessage = null, isSending = true)
+                val success = whatsAppForwarder.sendMessage(address, body)
+                _uiState.value = _uiState.value.copy(
+                    isSending = false,
+                    error = if (!success) "WhatsApp is not available" else null
+                )
+                return@launch
+            }
+            undoJob?.cancel()
+            val pending = PendingSend(
+                address = address,
+                body = body,
+                sendAtMillis = System.currentTimeMillis() + UNDO_SEND_DELAY_MS,
+                isWhatsApp = true
             )
+            _uiState.value = _uiState.value.copy(
+                pendingSendMessage = pending,
+                replyToMessage = null
+            )
+            undoJob = viewModelScope.launch {
+                delay(UNDO_SEND_DELAY_MS)
+                _uiState.value = _uiState.value.copy(pendingSendMessage = null, isSending = true)
+                val success = whatsAppForwarder.sendMessage(address, body)
+                _uiState.value = _uiState.value.copy(
+                    isSending = false,
+                    error = if (!success) "WhatsApp is not available" else null
+                )
+            }
         }
     }
 

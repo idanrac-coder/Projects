@@ -17,7 +17,7 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val whatsAppForwardSettings: WhatsAppForwardSettings,
     private val whatsAppForwarder: WhatsAppForwarder,
-    preferencesRepository: UserPreferencesRepository
+    private val preferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
     private val _whatsAppForwardEnabled = MutableStateFlow(whatsAppForwardSettings.isEnabled)
@@ -26,11 +26,20 @@ class SettingsViewModel @Inject constructor(
     val isPremium: StateFlow<Boolean> = preferencesRepository.isPremium
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val undoSendEnabled: StateFlow<Boolean> = preferencesRepository.undoSendEnabled
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
     val isWhatsAppInstalled: Boolean
         get() = whatsAppForwarder.isWhatsAppInstalled()
 
     fun setWhatsAppForwardEnabled(enabled: Boolean) {
         whatsAppForwardSettings.isEnabled = enabled
         _whatsAppForwardEnabled.value = enabled
+    }
+
+    fun setUndoSendEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.setUndoSendEnabled(enabled)
+        }
     }
 }

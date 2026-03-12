@@ -28,4 +28,5 @@ object PreferencesKeys {
     val SCAM_DETECTION_ENABLED = booleanPreferencesKey("scam_detection_enabled")
     val CONVERSATION_BACKGROUND_ID = stringPreferencesKey("conversation_background_id")
     val FILTER_INTERNATIONAL_SENDERS = booleanPreferencesKey("filter_international_senders")
+    val UNDO_SEND_ENABLED = booleanPreferencesKey("undo_send_enabled")
 }

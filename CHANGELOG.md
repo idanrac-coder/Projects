@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.22.2] - 2026-03-12
+
+### Added
+- Settings toggle to turn off undo message send (Messages section)
+
 ## [3.22.1] - 2026-03-12
 
 ### Fixed

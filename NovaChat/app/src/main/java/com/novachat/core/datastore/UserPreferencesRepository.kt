@@ -127,4 +127,12 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun setFilterInternationalSenders(enabled: Boolean) {
         dataStore.edit { it[PreferencesKeys.FILTER_INTERNATIONAL_SENDERS] = enabled }
     }
+
+    val undoSendEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[PreferencesKeys.UNDO_SEND_ENABLED] ?: true
+    }
+
+    suspend fun setUndoSendEnabled(enabled: Boolean) {
+        dataStore.edit { it[PreferencesKeys.UNDO_SEND_ENABLED] = enabled }
+    }
 }
