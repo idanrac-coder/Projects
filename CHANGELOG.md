@@ -3,6 +3,12 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.22.1] - 2026-03-12
+
+### Fixed
+- Message conversation order incorrect when replying to automated system messages (e.g. appointment confirmations); now sorted by timestamp and ID for stable chronological display
+- Explicit THREAD_ID set when inserting sent messages for correct conversation association
+
 ## [3.22.0] - 2026-03-12
 
 ### Added

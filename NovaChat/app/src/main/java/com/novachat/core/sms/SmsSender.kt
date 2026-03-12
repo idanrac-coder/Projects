@@ -53,10 +53,12 @@ class SmsSender @Inject constructor(
 
     private fun writeSentMessageToProvider(address: String, body: String) {
         try {
+            val threadId = Telephony.Threads.getOrCreateThreadId(context, address)
             val values = ContentValues().apply {
                 put(Telephony.Sms.ADDRESS, address)
                 put(Telephony.Sms.BODY, body)
                 put(Telephony.Sms.TYPE, Telephony.Sms.MESSAGE_TYPE_SENT)
+                put(Telephony.Sms.THREAD_ID, threadId)
                 put(Telephony.Sms.DATE, System.currentTimeMillis())
                 put(Telephony.Sms.READ, 1)
                 put(Telephony.Sms.SEEN, 1)

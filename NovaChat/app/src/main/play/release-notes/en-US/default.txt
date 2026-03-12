@@ -1,3 +1,1 @@
-RCS messages are now filtered for spam! Survey links, promotional texts, and other spam from RCS senders will go to the spam folder instead of your inbox.
-
-Bug fixes and performance improvements.
+Fix message order when replying to automated texts (e.g. appointment reminders). Messages now appear in the correct chronological order.

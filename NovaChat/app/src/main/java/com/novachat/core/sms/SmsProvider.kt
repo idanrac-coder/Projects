@@ -140,7 +140,7 @@ class SmsProvider @Inject constructor(
             ),
             "${Telephony.Sms.THREAD_ID} = ?",
             arrayOf(threadId.toString()),
-            "${Telephony.Sms.DATE} ASC"
+            "${Telephony.Sms.DATE} ASC, ${Telephony.Sms._ID} ASC"
         )
 
         cursor?.use {
@@ -148,6 +148,7 @@ class SmsProvider @Inject constructor(
                 messages.add(cursorToMessage(it))
             }
         }
+        messages.sortWith(compareBy({ it.timestamp }, { it.id }))
         if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "*** SmsProvider.getMessagesForThread($threadId) found ${messages.size} messages")
         messages
     }
