@@ -1,6 +1,7 @@
 package com.novachat
 
 import android.app.Application
+import android.content.ContentUris
 import android.database.ContentObserver
 import android.net.Uri
 import android.os.Handler
@@ -10,8 +11,14 @@ import android.util.Log
 import com.novachat.BuildConfig
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import com.novachat.core.sms.SmsNotificationHandler
+import com.novachat.core.sms.SmsProvider
 import com.novachat.domain.repository.ConversationRepository
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -23,7 +30,14 @@ class NovaChatApplication : Application(), Configuration.Provider {
     @Inject
     lateinit var conversationRepository: ConversationRepository
 
+    @Inject
+    lateinit var smsNotificationHandler: SmsNotificationHandler
+
+    @Inject
+    lateinit var smsProvider: SmsProvider
+
     private var smsObserver: ContentObserver? = null
+    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
@@ -44,6 +58,11 @@ class NovaChatApplication : Application(), Configuration.Provider {
                 super.onChange(selfChange, uri)
                 val now = System.currentTimeMillis()
                 if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "~~~ ContentObserver.onChange uri=$uri timeSinceLast=${now - lastNotifyTime}ms")
+
+                appScope.launch {
+                    processProviderInsertedMessages(uri)
+                }
+
                 if (now - lastNotifyTime > 200) {
                     lastNotifyTime = now
                     if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "~~~ ContentObserver: FIRING invalidateAllCaches + notifyNewMessage(-1)")
@@ -65,5 +84,33 @@ class NovaChatApplication : Application(), Configuration.Provider {
             true,
             smsObserver!!
         )
+    }
+
+    private suspend fun processProviderInsertedMessages(uri: Uri?) {
+        val candidateIds = when {
+            uri == null -> smsProvider.getRecentInboxMessageIds(5000L)
+            uri == Telephony.Sms.CONTENT_URI || uri.toString() == "content://mms-sms/" ->
+                smsProvider.getRecentInboxMessageIds(5000L)
+            else -> {
+                try {
+                    val id = ContentUris.parseId(uri)
+                    listOf(id)
+                } catch (_: Exception) {
+                    smsProvider.getRecentInboxMessageIds(5000L)
+                }
+            }
+        }
+
+        for (messageId in candidateIds) {
+            if (smsProvider.wasInsertedByUs(messageId)) continue
+            val info = smsProvider.getInboxMessageById(messageId) ?: continue
+            if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "~~~ processProviderInsertedMessages: processing messageId=$messageId address=${info.address}")
+            smsNotificationHandler.handleProviderInsertedIncomingMessage(
+                address = info.address,
+                body = info.body,
+                timestamp = info.timestamp,
+                messageId = messageId
+            )
+        }
     }
 }

@@ -219,8 +219,20 @@ class SmsNotificationHandler @Inject constructor(
             if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== Handler: fallback getThreadIdForAddress=$threadId")
         }
 
+        // Use a category that reflects the actual trigger; only show "suspicious link" when a link was actually detected
         val lowConfidenceSpam = if (spamClassificationResult?.classification == SpamFilter.SpamClassification.SUSPICIOUS) {
-            ScamAnalysis(isScam = true, confidence = 0.5f, reason = "Suspicious", category = ScamCategory.SUSPICIOUS_LINK, signals = emptyList())
+            val category: ScamCategory? = when {
+                spamClassificationResult.matchedRuleType?.contains("URL") == true ||
+                spamClassificationResult.matchedRuleType?.contains("SHORTENED") == true ||
+                spamClassificationResult.matchedRuleType?.contains("TLD") == true ||
+                spamClassificationResult.matchedRuleType?.contains("contains_url") == true ->
+                    ScamCategory.SUSPICIOUS_LINK
+                spamClassificationResult.matchedRuleType?.contains("OTP") == true ||
+                spamClassificationResult.matchedRuleType?.contains("otp_verify") == true ->
+                    ScamCategory.OTP_FRAUD
+                else -> null // Generic "Possible spam" when trigger is unknown (e.g. unknown sender, urgency)
+            }
+            ScamAnalysis(isScam = true, confidence = 0.5f, reason = "Suspicious", category = category, signals = emptyList())
         } else null
 
         val notifTitle = if (lowConfidenceSpam != null) {
@@ -251,6 +263,110 @@ class SmsNotificationHandler @Inject constructor(
         conversationRepository.invalidateAllCaches()
         conversationRepository.notifyNewMessage(effectiveThreadId)
         if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== handleIncomingSms END ===")
+    }
+
+    /**
+     * Handles a message that was inserted into the SMS provider by the system (e.g. RCS, MMS)
+     * rather than via SmsReceiver. Runs the same block/spam pipeline but deletes the specific
+     * message from the provider instead of inserting it. Used by ContentObserver.
+     */
+    suspend fun handleProviderInsertedIncomingMessage(
+        address: String,
+        body: String,
+        timestamp: Long,
+        messageId: Long
+    ) {
+        if (BuildConfig.DEBUG) Log.d(TAG, "=== handleProviderInsertedIncomingMessage messageId=$messageId address=$address")
+        val contactName = contactResolver.getContactName(address)
+        val isKnownContact = contactName != null
+
+        val isSystemBlocked = try {
+            android.provider.BlockedNumberContract.isBlocked(context, address)
+        } catch (e: Exception) { false }
+
+        val blockedRule = blockRepository.isBlocked(address, contactName, body)
+        if (isSystemBlocked || blockedRule != null) {
+            if (blockedRule != null) {
+                spamMessageDao.insertSpamMessage(
+                    SpamMessageEntity(
+                        smsId = System.currentTimeMillis(),
+                        address = address,
+                        body = body,
+                        timestamp = timestamp,
+                        matchedRuleId = blockedRule.id,
+                        matchedRuleType = blockedRule.type.name
+                    )
+                )
+            }
+            try { smsProvider.deleteMessage(messageId) } catch (_: Exception) { }
+            conversationRepository.invalidateAllCaches()
+            conversationRepository.notifyNewMessage(-1L)
+            return
+        }
+
+        val filterInternational = userPreferencesRepository.filterInternationalSenders.first()
+        if (filterInternational && !isKnownContact && !spamFilter.isAllowlisted(address)) {
+            val userCountry = try {
+                @Suppress("DEPRECATION")
+                context.resources.configuration.locale?.country ?: Locale.getDefault().country
+            } catch (_: Exception) { Locale.getDefault().country }
+            if (userCountry != null && userCountry.isNotBlank() && isInternationalSender(address, userCountry)) {
+                Log.d(TAG, "Provider-inserted: International filter, moving to Shadow Inbox messageId=$messageId")
+                spamMessageDao.insertSpamMessage(
+                    SpamMessageEntity(
+                        smsId = System.currentTimeMillis(),
+                        address = address,
+                        body = body,
+                        timestamp = timestamp,
+                        matchedRuleId = -1,
+                        matchedRuleType = "INTERNATIONAL_FILTER"
+                    )
+                )
+                try { smsProvider.deleteMessage(messageId) } catch (_: Exception) { }
+                conversationRepository.invalidateAllCaches()
+                conversationRepository.notifyNewMessage(-1L)
+                return
+            }
+        }
+
+        val scamDetectionEnabled = userPreferencesRepository.scamDetectionEnabled.first()
+        val isSenderAllowlisted = spamFilter.isAllowlisted(address)
+        if (isKnownContact || !scamDetectionEnabled || isSenderAllowlisted) {
+            if (BuildConfig.DEBUG) Log.d(TAG, "Provider-inserted: skipping spam (contact/allowlist/disabled), messageId=$messageId")
+            return
+        }
+
+        val spamClassificationResult = spamFilter.classify(address, body, isKnownContact)
+        if (spamClassificationResult.classification == SpamFilter.SpamClassification.SPAM) {
+            Log.d(TAG, "Provider-inserted spam filter: score=${spamClassificationResult.score} rule=${spamClassificationResult.matchedRuleType}, moving to Shadow Inbox messageId=$messageId")
+            spamMessageDao.insertSpamMessage(
+                SpamMessageEntity(
+                    smsId = System.currentTimeMillis(),
+                    address = address,
+                    body = body,
+                    timestamp = timestamp,
+                    matchedRuleId = -1,
+                    matchedRuleType = "SPAM_FILTER:${spamClassificationResult.matchedRuleType ?: "SCORE_${spamClassificationResult.score}"}"
+                )
+            )
+            spamFilter.reportSpam(address, body, ScamCategory.SUSPICIOUS_LINK)
+            try { smsProvider.deleteMessage(messageId) } catch (_: Exception) { }
+
+            val reputation = scamDetector.getSenderReputation(address)
+            if (reputation != null && reputation.spamCount >= 2) {
+                Log.d(TAG, "Repeat offender auto-block: $address flagged ${reputation.spamCount} times")
+                try {
+                    blockRepository.addRule(
+                        com.novachat.domain.model.BlockRule(
+                            type = com.novachat.domain.model.BlockType.NUMBER,
+                            value = address
+                        )
+                    )
+                } catch (e: Exception) { Log.w(TAG, "Failed to auto-create block rule", e) }
+            }
+            conversationRepository.invalidateAllCaches()
+            conversationRepository.notifyNewMessage(-1L)
+        }
     }
 
     private suspend fun handleBlockedMessage(

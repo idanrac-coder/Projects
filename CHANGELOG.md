@@ -3,6 +3,15 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.22.0] - 2026-03-12
+
+### Added
+- RCS and system-inserted messages (bypassing SMS broadcast) now filtered for spam via ContentObserver
+- SmsProvider tracks recently inserted message IDs to avoid reprocessing our own SMS; ContentObserver processes provider-inserted messages and moves spam to Shadow Inbox
+
+### Fixed
+- RCS messages no longer bypass spam filter; spam (e.g. survey links, political polls) from RCS senders now blocked
+
 ## [3.21.3] - 2026-03-10
 
 ### Fixed

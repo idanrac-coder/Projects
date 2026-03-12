@@ -1,2 +1,3 @@
-• Block list now shows each number, word, sender, and language only once—no more duplicates
-• Automatically cleaned up any duplicate entries you may have had
+RCS messages are now filtered for spam! Survey links, promotional texts, and other spam from RCS senders will go to the spam folder instead of your inbox.
+
+Bug fixes and performance improvements.

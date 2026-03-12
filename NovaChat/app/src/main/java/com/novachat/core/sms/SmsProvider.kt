@@ -15,8 +15,11 @@ import com.novachat.domain.model.MessageType
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
+
+private const val RECENTLY_INSERTED_TTL_MS = 3000L
 
 @Singleton
 class SmsProvider @Inject constructor(
@@ -24,6 +27,21 @@ class SmsProvider @Inject constructor(
     private val contentResolver: ContentResolver,
     private val contactResolver: ContactResolver
 ) {
+    private val recentlyInsertedIds = ConcurrentHashMap<Long, Long>()
+
+    fun markAsInsertedByUs(messageId: Long) {
+        recentlyInsertedIds[messageId] = System.currentTimeMillis()
+    }
+
+    fun wasInsertedByUs(messageId: Long): Boolean {
+        pruneExpiredIds()
+        return recentlyInsertedIds.remove(messageId) != null
+    }
+
+    private fun pruneExpiredIds() {
+        val now = System.currentTimeMillis()
+        recentlyInsertedIds.entries.removeIf { (_, ts) -> now - ts > RECENTLY_INSERTED_TTL_MS }
+    }
 
     fun isDefaultSmsApp(): Boolean {
         val roleManager = context.getSystemService(RoleManager::class.java)
@@ -191,6 +209,12 @@ class SmsProvider @Inject constructor(
             val uri = contentResolver.insert(Telephony.Sms.CONTENT_URI, values)
                 ?: contentResolver.insert(Telephony.Sms.Inbox.CONTENT_URI, values)
             Log.d("SmsProvider", "Insert result: uri=$uri threadId=$threadId address=$address")
+            uri?.let { u ->
+                try {
+                    val id = ContentUris.parseId(u)
+                    markAsInsertedByUs(id)
+                } catch (_: Exception) { }
+            }
             InsertResult(uri, threadId)
         } catch (e: Exception) {
             Log.e("SmsProvider", "Failed to insert incoming SMS", e)
@@ -231,6 +255,51 @@ class SmsProvider @Inject constructor(
             null,
             null
         )
+    }
+
+    data class InboxMessageInfo(
+        val messageId: Long,
+        val address: String,
+        val body: String,
+        val timestamp: Long
+    )
+
+    suspend fun getInboxMessageById(messageId: Long): InboxMessageInfo? = withContext(Dispatchers.IO) {
+        contentResolver.query(
+            ContentUris.withAppendedId(Telephony.Sms.CONTENT_URI, messageId),
+            arrayOf(Telephony.Sms._ID, Telephony.Sms.ADDRESS, Telephony.Sms.BODY, Telephony.Sms.DATE, Telephony.Sms.TYPE),
+            null, null, null
+        )?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val type = cursor.getInt(cursor.getColumnIndexOrThrow(Telephony.Sms.TYPE))
+                if (type == Telephony.Sms.MESSAGE_TYPE_INBOX) {
+                    InboxMessageInfo(
+                        messageId = cursor.getLong(cursor.getColumnIndexOrThrow(Telephony.Sms._ID)),
+                        address = cursor.getString(cursor.getColumnIndexOrThrow(Telephony.Sms.ADDRESS)) ?: "",
+                        body = cursor.getString(cursor.getColumnIndexOrThrow(Telephony.Sms.BODY)) ?: "",
+                        timestamp = cursor.getLong(cursor.getColumnIndexOrThrow(Telephony.Sms.DATE))
+                    )
+                } else null
+                } else null
+        }
+    }
+
+    suspend fun getRecentInboxMessageIds(sinceMsAgo: Long = 5000L): List<Long> = withContext(Dispatchers.IO) {
+        val since = System.currentTimeMillis() - sinceMsAgo
+        contentResolver.query(
+            Telephony.Sms.CONTENT_URI,
+            arrayOf(Telephony.Sms._ID),
+            "${Telephony.Sms.TYPE} = ? AND ${Telephony.Sms.DATE} >= ?",
+            arrayOf(Telephony.Sms.MESSAGE_TYPE_INBOX.toString(), since.toString()),
+            "${Telephony.Sms.DATE} DESC"
+        )?.use { cursor ->
+            val colId = cursor.getColumnIndexOrThrow(Telephony.Sms._ID)
+            val ids = mutableListOf<Long>()
+            while (cursor.moveToNext()) {
+                ids.add(cursor.getLong(colId))
+            }
+            ids
+        } ?: emptyList()
     }
 
     private fun cursorToMessage(cursor: Cursor): Message {
