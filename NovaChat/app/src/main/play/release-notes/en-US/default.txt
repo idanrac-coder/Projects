@@ -1,1 +1,4 @@
-New: Turn off undo send in Settings > Messages. When disabled, messages send immediately without the undo option.
+Refreshed chat design with Material 3 Expressive style:
+- New pill-shaped input bar with emoji, gallery, camera, and GIF shortcuts
+- Clearer read receipts with recipient avatar and checkmark
+- Voice and attachment buttons moved outside the field for easier access
