@@ -15,10 +15,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
@@ -52,7 +50,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import android.widget.Toast
-import com.novachat.core.theme.GradientAvatar
 import com.novachat.core.theme.LocalChatColors
 import com.novachat.core.theme.LocalChatShapes
 import com.novachat.core.theme.sentBubbleGradient
@@ -95,7 +92,6 @@ fun MessageBubble(
     isActiveMatch: Boolean = false,
     replyToBody: String? = null,
     scamAnalysis: ScamAnalysis? = null,
-    recipientDisplayName: String? = null,
     onLongClick: () -> Unit = {},
     onReactionClick: (String) -> Unit = {},
     onCodeCopy: (String) -> Unit = {},
@@ -248,9 +244,9 @@ fun MessageBubble(
                 Row(
                     modifier = Modifier
                         .align(if (isSent) Alignment.End else Alignment.Start)
-                        .padding(top = 6.dp),
+                        .padding(top = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    horizontalArrangement = Arrangement.spacedBy(3.dp)
                 ) {
                     Text(
                         text = formattedTime,
@@ -259,42 +255,13 @@ fun MessageBubble(
                         fontWeight = FontWeight.Medium
                     )
                     if (isSent) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(2.dp)
-                        ) {
-                            if (message.isRead) {
-                                GradientAvatar(
-                                    address = message.address,
-                                    displayName = recipientDisplayName ?: message.address,
-                                    size = 16
-                                )
-                                Surface(
-                                    shape = CircleShape,
-                                    color = Color.White.copy(alpha = 0.95f),
-                                    modifier = Modifier.size(14.dp)
-                                ) {
-                                    Box(
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.DoneAll,
-                                            contentDescription = "Read",
-                                            modifier = Modifier.size(10.dp),
-                                            tint = chatColors.sentBubble
-                                        )
-                                    }
-                                }
-                            } else {
-                                Icon(
-                                    imageVector = Icons.Default.Done,
-                                    contentDescription = "Sent",
-                                    modifier = Modifier.size(14.dp),
-                                    tint = textColor.copy(alpha = 0.45f)
-                                )
-                            }
-                        }
+                        Icon(
+                            imageVector = if (message.isRead) Icons.Default.DoneAll else Icons.Default.Done,
+                            contentDescription = if (message.isRead) "Read" else "Sent",
+                            modifier = Modifier.size(14.dp),
+                            tint = if (message.isRead) Color(0xFF55EFC4)
+                            else textColor.copy(alpha = 0.45f)
+                        )
                     }
                 }
             }

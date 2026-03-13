@@ -57,8 +57,8 @@ val LocalChatColors = compositionLocalOf {
 
 val LocalChatShapes = compositionLocalOf {
     ChatShapes(
-        sentBubbleShape = RoundedCornerShape(24.dp, 24.dp, 6.dp, 24.dp),
-        receivedBubbleShape = RoundedCornerShape(24.dp, 24.dp, 24.dp, 6.dp)
+        sentBubbleShape = RoundedCornerShape(20.dp, 20.dp, 4.dp, 20.dp),
+        receivedBubbleShape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 4.dp)
     )
 }
 
@@ -383,16 +383,16 @@ fun NovaChatMaterialTheme(
 
 fun bubbleShapeFor(shape: BubbleShape): ChatShapes = when (shape) {
     BubbleShape.ROUNDED -> ChatShapes(
-        sentBubbleShape = RoundedCornerShape(24.dp, 24.dp, 6.dp, 24.dp),
-        receivedBubbleShape = RoundedCornerShape(24.dp, 24.dp, 24.dp, 6.dp)
+        sentBubbleShape = RoundedCornerShape(20.dp, 20.dp, 4.dp, 20.dp),
+        receivedBubbleShape = RoundedCornerShape(20.dp, 20.dp, 20.dp, 4.dp)
     )
     BubbleShape.SQUARE -> ChatShapes(
         sentBubbleShape = RoundedCornerShape(4.dp),
         receivedBubbleShape = RoundedCornerShape(4.dp)
     )
     BubbleShape.CLOUD -> ChatShapes(
-        sentBubbleShape = RoundedCornerShape(28.dp, 28.dp, 6.dp, 28.dp),
-        receivedBubbleShape = RoundedCornerShape(28.dp, 28.dp, 28.dp, 6.dp)
+        sentBubbleShape = RoundedCornerShape(24.dp, 24.dp, 4.dp, 24.dp),
+        receivedBubbleShape = RoundedCornerShape(24.dp, 24.dp, 24.dp, 4.dp)
     )
     BubbleShape.MINIMAL -> ChatShapes(
         sentBubbleShape = RoundedCornerShape(12.dp),

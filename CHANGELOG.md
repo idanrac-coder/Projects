@@ -3,19 +3,6 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## [3.22.3] - 2026-03-13
-
-### Added
-- Material 3 Expressive design: taller pill-shaped input, expressive accessory bar (emoji, gallery, camera, GIF)
-- Circle-style read receipts: recipient avatar + checkmark for read messages
-- Voice and attachment buttons moved outside the text field for cleaner layout
-
-### Changed
-- Chat bubbles use more rounded corners (24dp) for Material 3 Expressive alignment
-- Input area redesigned with pill-shaped accessory bar and revised spacing
-- Animated content size for smoother multi-line input expansion
-- LazyColumn padding and spacing increased for revised density
-
 ## [3.22.2] - 2026-03-12
 
 ### Added

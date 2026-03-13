@@ -25,7 +25,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,7 +33,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -51,9 +49,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AddCircleOutline
-import androidx.compose.material.icons.filled.AttachFile
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.VerifiedUser
@@ -663,8 +658,8 @@ fun ChatScreen(
                         state = listState,
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                            .padding(horizontal = 14.dp),
+                        verticalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
                         items(
                             count = chatItems.size,
@@ -688,7 +683,6 @@ fun ChatScreen(
                                 is ChatListItem.MessageRow -> {
                                     SwipeableMessageItem(
                                         message = item.message,
-                                        contactName = contactName,
                                         uiState = uiState,
                                         showScamBannerForThisMessage = item.message.id == lastScamWarningMessageId,
                                         hapticFeedback = hapticFeedback,
@@ -749,7 +743,7 @@ fun ChatScreen(
 
                     Surface(
                         color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+                        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
                         shadowElevation = 8.dp,
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -1059,217 +1053,105 @@ fun ChatScreen(
                 }
             }
 
-            // Input area - Material 3 Expressive design
+            // Input area
             Surface(
                 color = MaterialTheme.colorScheme.background,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    // SMS / RCS / WhatsApp mode indicator
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp, vertical = 4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = if (uiState.sendViaWhatsApp) "WhatsApp" else "SMS / RCS",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                        )
-                        if (!uiState.sendViaWhatsApp) {
-                            Text(
-                                text = "\u00B7",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                            )
-                            Text(
-                                text = "Text message",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                            )
-                        }
-                    }
-
-                    // Expressive accessory bar - pill-shaped
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 4.dp),
+                        modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(24.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                     ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            IconButton(
-                                onClick = { showEmojiPicker = !showEmojiPicker },
-                                modifier = Modifier.size(40.dp)
-                            ) {
-                                Icon(
-                                    Icons.Default.EmojiEmotions,
-                                    contentDescription = "Emoji",
-                                    tint = if (showEmojiPicker) MaterialTheme.colorScheme.primary
-                                           else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-                                    modifier = Modifier.size(22.dp)
-                                )
-                            }
-                            IconButton(
-                                onClick = { onNavigateToMediaGallery() },
-                                modifier = Modifier.size(40.dp)
-                            ) {
-                                Icon(
-                                    Icons.Default.Image,
-                                    contentDescription = "Gallery",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-                                    modifier = Modifier.size(22.dp)
-                                )
-                            }
-                            IconButton(
-                                onClick = { Toast.makeText(context, "Camera coming with MMS support", Toast.LENGTH_SHORT).show() },
-                                modifier = Modifier.size(40.dp)
-                            ) {
-                                Icon(
-                                    Icons.Default.CameraAlt,
-                                    contentDescription = "Camera",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-                                    modifier = Modifier.size(22.dp)
-                                )
-                            }
-                            Surface(
-                                onClick = { Toast.makeText(context, "GIF search coming soon", Toast.LENGTH_SHORT).show() },
-                                shape = RoundedCornerShape(12.dp),
-                                color = Color.Transparent,
-                                modifier = Modifier.height(36.dp)
-                            ) {
+                        TextField(
+                            value = messageText,
+                            onValueChange = { messageText = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            placeholder = {
                                 Text(
-                                    text = "GIF",
-                                    modifier = Modifier.padding(horizontal = 12.dp).padding(vertical = 8.dp),
-                                    style = MaterialTheme.typography.labelMedium,
-                                    fontWeight = FontWeight.Medium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                                    if (uiState.sendViaWhatsApp) "WhatsApp message" else "Message",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                    style = MaterialTheme.typography.bodyMedium
                                 )
-                            }
-                            if (uiState.isWhatsAppAvailable) {
-                                Spacer(modifier = Modifier.weight(1f))
-                                IconButton(
-                                    onClick = { viewModel.toggleSendViaWhatsApp() },
-                                    modifier = Modifier.size(40.dp)
-                                ) {
-                                    if (uiState.sendViaWhatsApp) {
-                                        Text(
-                                            text = "W",
-                                            style = MaterialTheme.typography.labelLarge,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color(0xFF25D366)
-                                        )
-                                    } else {
+                            },
+                            leadingIcon = if (uiState.isWhatsAppAvailable) {
+                                {
+                                    IconButton(
+                                        onClick = { viewModel.toggleSendViaWhatsApp() },
+                                        modifier = Modifier.size(36.dp)
+                                    ) {
+                                        if (uiState.sendViaWhatsApp) {
+                                            Text(
+                                                text = "W",
+                                                style = MaterialTheme.typography.labelLarge,
+                                                fontWeight = FontWeight.Bold,
+                                                color = Color(0xFF25D366)
+                                            )
+                                        } else {
+                                            Icon(
+                                                Icons.Default.Sms,
+                                                contentDescription = "Switch to WhatsApp",
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+                                    }
+                                }
+                            } else null,
+                            trailingIcon = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    IconButton(
+                                        onClick = { },
+                                        modifier = Modifier.size(36.dp)
+                                    ) {
                                         Icon(
-                                            Icons.Default.Sms,
-                                            contentDescription = "Switch to WhatsApp",
+                                            Icons.Outlined.Create,
+                                            contentDescription = "AI Compose",
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                    IconButton(
+                                        onClick = { showEmojiPicker = !showEmojiPicker },
+                                        modifier = Modifier.size(36.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.EmojiEmotions,
+                                            contentDescription = "Emoji",
+                                            tint = if (showEmojiPicker) MaterialTheme.colorScheme.primary
+                                                   else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                    IconButton(
+                                        onClick = { viewModel.showScheduleDialog() },
+                                        modifier = Modifier.size(36.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.AddCircleOutline,
+                                            contentDescription = "More",
                                             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                                             modifier = Modifier.size(20.dp)
                                         )
                                     }
                                 }
-                            }
-                        }
-                    }
-
-                    // Main input row: mic + attach outside, pill field, send
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.Bottom,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        IconButton(
-                            onClick = {
-                                isVoiceRecording = !isVoiceRecording
-                                if (isVoiceRecording) {
-                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    voiceDurationMs = 0
-                                }
                             },
-                            modifier = Modifier.size(44.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Mic,
-                                contentDescription = "Voice message",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-                                modifier = Modifier.size(24.dp)
+                            maxLines = 4,
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
                             )
-                        }
-                        IconButton(
-                            onClick = { Toast.makeText(context, "Attachments coming with MMS support", Toast.LENGTH_SHORT).show() },
-                            modifier = Modifier.size(44.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.AttachFile,
-                                contentDescription = "Attach",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                        Surface(
-                            modifier = Modifier
-                                .weight(1f)
-                                .heightIn(min = 48.dp)
-                                .animateContentSize(animationSpec = tween(200)),
-                            shape = RoundedCornerShape(24.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                        ) {
-                            TextField(
-                                value = messageText,
-                                onValueChange = { messageText = it },
-                                modifier = Modifier.fillMaxWidth(),
-                                placeholder = {
-                                    Text(
-                                        if (uiState.sendViaWhatsApp) "WhatsApp message" else "Type a message",
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-                                },
-                                trailingIcon = {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        IconButton(
-                                            onClick = { },
-                                            modifier = Modifier.size(36.dp)
-                                        ) {
-                                            Icon(
-                                                Icons.Outlined.Create,
-                                                contentDescription = "AI Compose",
-                                                tint = MaterialTheme.colorScheme.primary,
-                                                modifier = Modifier.size(20.dp)
-                                            )
-                                        }
-                                        IconButton(
-                                            onClick = { viewModel.showScheduleDialog() },
-                                            modifier = Modifier.size(36.dp)
-                                        ) {
-                                            Icon(
-                                                Icons.Default.AddCircleOutline,
-                                                contentDescription = "Schedule",
-                                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                                                modifier = Modifier.size(20.dp)
-                                            )
-                                        }
-                                    }
-                                },
-                                maxLines = 4,
-                                minLines = 1,
-                                colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent,
-                                    focusedIndicatorColor = Color.Transparent,
-                                    unfocusedIndicatorColor = Color.Transparent
-                                )
-                            )
-                        }
+                        )
+                    }
 
                     // Send / Mic button with animated transition
                     val sendButtonColor = if (messageText.isNotBlank()) {
@@ -1283,12 +1165,18 @@ fun ChatScreen(
                                 viewModel.sendMessage(address, messageText)
                                 messageText = ""
                                 showEmojiPicker = false
+                            } else {
+                                isVoiceRecording = !isVoiceRecording
+                                if (isVoiceRecording) {
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    voiceDurationMs = 0
+                                }
                             }
                         },
                         shape = CircleShape,
                         color = sendButtonColor,
                         modifier = Modifier.size(48.dp),
-                        enabled = !uiState.isSending && messageText.isNotBlank()
+                        enabled = !uiState.isSending
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             AnimatedContent(
@@ -1326,7 +1214,6 @@ fun ChatScreen(
                             }
                         }
                     }
-                }
                 }
             }
 
@@ -1456,7 +1343,6 @@ private fun DateSeparator(label: String) {
 @Composable
 private fun SwipeableMessageItem(
     message: Message,
-    contactName: String?,
     uiState: ChatUiState,
     showScamBannerForThisMessage: Boolean = true,
     hapticFeedback: androidx.compose.ui.hapticfeedback.HapticFeedback,
@@ -1537,7 +1423,6 @@ private fun SwipeableMessageItem(
         MessageBubble(
             message = message,
             modifier = Modifier.padding(vertical = 2.dp),
-            recipientDisplayName = contactName,
             highlightText = if (isMatch) uiState.searchQuery else null,
             isActiveMatch = message.id == uiState.activeMatchMessageId,
             scamAnalysis = scamWarning,
