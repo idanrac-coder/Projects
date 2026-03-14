@@ -1,1 +1,1 @@
-New: Turn off undo send in Settings > Messages. When disabled, messages send immediately without the undo option.
+Back button now correctly dismisses the copy menu when selecting text in a message, instead of exiting the conversation.

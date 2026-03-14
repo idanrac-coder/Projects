@@ -1,5 +1,7 @@
 package com.novachat.ui.chat
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.runtime.CompositionLocalProvider
 import com.novachat.ui.blocking.BlockRuleLimitDialog
 import androidx.compose.animation.AnimatedVisibility
 import kotlinx.coroutines.launch
@@ -107,6 +109,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.platform.LocalTextToolbar
+import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -385,6 +391,33 @@ fun ChatScreen(
         }
     ) { padding ->
         val searchFocusRequester = remember { FocusRequester() }
+        val focusManager = LocalFocusManager.current
+        val defaultToolbar = LocalTextToolbar.current
+        var hasTextSelection by remember { mutableStateOf(false) }
+        val trackingToolbar = remember(defaultToolbar) {
+            object : TextToolbar {
+                override val status get() = defaultToolbar.status
+                override fun showMenu(
+                    rect: Rect,
+                    onCopyRequested: (() -> Unit)?,
+                    onPasteRequested: (() -> Unit)?,
+                    onCutRequested: (() -> Unit)?,
+                    onSelectAllRequested: (() -> Unit)?
+                ) {
+                    hasTextSelection = true
+                    defaultToolbar.showMenu(rect, onCopyRequested, onPasteRequested, onCutRequested, onSelectAllRequested)
+                }
+                override fun hide() {
+                    hasTextSelection = false
+                    defaultToolbar.hide()
+                }
+            }
+        }
+        BackHandler(enabled = hasTextSelection) {
+            focusManager.clearFocus(true)
+        }
+
+        CompositionLocalProvider(LocalTextToolbar provides trackingToolbar) {
 
         LaunchedEffect(uiState.isSearchActive) {
             if (uiState.isSearchActive) searchFocusRequester.requestFocus()
@@ -1313,6 +1346,7 @@ fun ChatScreen(
                 },
                 onDismiss = { phoneNumberDialogTarget = null }
             )
+        }
         }
     }
 }
