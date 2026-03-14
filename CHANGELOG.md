@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.22.4] - 2026-03-14
+
+### Fixed
+- Tapping anywhere on screen also dismisses text selection menu in chat (in addition to back button)
+
 ## [3.22.3] - 2026-03-14
 
 ### Fixed

@@ -418,6 +418,7 @@ fun ChatScreen(
         }
 
         CompositionLocalProvider(LocalTextToolbar provides trackingToolbar) {
+        Box(modifier = Modifier.fillMaxSize()) {
 
         LaunchedEffect(uiState.isSearchActive) {
             if (uiState.isSearchActive) searchFocusRequester.requestFocus()
@@ -1346,6 +1347,17 @@ fun ChatScreen(
                 },
                 onDismiss = { phoneNumberDialogTarget = null }
             )
+        }
+
+        if (hasTextSelection) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .imePadding()
+                    .clickable { focusManager.clearFocus(true) }
+            )
+        }
         }
         }
     }
