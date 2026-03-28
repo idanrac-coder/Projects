@@ -220,6 +220,13 @@ fun SettingsScreen(
                         onCheckedChange = { viewModel.setUndoSendEnabled(it) }
                     )
                     SettingsDivider()
+                    SettingsToggleItem(
+                        title = "Forward SMS to WhatsApp",
+                        subtitle = "Auto-forward contact SMS to WhatsApp",
+                        checked = whatsAppForwardEnabled,
+                        onCheckedChange = { viewModel.setWhatsAppForwardEnabled(it) }
+                    )
+                    SettingsDivider()
                     SettingsItem(
                         icon = Icons.Default.Notifications,
                         title = "Notifications",
@@ -248,24 +255,6 @@ fun SettingsScreen(
                         onClick = onArchivedClick
                     )
                 }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // WhatsApp Integration section
-            SettingsSectionHeader(title = "WhatsApp")
-            Spacer(modifier = Modifier.height(8.dp))
-            Surface(
-                shape = RoundedCornerShape(16.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                SettingsToggleItem(
-                    title = "Forward SMS to WhatsApp",
-                    subtitle = "Auto-forward contact SMS to WhatsApp",
-                    checked = whatsAppForwardEnabled,
-                    onCheckedChange = { viewModel.setWhatsAppForwardEnabled(it) }
-                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))

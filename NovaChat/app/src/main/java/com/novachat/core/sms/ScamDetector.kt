@@ -520,7 +520,14 @@ class ScamDetector @Inject constructor(
         if (hasHebrew) {
             val hebrewInfoWords = listOf("תעודת זהות", "מספר כרטיס", "סיסמה", "קוד אימות", "פרטי חשבון", "כרטיס אשראי")
             infoRequests += hebrewInfoWords.count { body.contains(it) }
-            val hebrewUrgencyWords = listOf("דחוף", "מיד", "בהקדם", "מיידי", "תגיב", "אזהרה", "פג תוקף", "נדרשת פעולה", "ייחסם", "פעולה מיידית", "יש לך הודעה", "לחץ כאן")
+            val hebrewUrgencyWords = listOf(
+                "דחוף", "מיד", "בהקדם",
+                "מיידי", "מיידית", "מידי", "מידית",
+                "תגיב", "אזהרה", "פג תוקף", "נדרשת פעולה", "ייחסם",
+                "פעולה מיידית", "יש לך הודעה",
+                "לחץ כאן", "לחץ", "לחצו", "הקלק", "הקליקו",
+                "לבדיקה", "בדוק עכשיו"
+            )
             if (hebrewUrgencyWords.count { body.contains(it) } >= 2) {
                 score += 0.10f
                 signals.add("High Hebrew urgency word density")

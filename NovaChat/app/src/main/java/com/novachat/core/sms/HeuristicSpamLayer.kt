@@ -11,12 +11,15 @@ package com.novachat.core.sms
  */
 object HeuristicSpamLayer {
 
-    private val urlRegex = Regex("(?i)https?://\\S+")
+    private val urlRegex = Regex(
+        "(?i)(https?://\\S+|(bit\\.ly|tinyurl\\.com|t\\.co|goo\\.gl|rb\\.gy|cutt\\.ly|is\\.gd|v\\.gd|qr\\.ae|clck\\.ru|adf\\.ly|ow\\.ly|buff\\.ly|j\\.mp|tiny\\.cc|short\\.link)/\\S+)"
+    )
     private val otpVerifyEnglishRegex = Regex(
         "(?i)(OTP|verify|verification\\s+code|verification\\s+code)"
     )
+    // Whole-word / phrase patterns to avoid substring false positives (e.g. "אימות" in other words)
     private val otpVerifyHebrewRegex = Regex(
-        "קוד\\s*אימות|הזן\\s*את\\s*הקוד|קוד\\s*זמני|שלח.*הקוד|אימות"
+        "קוד\\s*אימות|הזן\\s*את\\s*הקוד|קוד\\s*זמני|שלח.*הקוד|(?<![\\p{L}\\p{N}])אימות(?![\\p{L}\\p{N}])"
     )
 
     private const val SCORE_SENDER_UNKNOWN = 40
@@ -24,7 +27,8 @@ object HeuristicSpamLayer {
     private const val SCORE_OTP_VERIFY = 20
     private const val SCORE_HIGH_SPECIAL_CHARS = 15
     private const val THRESHOLD_SPAM = 75
-    private const val THRESHOLD_SUSPICIOUS = 40
+    // Require at least 2 signals (e.g. unknown sender + URL/OTP) to avoid flagging every non-contact message
+    private const val THRESHOLD_SUSPICIOUS = 55
     private const val NON_ALPHA_THRESHOLD_RATIO = 0.15f
 
     enum class Classification { SPAM, SUSPICIOUS, SAFE }

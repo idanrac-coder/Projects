@@ -3,6 +3,14 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.22.5] - 2026-03-28
+
+### Fixed
+- Spam detection: URL scoring now catches bare shortener domains (bit.ly/xxx) without http:// prefix
+- Spam detection: DeterministicSpamLayer now evaluates all patterns and returns highest-priority match instead of first-match-wins
+- Spam detection: SpamFilter now uses sender reputation and alphanumeric sender scoring for stronger classification
+- Spam detection: Add Hebrew urgency word variants (מידית, לחץ, לחצו, הקלק, לבדיקה) to reduce false negatives on Israeli phishing SMS
+
 ## [3.22.4] - 2026-03-14
 
 ### Fixed

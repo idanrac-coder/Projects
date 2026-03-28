@@ -6,6 +6,7 @@ import com.novachat.core.datastore.UserPreferencesRepository
 import com.novachat.core.sms.WhatsAppForwardSettings
 import com.novachat.core.sms.WhatsAppForwarder
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

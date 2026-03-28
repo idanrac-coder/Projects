@@ -1,1 +1,6 @@
-When selecting text in a message, the copy menu now closes when you press back or tap anywhere on the screen.
+Smarter spam detection! Fixed several gaps in our spam filter:
+
+- Now catches shortened links (like bit.ly) even without http:// prefix
+- Better detection of Israeli tax refund and phishing scams
+- Improved sender reputation scoring for unknown and alphanumeric senders
+- Added more Hebrew urgency word patterns to catch phishing messages

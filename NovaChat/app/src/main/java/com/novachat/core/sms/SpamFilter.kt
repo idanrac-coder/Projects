@@ -60,7 +60,7 @@ class SpamFilter @Inject constructor(
             )
         }
 
-        val scamAnalysis = scamDetector.analyze(body)
+        val scamAnalysis = scamDetector.analyzeWithReputation(body, address, isKnownContact)
         if (scamAnalysis.isScam) {
             val scoreInt = (scamAnalysis.confidence * 100).toInt().coerceIn(0, 100)
             val classification = if (scamAnalysis.confidence >= 0.72f) {
@@ -76,14 +76,17 @@ class SpamFilter @Inject constructor(
             )
         }
 
+        val shortCircuitRules = setOf("TAX_REFUND_SCAM", "ISRAELI_PANIC", "SURVEY_UNSUBSCRIBE", "POLITICAL_POLL")
+
         val hasHebrew = body.any { it in '\u0590'..'\u05FF' }
         if (hasHebrew) {
             val detRaw = DeterministicSpamLayer.analyze(body)
-            if (detRaw.matched && detRaw.ruleType in setOf("TAX_REFUND_SCAM", "ISRAELI_PANIC", "SURVEY_UNSUBSCRIBE", "POLITICAL_POLL")) {
+            val shortCircuitMatch = detRaw.matchedRuleTypes.firstOrNull { it in shortCircuitRules }
+            if (detRaw.matched && shortCircuitMatch != null) {
                 return@withContext ClassificationResult(
                     SpamClassification.SPAM,
                     (detRaw.contributesToScore + 50).coerceIn(0, 100),
-                    "DET_RAW:${detRaw.ruleType}",
+                    "DET_RAW:$shortCircuitMatch",
                     false
                 )
             }

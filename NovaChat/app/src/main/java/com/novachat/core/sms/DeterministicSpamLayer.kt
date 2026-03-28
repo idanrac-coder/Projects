@@ -44,49 +44,61 @@ object DeterministicSpamLayer {
     // Crypto
     private val israeliCryptoRegex = Regex("קריפטו|השקעה מובטחת|ביטקוין")
 
+    private data class Rule(val regex: Regex, val type: String, val score: Int, val priority: Int)
+
+    private val rules = listOf(
+        Rule(taxRefundScamRegex, "TAX_REFUND_SCAM", 25, 100),
+        Rule(israeliPanicRegex, "ISRAELI_PANIC", 30, 95),
+        Rule(surveyUnsubscribeRegex, "SURVEY_UNSUBSCRIBE", 35, 90),
+        Rule(politicalPollRegex, "POLITICAL_POLL", 35, 90),
+        Rule(israeliBankRegex, "ISRAELI_BANK", 25, 85),
+        Rule(israeliGovRegex, "ISRAELI_GOV", 25, 85),
+        Rule(israeliDeliveryRegex, "ISRAELI_DELIVERY", 25, 80),
+        Rule(israeliCryptoRegex, "ISRAELI_CRYPTO", 25, 80),
+        Rule(ipUrlRegex, "IP_URL", 25, 70),
+        Rule(suspiciousTldRegex, "SUSPICIOUS_TLD", 25, 65),
+        Rule(shortenedUrlRegex, "SHORTENED_URL", 25, 60),
+        Rule(urgentKeywordsRegex, "URGENT_KEYWORDS", 20, 50),
+        Rule(otpVerifyEnglishRegex, "OTP_VERIFY_EN", 25, 40),
+        Rule(otpVerifyHebrewRegex, "OTP_VERIFY_HE", 25, 40)
+    )
+
     data class MatchResult(
         val matched: Boolean,
         val ruleType: String?,
-        val contributesToScore: Int
+        val contributesToScore: Int,
+        val matchedRuleTypes: List<String> = emptyList()
     )
 
     /**
-     * Runs deterministic pattern check on message body.
-     * @return MatchResult with matched flag, rule type, and score contribution (e.g. +25 for strong match)
+     * Runs all deterministic pattern checks on message body.
+     * Returns the highest-priority match as the primary ruleType,
+     * with contributesToScore accumulated from all matched patterns (capped at 60).
      */
     fun analyze(body: String): MatchResult {
         if (body.length < 10) return MatchResult(false, null, 0)
 
-        when {
-            shortenedUrlRegex.containsMatchIn(body) ->
-                return MatchResult(true, "SHORTENED_URL", 25)
-            suspiciousTldRegex.containsMatchIn(body) ->
-                return MatchResult(true, "SUSPICIOUS_TLD", 25)
-            ipUrlRegex.containsMatchIn(body) ->
-                return MatchResult(true, "IP_URL", 25)
-            urgentKeywordsRegex.containsMatchIn(body) ->
-                return MatchResult(true, "URGENT_KEYWORDS", 20)
-            otpVerifyEnglishRegex.containsMatchIn(body) ->
-                return MatchResult(true, "OTP_VERIFY_EN", 25)
-            otpVerifyHebrewRegex.containsMatchIn(body) ->
-                return MatchResult(true, "OTP_VERIFY_HE", 25)
-            taxRefundScamRegex.containsMatchIn(body) ->
-                return MatchResult(true, "TAX_REFUND_SCAM", 25)
-            surveyUnsubscribeRegex.containsMatchIn(body) ->
-                return MatchResult(true, "SURVEY_UNSUBSCRIBE", 35)
-            politicalPollRegex.containsMatchIn(body) ->
-                return MatchResult(true, "POLITICAL_POLL", 35)
-            israeliBankRegex.containsMatchIn(body) ->
-                return MatchResult(true, "ISRAELI_BANK", 25)
-            israeliDeliveryRegex.containsMatchIn(body) ->
-                return MatchResult(true, "ISRAELI_DELIVERY", 25)
-            israeliGovRegex.containsMatchIn(body) ->
-                return MatchResult(true, "ISRAELI_GOV", 25)
-            israeliPanicRegex.containsMatchIn(body) ->
-                return MatchResult(true, "ISRAELI_PANIC", 30)
-            israeliCryptoRegex.containsMatchIn(body) ->
-                return MatchResult(true, "ISRAELI_CRYPTO", 25)
+        var bestRule: Rule? = null
+        var totalScore = 0
+        val matchedTypes = mutableListOf<String>()
+
+        for (rule in rules) {
+            if (rule.regex.containsMatchIn(body)) {
+                matchedTypes.add(rule.type)
+                totalScore += rule.score
+                if (bestRule == null || rule.priority > bestRule.priority) {
+                    bestRule = rule
+                }
+            }
         }
-        return MatchResult(false, null, 0)
+
+        if (bestRule == null) return MatchResult(false, null, 0)
+
+        return MatchResult(
+            matched = true,
+            ruleType = bestRule.type,
+            contributesToScore = totalScore.coerceAtMost(60),
+            matchedRuleTypes = matchedTypes
+        )
     }
 }

@@ -1,5 +1,6 @@
 package com.novachat.ui.blocking
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,7 +52,31 @@ private fun formatMatchedRuleType(ruleType: String): String = when {
         ruleType == "KEYWORD" -> "Blocked by keyword"
         ruleType == "LANGUAGE" -> "Blocked by language"
         ruleType == "INTERNATIONAL_FILTER" -> "International filter"
+        ruleType.startsWith("SPAM_FILTER:") -> formatSpamFilterReason(ruleType.removePrefix("SPAM_FILTER:"))
         else -> ruleType
+    }
+
+    private fun formatSpamFilterReason(inner: String): String = when {
+        inner.startsWith("DET:") -> when (val det = inner.removePrefix("DET:")) {
+            "SHORTENED_URL" -> "Shortened link"
+            "SUSPICIOUS_TLD" -> "Suspicious website"
+            "IP_URL" -> "Suspicious link"
+            "URGENT_KEYWORDS" -> "Urgency tactics"
+            "OTP_VERIFY_EN", "OTP_VERIFY_HE" -> "Possible OTP scam"
+            else -> "Suspicious content"
+        }
+        inner.startsWith("HEUR:") -> {
+            val heur = inner.removePrefix("HEUR:")
+            when {
+                heur.contains("contains_url") -> "Suspicious link"
+                heur.contains("otp_verify") -> "Possible OTP scam"
+                heur.contains("high_special_chars") && heur.contains("sender_unknown") -> "Suspicious content"
+                heur.contains("sender_unknown") -> "Unknown sender"
+                else -> "Spam detected"
+            }
+        }
+        inner.startsWith("SCORE_") -> "Spam detected"
+        else -> "Blocked as spam"
     }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -131,23 +156,28 @@ fun SpamFolderScreen(
                             verticalAlignment = Alignment.Top
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = spam.address,
-                                        style = MaterialTheme.typography.titleSmall
-                                    )
-                                    if (spam.matchedRuleType.isNotBlank()) {
+                                Text(
+                                    text = spam.address,
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                                if (spam.matchedRuleType.isNotBlank()) {
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .background(
+                                                color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
+                                                shape = RoundedCornerShape(6.dp)
+                                            )
+                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    ) {
                                         Text(
                                             text = formatMatchedRuleType(spam.matchedRuleType),
                                             style = MaterialTheme.typography.labelSmall,
-                                            color = MaterialTheme.colorScheme.primary
+                                            color = MaterialTheme.colorScheme.onErrorContainer
                                         )
                                     }
                                 }
+                                Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = spam.body,
                                     style = MaterialTheme.typography.bodyMedium,
@@ -155,11 +185,12 @@ fun SpamFolderScreen(
                                     maxLines = 3,
                                     overflow = TextOverflow.Ellipsis
                                 )
+                                Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
                                         .format(Date(spam.timestamp)),
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                 )
                             }
                             IconButton(onClick = { viewModel.restoreToInbox(spam.id) }) {
