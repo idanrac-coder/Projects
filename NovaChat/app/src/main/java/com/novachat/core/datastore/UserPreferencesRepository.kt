@@ -135,4 +135,32 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun setUndoSendEnabled(enabled: Boolean) {
         dataStore.edit { it[PreferencesKeys.UNDO_SEND_ENABLED] = enabled }
     }
+
+    val themeMode: Flow<String> = dataStore.data.map { prefs ->
+        prefs[PreferencesKeys.THEME_MODE] ?: "system"
+    }
+
+    suspend fun setThemeMode(mode: String) {
+        dataStore.edit { it[PreferencesKeys.THEME_MODE] = mode }
+    }
+
+    val installTime: Flow<Long> = dataStore.data.map { prefs ->
+        prefs[PreferencesKeys.INSTALL_TIME] ?: 0L
+    }
+
+    suspend fun setInstallTimeIfNeeded() {
+        dataStore.edit { prefs ->
+            if (prefs[PreferencesKeys.INSTALL_TIME] == null) {
+                prefs[PreferencesKeys.INSTALL_TIME] = System.currentTimeMillis()
+            }
+        }
+    }
+
+    val reviewShown: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[PreferencesKeys.REVIEW_SHOWN] ?: false
+    }
+
+    suspend fun setReviewShown() {
+        dataStore.edit { it[PreferencesKeys.REVIEW_SHOWN] = true }
+    }
 }

@@ -2,6 +2,7 @@ package com.novachat.domain.repository
 
 import com.novachat.domain.model.Conversation
 import com.novachat.domain.model.Message
+import com.novachat.domain.model.MessageEdit
 import com.novachat.domain.model.Reaction
 import com.novachat.domain.model.ScheduledMessage
 import com.novachat.domain.model.MessageReminder
@@ -56,4 +57,9 @@ interface ConversationRepository {
     suspend fun renameCustomCategory(id: Long, newName: String)
     suspend fun deleteCustomCategory(id: Long)
     suspend fun getCustomCategoriesOnce(): List<Pair<Long, String>>
+
+    suspend fun saveMessageEdit(messageId: Long, previousBody: String, newBody: String)
+    suspend fun getEditHistory(messageId: Long): List<MessageEdit>
+    suspend fun getEditedMessageIds(messageIds: List<Long>): Set<Long>
+    suspend fun updateMessageBody(messageId: Long, newBody: String): Boolean
 }

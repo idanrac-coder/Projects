@@ -248,6 +248,14 @@ fun MessageBubble(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(3.dp)
                 ) {
+                    if (message.isEdited) {
+                        Text(
+                            text = "Edited",
+                            color = textColor.copy(alpha = 0.4f),
+                            fontSize = 10.sp,
+                            fontStyle = FontStyle.Italic
+                        )
+                    }
                     Text(
                         text = formattedTime,
                         color = textColor.copy(alpha = 0.45f),

@@ -12,6 +12,7 @@ import com.novachat.core.sms.WhatsAppForwarder
 import com.novachat.domain.model.BlockRule
 import com.novachat.domain.model.BlockType
 import com.novachat.domain.model.Message
+import com.novachat.domain.model.MessageEdit
 import com.novachat.domain.model.MessageType
 import com.novachat.domain.model.Reaction
 import com.novachat.domain.repository.BlockRepository
@@ -58,7 +59,10 @@ data class ChatUiState(
     val showBlockLimitDialog: Boolean = false,
     val blockSuccessNavigateBack: Boolean = false,
     val isSenderAllowlisted: Boolean = false,
-    val senderBannerDismissed: Boolean = false
+    val senderBannerDismissed: Boolean = false,
+    val editingMessage: Message? = null,
+    val editHistoryEntries: List<MessageEdit> = emptyList(),
+    val showEditHistory: Boolean = false
 ) {
     val matchCount: Int get() = matchingMessageIds.size
     val activeMatchMessageId: Long? get() =
@@ -89,10 +93,6 @@ class ChatViewModel @Inject constructor(
     private var currentThreadId: Long = -1
     private var loadJob: Job? = null
     private var undoJob: Job? = null
-
-    companion object {
-        const val UNDO_SEND_DELAY_MS = 5000L
-    }
 
     init {
         _uiState.value = _uiState.value.copy(
@@ -166,11 +166,15 @@ class ChatViewModel @Inject constructor(
                 val pinnedMsgs = messages.filter { it.isPinned }
                 val quickReplyOn = userPreferencesRepository.quickReplyEnabled.first()
                 val smartReplies = if (quickReplyOn) generateSmartReplies(messages) else emptyList()
-                val scamWarnings = analyzeForScams(messages)
-                val senderAddress = messages.firstOrNull { it.type == MessageType.RECEIVED }?.address
+                val editedIds = conversationRepository.getEditedMessageIds(messages.map { it.id })
+                val enrichedMessages = messages.map { msg ->
+                    if (msg.id in editedIds) msg.copy(isEdited = true) else msg
+                }
+                val scamWarnings = analyzeForScams(enrichedMessages)
+                val senderAddress = enrichedMessages.firstOrNull { it.type == MessageType.RECEIVED }?.address
                 val allowlisted = if (senderAddress != null) scamDetector.isAllowlisted(senderAddress) else false
                 _uiState.value = _uiState.value.copy(
-                    messages = messages,
+                    messages = enrichedMessages,
                     isLoading = false,
                     smartReplies = smartReplies,
                     pinnedMessages = pinnedMsgs,
@@ -696,4 +700,57 @@ class ChatViewModel @Inject constructor(
         )
     }
 
+    companion object {
+        const val UNDO_SEND_DELAY_MS = 5000L
+        private const val EDIT_WINDOW_MS = 15L * 60 * 1000
+    }
+
+    fun canEditMessage(message: Message): Boolean {
+        if (message.type != MessageType.SENT) return false
+        return (System.currentTimeMillis() - message.timestamp) <= EDIT_WINDOW_MS
+    }
+
+    fun startEditMessage(message: Message) {
+        _uiState.value = _uiState.value.copy(editingMessage = message)
+    }
+
+    fun cancelEdit() {
+        _uiState.value = _uiState.value.copy(editingMessage = null)
+    }
+
+    fun executeEdit(newBody: String) {
+        val editing = _uiState.value.editingMessage ?: return
+        if (newBody.isBlank() || newBody == editing.body) {
+            cancelEdit()
+            return
+        }
+        viewModelScope.launch {
+            try {
+                conversationRepository.saveMessageEdit(editing.id, editing.body, newBody)
+                conversationRepository.updateMessageBody(editing.id, newBody)
+                _uiState.value = _uiState.value.copy(editingMessage = null)
+                conversationRepository.invalidateMessagesCache(currentThreadId)
+                refreshMessages()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    error = "Failed to edit message",
+                    editingMessage = null
+                )
+            }
+        }
+    }
+
+    fun showEditHistory(messageId: Long) {
+        viewModelScope.launch {
+            val edits = conversationRepository.getEditHistory(messageId)
+            _uiState.value = _uiState.value.copy(
+                editHistoryEntries = edits,
+                showEditHistory = true
+            )
+        }
+    }
+
+    fun dismissEditHistory() {
+        _uiState.value = _uiState.value.copy(showEditHistory = false, editHistoryEntries = emptyList())
+    }
 }

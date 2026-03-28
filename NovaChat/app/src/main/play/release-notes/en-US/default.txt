@@ -1,6 +1,9 @@
-Smarter spam detection! Fixed several gaps in our spam filter:
+New features packed in this update!
 
-- Now catches shortened links (like bit.ly) even without http:// prefix
-- Better detection of Israeli tax refund and phishing scams
-- Improved sender reputation scoring for unknown and alphanumeric senders
-- Added more Hebrew urgency word patterns to catch phishing messages
+- Edit messages: tap and hold a sent message to edit it within 15 minutes. View the full edit history anytime.
+
+- System Theme: Aura now follows your device's dark/light mode automatically with Material You colors.
+
+- Send Feedback & Rate Us options added to Settings.
+
+- Lifetime license now includes clear Terms & Conditions with refund policy details.

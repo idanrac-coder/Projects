@@ -14,10 +14,12 @@ import com.novachat.core.database.dao.ScheduledMessageDao
 import com.novachat.core.database.dao.ShortCodeWhitelistDao
 import com.novachat.core.database.dao.SpamLearningDao
 import com.novachat.core.database.dao.SpamMessageDao
+import com.novachat.core.database.dao.MessageEditDao
 import com.novachat.core.database.dao.ThemeDao
 import com.novachat.core.database.entity.BlockRuleEntity
 import com.novachat.core.database.entity.ConversationMetaEntity
 import com.novachat.core.database.entity.CustomCategoryEntity
+import com.novachat.core.database.entity.MessageEditEntity
 import com.novachat.core.database.entity.MessageReactionEntity
 import com.novachat.core.database.entity.MessageReminderEntity
 import com.novachat.core.database.entity.NotificationProfileEntity
@@ -47,9 +49,10 @@ import com.novachat.core.database.entity.ThemeEntity
         SpamSenderReputationEntity::class,
         SpamKeywordWeightEntity::class,
         SenderAllowlistEntity::class,
-        ShortCodeWhitelistEntity::class
+        ShortCodeWhitelistEntity::class,
+        MessageEditEntity::class
     ],
-    version = 12,
+    version = 13,
     exportSchema = true
 )
 abstract class NovaChatDatabase : RoomDatabase() {
@@ -65,4 +68,5 @@ abstract class NovaChatDatabase : RoomDatabase() {
     abstract fun customCategoryDao(): CustomCategoryDao
     abstract fun notificationProfileDao(): NotificationProfileDao
     abstract fun shortCodeWhitelistDao(): ShortCodeWhitelistDao
+    abstract fun messageEditDao(): MessageEditDao
 }

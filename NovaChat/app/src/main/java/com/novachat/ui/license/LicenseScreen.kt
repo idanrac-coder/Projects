@@ -1,7 +1,9 @@
 package com.novachat.ui.license
 
 import android.app.Activity
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +23,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Star
@@ -44,7 +48,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -305,6 +311,64 @@ fun LicenseScreen(
                 ) {
                     Text("Restore Purchase")
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                var termsExpanded by remember { mutableStateOf(false) }
+
+                Row(
+                    modifier = Modifier
+                        .clickable { termsExpanded = !termsExpanded }
+                        .padding(horizontal = 24.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Terms & Conditions",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        textDecoration = TextDecoration.Underline
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Icon(
+                        if (termsExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                        contentDescription = if (termsExpanded) "Collapse" else "Expand",
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                AnimatedVisibility(visible = termsExpanded) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        DisclaimerItem(
+                            title = "Refund Policy",
+                            body = "Refunds are available within 30 days of purchase. After this period, all sales are final. Refund requests can be submitted through Google Play."
+                        )
+                        DisclaimerItem(
+                            title = "Lifetime License",
+                            body = "\"Lifetime\" refers to the operational lifetime of the Aura app. If the app is discontinued or removed from the Google Play Store, the license expires with no further obligation to the developer."
+                        )
+                        DisclaimerItem(
+                            title = "What's Included",
+                            body = "Your license includes all current premium features and future updates for as long as the app is actively maintained."
+                        )
+                        DisclaimerItem(
+                            title = "Non-Transferable",
+                            body = "This license is tied to your Google account and cannot be transferred, shared, or resold."
+                        )
+                        DisclaimerItem(
+                            title = "Google Play",
+                            body = "This purchase is subject to Google Play's Terms of Service."
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -319,6 +383,23 @@ fun LicenseScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
         }
+    }
+}
+
+@Composable
+private fun DisclaimerItem(title: String, body: String) {
+    Column {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            text = body,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+        )
     }
 }
 

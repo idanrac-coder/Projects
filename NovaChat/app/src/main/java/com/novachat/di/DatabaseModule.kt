@@ -16,6 +16,7 @@ import com.novachat.core.database.dao.ScheduledMessageDao
 import com.novachat.core.database.dao.SpamLearningDao
 import com.novachat.core.database.dao.ShortCodeWhitelistDao
 import com.novachat.core.database.dao.SpamMessageDao
+import com.novachat.core.database.dao.MessageEditDao
 import com.novachat.core.database.dao.ThemeDao
 import dagger.Module
 import dagger.Provides
@@ -23,6 +24,21 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+
+val MIGRATION_12_13 = object : Migration(12, 13) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS message_edits (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                messageId INTEGER NOT NULL,
+                previousBody TEXT NOT NULL,
+                newBody TEXT NOT NULL,
+                timestamp INTEGER NOT NULL
+            )
+        """.trimIndent())
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_message_edits_messageId ON message_edits(messageId)")
+    }
+}
 
 val MIGRATION_11_12 = object : Migration(11, 12) {
     override fun migrate(db: SupportSQLiteDatabase) {
@@ -232,7 +248,7 @@ object DatabaseModule {
             context,
             NovaChatDatabase::class.java,
             "novachat.db"
-        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12).build()
+        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13).build()
     }
 
     @Provides
@@ -270,4 +286,7 @@ object DatabaseModule {
 
     @Provides
     fun provideShortCodeWhitelistDao(db: NovaChatDatabase): ShortCodeWhitelistDao = db.shortCodeWhitelistDao()
+
+    @Provides
+    fun provideMessageEditDao(db: NovaChatDatabase): MessageEditDao = db.messageEditDao()
 }

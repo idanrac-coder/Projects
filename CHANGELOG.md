@@ -3,6 +3,14 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.23.0] - 2026-03-28
+
+### Added
+- Message Edit History: edit sent messages within 15 minutes, view full edit timeline via "View Details"
+- System Theme mode: app now follows device dark/light setting using Material You dynamic colors
+- In-App Feedback: "Send Feedback" and "Rate Us" options in Settings, Google Play In-App Review prompt after 3 days
+- Lifetime License Terms & Conditions: expandable disclaimer with refund policy, lifetime definition, and usage terms
+
 ## [3.22.5] - 2026-03-28
 
 ### Fixed

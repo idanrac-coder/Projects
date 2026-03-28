@@ -18,8 +18,10 @@ import com.novachat.core.database.dao.SpamLearningDao
 import com.novachat.core.database.dao.SpamMessageDao
 import com.novachat.core.sms.SmsSender
 import com.novachat.core.sms.SmsProvider
+import com.novachat.core.database.entity.MessageEditEntity
 import com.novachat.domain.model.Conversation
 import com.novachat.domain.model.Message
+import com.novachat.domain.model.MessageEdit
 import com.novachat.domain.model.MessageCategory
 import com.novachat.domain.model.MessageReminder
 import com.novachat.domain.model.Reaction
@@ -45,7 +47,8 @@ class ConversationRepositoryImpl @Inject constructor(
     private val messageReactionDao: MessageReactionDao,
     private val scheduledMessageDao: ScheduledMessageDao,
     private val messageReminderDao: MessageReminderDao,
-    private val pinnedMessageDao: PinnedMessageDao
+    private val pinnedMessageDao: PinnedMessageDao,
+    private val messageEditDao: com.novachat.core.database.dao.MessageEditDao
 ) : ConversationRepository {
 
     private val _refreshTrigger = MutableSharedFlow<Long>(extraBufferCapacity = 5, replay = 0)
@@ -398,5 +401,31 @@ class ConversationRepositoryImpl @Inject constructor(
         if (conversationMetaDao.getMetaForThread(threadId) == null) {
             conversationMetaDao.upsertMeta(ConversationMetaEntity(threadId = threadId))
         }
+    }
+
+    override suspend fun saveMessageEdit(messageId: Long, previousBody: String, newBody: String) {
+        messageEditDao.insert(
+            MessageEditEntity(
+                messageId = messageId,
+                previousBody = previousBody,
+                newBody = newBody,
+                timestamp = System.currentTimeMillis()
+            )
+        )
+    }
+
+    override suspend fun getEditHistory(messageId: Long): List<MessageEdit> {
+        return messageEditDao.getEditsForMessage(messageId).map {
+            MessageEdit(it.id, it.messageId, it.previousBody, it.newBody, it.timestamp)
+        }
+    }
+
+    override suspend fun getEditedMessageIds(messageIds: List<Long>): Set<Long> {
+        if (messageIds.isEmpty()) return emptySet()
+        return messageEditDao.getEditedMessageIds(messageIds).toSet()
+    }
+
+    override suspend fun updateMessageBody(messageId: Long, newBody: String): Boolean {
+        return smsProvider.updateMessageBody(messageId, newBody)
     }
 }

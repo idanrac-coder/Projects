@@ -48,7 +48,9 @@ import com.novachat.domain.repository.ThemeRepository
 import com.novachat.ui.navigation.ChatRoute
 import com.novachat.ui.navigation.NovaChatNavHost
 import com.novachat.ui.onboarding.RestoreOnboardingScreen
+import com.google.android.play.core.review.ReviewManagerFactory
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -107,6 +109,8 @@ class MainActivity : ComponentActivity() {
         ScheduledMessageWorker.enqueue(this)
 
         setContent {
+            val themeMode by userPreferencesRepository.themeMode
+                .collectAsState(initial = "system")
             val activeThemeId by userPreferencesRepository.activeThemeId
                 .collectAsState(initial = 1L)
             val bubbleShapeOverride by userPreferencesRepository.activeBubbleShape
@@ -117,6 +121,7 @@ class MainActivity : ComponentActivity() {
             val conversationBackgroundOverride = remember(conversationBackgroundId) {
                 com.novachat.domain.model.BuiltInBackgrounds.findById(conversationBackgroundId)
             }
+            val useSystemTheme = themeMode == "system"
 
             LaunchedEffect(Unit) {
                 themeRepository.seedBuiltInThemes()
@@ -127,7 +132,8 @@ class MainActivity : ComponentActivity() {
             }
 
             NovaChatMaterialTheme(
-                activeTheme = activeTheme,
+                activeTheme = if (useSystemTheme) null else activeTheme,
+                useDynamicColor = useSystemTheme,
                 bubbleShapeOverride = bubbleShapeOverride,
                 conversationBackgroundOverride = conversationBackgroundOverride
             ) {
@@ -208,6 +214,29 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         licenseManager.recheckLicense()
+        maybePromptReview()
+    }
+
+    private fun maybePromptReview() {
+        kotlinx.coroutines.MainScope().launch {
+            userPreferencesRepository.setInstallTimeIfNeeded()
+            val alreadyShown = userPreferencesRepository.reviewShown.first()
+            if (alreadyShown) return@launch
+            val installTime = userPreferencesRepository.installTime.first()
+            if (installTime == 0L) return@launch
+            val threeDaysMs = 3L * 24 * 60 * 60 * 1000
+            if (System.currentTimeMillis() - installTime < threeDaysMs) return@launch
+
+            val reviewManager = ReviewManagerFactory.create(this@MainActivity)
+            reviewManager.requestReviewFlow().addOnSuccessListener { reviewInfo ->
+                reviewManager.launchReviewFlow(this@MainActivity, reviewInfo)
+                    .addOnCompleteListener {
+                        kotlinx.coroutines.MainScope().launch {
+                            userPreferencesRepository.setReviewShown()
+                        }
+                    }
+            }
+        }
     }
 
     override fun onNewIntent(intent: Intent) {

@@ -29,4 +29,7 @@ object PreferencesKeys {
     val CONVERSATION_BACKGROUND_ID = stringPreferencesKey("conversation_background_id")
     val FILTER_INTERNATIONAL_SENDERS = booleanPreferencesKey("filter_international_senders")
     val UNDO_SEND_ENABLED = booleanPreferencesKey("undo_send_enabled")
+    val THEME_MODE = stringPreferencesKey("theme_mode")
+    val INSTALL_TIME = longPreferencesKey("install_time")
+    val REVIEW_SHOWN = booleanPreferencesKey("review_shown")
 }

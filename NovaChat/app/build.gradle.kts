@@ -15,8 +15,8 @@ android {
         applicationId = "com.novachat"
         minSdk = 31
         targetSdk = 35
-        versionCode = 108
-        versionName = "3.22.5"
+        versionCode = 109
+        versionName = "3.23.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -107,6 +107,9 @@ dependencies {
     implementation(libs.androidx.work.runtime)
     implementation(libs.androidx.hilt.work)
     ksp(libs.androidx.hilt.compiler)
+
+    // In-App Review
+    implementation(libs.play.review.ktx)
 
     // ML Kit Language ID
     implementation(libs.mlkit.language.id)

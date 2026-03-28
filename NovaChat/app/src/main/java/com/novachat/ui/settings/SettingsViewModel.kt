@@ -30,6 +30,9 @@ class SettingsViewModel @Inject constructor(
     val undoSendEnabled: StateFlow<Boolean> = preferencesRepository.undoSendEnabled
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
+    val themeMode: StateFlow<String> = preferencesRepository.themeMode
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "system")
+
     val isWhatsAppInstalled: Boolean
         get() = whatsAppForwarder.isWhatsAppInstalled()
 
@@ -41,6 +44,12 @@ class SettingsViewModel @Inject constructor(
     fun setUndoSendEnabled(enabled: Boolean) {
         viewModelScope.launch {
             preferencesRepository.setUndoSendEnabled(enabled)
+        }
+    }
+
+    fun setThemeMode(mode: String) {
+        viewModelScope.launch {
+            preferencesRepository.setThemeMode(mode)
         }
     }
 }

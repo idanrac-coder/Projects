@@ -3,6 +3,7 @@ package com.novachat.core.sms
 import android.app.role.RoleManager
 import android.content.ContentResolver
 import android.content.ContentUris
+import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
@@ -256,6 +257,17 @@ class SmsProvider @Inject constructor(
             null,
             null
         )
+    }
+
+    suspend fun updateMessageBody(messageId: Long, newBody: String): Boolean = withContext(Dispatchers.IO) {
+        val values = ContentValues().apply {
+            put(Telephony.Sms.BODY, newBody)
+        }
+        val rows = contentResolver.update(
+            ContentUris.withAppendedId(Telephony.Sms.CONTENT_URI, messageId),
+            values, null, null
+        )
+        rows > 0
     }
 
     data class InboxMessageInfo(

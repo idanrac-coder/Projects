@@ -20,7 +20,8 @@ data class Message(
     val replyToMessageId: Long? = null,
     val replyToBody: String? = null,
     val scheduledTime: Long? = null,
-    val formattedBody: String? = null
+    val formattedBody: String? = null,
+    val isEdited: Boolean = false
 )
 
 enum class MessageType {

@@ -57,6 +57,8 @@ import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.EmojiEmotions
 import androidx.compose.material.icons.automirrored.filled.Forward
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -194,6 +196,14 @@ fun ChatScreen(
     var isVoiceRecording by remember { mutableStateOf(false) }
     var voiceDurationMs by remember { mutableStateOf(0L) }
     var phoneNumberDialogTarget by remember { mutableStateOf<String?>(null) }
+    val isEditing = uiState.editingMessage != null
+
+    LaunchedEffect(uiState.editingMessage) {
+        val editing = uiState.editingMessage
+        if (editing != null) {
+            messageText = editing.body
+        }
+    }
 
     val chatItems = remember(uiState.messages) {
         buildList {
@@ -902,6 +912,33 @@ fun ChatScreen(
                                     Text("Delete", color = MaterialTheme.colorScheme.error)
                                 }
                             }
+                            if (message != null && (viewModel.canEditMessage(message) || message.isEdited)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                ) {
+                                    if (viewModel.canEditMessage(message)) {
+                                        TextButton(onClick = {
+                                            viewModel.hideReactionPicker()
+                                            viewModel.startEditMessage(message)
+                                        }) {
+                                            Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text("Edit")
+                                        }
+                                    }
+                                    if (message.isEdited) {
+                                        TextButton(onClick = {
+                                            viewModel.hideReactionPicker()
+                                            viewModel.showEditHistory(messageId)
+                                        }) {
+                                            Icon(Icons.Default.History, contentDescription = null, modifier = Modifier.size(18.dp))
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text("View Details")
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -983,6 +1020,48 @@ fun ChatScreen(
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
+                        }
+                    }
+                }
+            }
+
+            // Edit mode indicator
+            AnimatedVisibility(
+                visible = isEditing,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                Surface(color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Editing message",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.weight(1f)
+                        )
+                        IconButton(onClick = {
+                            viewModel.cancelEdit()
+                            messageText = ""
+                        }) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Cancel edit",
+                                modifier = Modifier.size(18.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                     }
                 }
@@ -1196,7 +1275,11 @@ fun ChatScreen(
                     Surface(
                         onClick = {
                             if (messageText.isNotBlank()) {
-                                viewModel.sendMessage(address, messageText)
+                                if (isEditing) {
+                                    viewModel.executeEdit(messageText)
+                                } else {
+                                    viewModel.sendMessage(address, messageText)
+                                }
                                 messageText = ""
                                 showEmojiPicker = false
                             } else {
@@ -1289,6 +1372,17 @@ fun ChatScreen(
                 currentDurationMs = uiState.disappearingDurationMs,
                 onDismiss = { viewModel.hideDisappearingDialog() },
                 onSelect = { durationMs -> viewModel.setDisappearingDuration(durationMs) }
+            )
+        }
+
+        if (uiState.showEditHistory && uiState.editHistoryEntries.isNotEmpty()) {
+            val currentMessage = uiState.messages.find { msg ->
+                uiState.editHistoryEntries.any { it.messageId == msg.id }
+            }
+            EditHistorySheet(
+                currentBody = currentMessage?.body ?: "",
+                edits = uiState.editHistoryEntries,
+                onDismiss = { viewModel.dismissEditHistory() }
             )
         }
 
