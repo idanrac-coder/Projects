@@ -1,6 +1,4 @@
-Smarter spam protection is here!
+Bug fixes and performance improvements
 
-- AI-powered spam detection now learns from your actions -- replies, blocks, and reports all make it smarter over time
-- New "Why flagged?" view: tap any blocked message to see exactly why it was caught
-- Protection dashboard shows your active defense layers and AI learning progress
-- Performance and stability improvements
+- Fixed compatibility with newer Android 15 devices
+- Improved app startup reliability

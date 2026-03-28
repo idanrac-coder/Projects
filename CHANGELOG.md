@@ -3,6 +3,15 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.24.1] - 2026-03-28
+
+### Changed
+- Migrate from TensorFlow Lite to LiteRT 2.1.0 for 16 KB page-size alignment (Android 15+ / Google Play requirement)
+
+### Fixed
+- APK incompatibility with 16 KB devices caused by unaligned LOAD segments in libtensorflowlite_jni.so
+- Potential ANR on 16 KB page-size devices due to native library loading failure
+
 ## [3.24.0] - 2026-03-28
 
 ### Added

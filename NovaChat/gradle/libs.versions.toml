@@ -22,8 +22,7 @@ mlkitLanguageId = "17.0.6"
 mlkitEntityExtraction = "16.0.0-beta6"
 playServicesCoroutines = "1.9.0"
 playReview = "2.0.2"
-tflite = "2.14.0"
-tfliteSupport = "0.4.4"
+litert = "2.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -87,9 +86,9 @@ kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "ko
 # In-App Review
 play-review-ktx = { group = "com.google.android.play", name = "review-ktx", version.ref = "playReview" }
 
-# TensorFlow Lite
-tflite-runtime = { group = "org.tensorflow", name = "tensorflow-lite", version.ref = "tflite" }
-tflite-support = { group = "org.tensorflow", name = "tensorflow-lite-support", version.ref = "tfliteSupport" }
+# LiteRT (TensorFlow Lite successor – 16 KB page-size aligned)
+litert = { group = "com.google.ai.edge.litert", name = "litert", version.ref = "litert" }
+litert-support = { group = "com.google.ai.edge.litert", name = "litert-support", version.ref = "litert" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
