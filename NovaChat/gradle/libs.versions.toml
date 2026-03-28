@@ -88,7 +88,6 @@ play-review-ktx = { group = "com.google.android.play", name = "review-ktx", vers
 
 # LiteRT (TensorFlow Lite successor – 16 KB page-size aligned)
 litert = { group = "com.google.ai.edge.litert", name = "litert", version.ref = "litert" }
-litert-support = { group = "com.google.ai.edge.litert", name = "litert-support", version.ref = "litert" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

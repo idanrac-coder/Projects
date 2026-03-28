@@ -117,7 +117,6 @@ dependencies {
 
     // LiteRT (TensorFlow Lite successor – 16 KB page-size aligned)
     implementation(libs.litert)
-    implementation(libs.litert.support)
 
     // ML Kit Language ID
     implementation(libs.mlkit.language.id)
