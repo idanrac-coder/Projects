@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.24.3] - 2026-03-28
+
+### Fixed
+- Crash on launch: Room migration for message_edits table created an index not declared in the entity — add missing @Index annotation to MessageEditEntity
+
 ## [3.24.2] - 2026-03-28
 
 ### Fixed

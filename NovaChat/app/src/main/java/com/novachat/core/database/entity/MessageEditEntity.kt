@@ -1,9 +1,13 @@
 package com.novachat.core.database.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "message_edits")
+@Entity(
+    tableName = "message_edits",
+    indices = [Index(value = ["messageId"])]
+)
 data class MessageEditEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val messageId: Long,
