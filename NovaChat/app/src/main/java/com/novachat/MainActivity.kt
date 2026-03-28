@@ -41,6 +41,7 @@ import com.novachat.core.datastore.UserPreferencesRepository
 import com.novachat.core.sms.BubbleNotificationHelper
 import com.novachat.core.theme.NovaChatMaterialTheme
 import com.novachat.core.worker.ScheduledMessageWorker
+import com.novachat.core.worker.SpamLearningDecayWorker
 import com.novachat.domain.model.BubbleShape
 import com.novachat.domain.model.NovaChatTheme
 import com.novachat.domain.repository.ConversationRepository
@@ -107,6 +108,7 @@ class MainActivity : ComponentActivity() {
         handleNotificationIntent(intent)
         bubbleNotificationHelper.createBubbleChannel()
         ScheduledMessageWorker.enqueue(this)
+        SpamLearningDecayWorker.enqueue(this)
 
         setContent {
             val themeMode by userPreferencesRepository.themeMode

@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.CleaningServices
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.MoveToInbox
+import androidx.compose.foundation.clickable
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -33,7 +34,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.novachat.core.database.entity.SpamMessageEntity
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -88,6 +92,7 @@ fun SpamFolderScreen(
     val spamMessages by viewModel.spamMessages.collectAsStateWithLifecycle()
     val restoredEvent by viewModel.restoredEvent.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    var detailMessage by remember { mutableStateOf<SpamMessageEntity?>(null) }
 
     LaunchedEffect(restoredEvent) {
         restoredEvent?.let { address ->
@@ -148,7 +153,9 @@ fun SpamFolderScreen(
             ) {
                 items(spamMessages, key = { it.id }) { spam ->
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { detailMessage = spam },
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Row(
@@ -211,6 +218,17 @@ fun SpamFolderScreen(
                     }
                 }
             }
+        }
+
+        detailMessage?.let { spam ->
+            SpamDetailSheet(
+                address = spam.address,
+                body = spam.body,
+                score = 0,
+                matchedRuleType = spam.matchedRuleType,
+                timestamp = spam.timestamp,
+                onDismiss = { detailMessage = null }
+            )
         }
     }
 }

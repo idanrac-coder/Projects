@@ -15,8 +15,8 @@ android {
         applicationId = "com.novachat"
         minSdk = 31
         targetSdk = 35
-        versionCode = 109
-        versionName = "3.23.0"
+        versionCode = 110
+        versionName = "3.24.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -51,6 +51,10 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+
+    androidResources {
+        noCompress += "tflite"
     }
 
 }
@@ -110,6 +114,10 @@ dependencies {
 
     // In-App Review
     implementation(libs.play.review.ktx)
+
+    // TensorFlow Lite
+    implementation(libs.tflite.runtime)
+    implementation(libs.tflite.support)
 
     // ML Kit Language ID
     implementation(libs.mlkit.language.id)

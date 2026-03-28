@@ -1,9 +1,6 @@
-New features packed in this update!
+Smarter spam protection is here!
 
-- Edit messages: tap and hold a sent message to edit it within 15 minutes. View the full edit history anytime.
-
-- System Theme: Aura now follows your device's dark/light mode automatically with Material You colors.
-
-- Send Feedback & Rate Us options added to Settings.
-
-- Lifetime license now includes clear Terms & Conditions with refund policy details.
+- AI-powered spam detection now learns from your actions -- replies, blocks, and reports all make it smarter over time
+- New "Why flagged?" view: tap any blocked message to see exactly why it was caught
+- Protection dashboard shows your active defense layers and AI learning progress
+- Performance and stability improvements

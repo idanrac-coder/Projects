@@ -21,6 +21,7 @@ import com.novachat.domain.repository.ConversationRepository
 import com.novachat.core.datastore.UserPreferencesRepository
 import com.novachat.core.database.dao.SpamMessageDao
 import com.novachat.core.database.entity.SpamMessageEntity
+import com.novachat.core.sms.ml.PersonalSpamAdapter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -84,7 +85,8 @@ class ChatViewModel @Inject constructor(
     private val whatsAppForwarder: WhatsAppForwarder,
     private val scamDetector: ScamDetector,
     private val spamFilter: SpamFilter,
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val personalSpamAdapter: PersonalSpamAdapter
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatUiState())
@@ -329,6 +331,14 @@ class ChatViewModel @Inject constructor(
         if (_uiState.value.sendViaWhatsApp) {
             sendViaWhatsAppDelayed(address, body)
             return
+        }
+        val lastReceived = _uiState.value.messages.lastOrNull { it.type == MessageType.RECEIVED }
+        if (lastReceived != null) {
+            viewModelScope.launch {
+                personalSpamAdapter.recordImplicitSignal(
+                    lastReceived.address, lastReceived.body, PersonalSpamAdapter.ImplicitSignal.REPLIED
+                )
+            }
         }
         viewModelScope.launch {
             if (!userPreferencesRepository.undoSendEnabled.first()) {
@@ -662,6 +672,11 @@ class ChatViewModel @Inject constructor(
                         matchedRuleType = ruleType
                     )
                 )
+                if (msg.type == MessageType.RECEIVED) {
+                    personalSpamAdapter.recordImplicitSignal(
+                        msg.address, msg.body, PersonalSpamAdapter.ImplicitSignal.BLOCKED
+                    )
+                }
             }
             try { conversationRepository.deleteThread(currentThreadId) } catch (e: Exception) {}
         }

@@ -3,6 +3,19 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.24.0] - 2026-03-28
+
+### Added
+- TFLite ML spam classifier infrastructure: on-device model loading, text preprocessing, vocabulary support, graceful fallback when no model bundled
+- Score fusion engine: combines deterministic, heuristic, semantic, ML, and personal model signals into unified spam score
+- Personal spam adapter: on-device Naive Bayes learning from implicit user signals (reply, block, delete, contact add)
+- Exponential decay worker: daily background task to age keyword weights so old training data fades
+- "Why flagged?" detail sheet: tap any spam folder item to see detection signal breakdown with score visualization
+- Protection Engine status in Smart & Secure: shows ML model availability, personal AI readiness, active detection layers
+- Shadow A/B testing framework: runs heuristic-only vs full ML pipeline in parallel, logs disagreements for model iteration
+- Model version manager: tracks bundled TFLite model metadata for future Dynamic Asset Delivery upgrades
+- Edit history encryption strategy document: detailed E2EE architecture for message edit history (future implementation)
+
 ## [3.23.0] - 2026-03-28
 
 ### Added

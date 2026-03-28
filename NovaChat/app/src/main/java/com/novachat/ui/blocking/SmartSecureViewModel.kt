@@ -7,6 +7,8 @@ import com.novachat.core.database.entity.SpamMessageEntity
 import com.novachat.core.datastore.UserPreferencesRepository
 import com.novachat.core.sms.ScamDetector
 import com.novachat.core.sms.SpamAgentStats
+import com.novachat.core.sms.ml.PersonalSpamAdapter
+import com.novachat.core.sms.ml.SpamMlClassifier
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,14 +23,19 @@ data class SmartSecureUiState(
     val latestSpam: SpamMessageEntity? = null,
     val scamDetectionEnabled: Boolean = true,
     val filterInternationalSenders: Boolean = false,
-    val agentStats: SpamAgentStats? = null
+    val agentStats: SpamAgentStats? = null,
+    val mlModelAvailable: Boolean = false,
+    val mlModelVersion: Int = 0,
+    val personalModelReady: Boolean = false
 )
 
 @HiltViewModel
 class SmartSecureViewModel @Inject constructor(
     private val spamMessageDao: SpamMessageDao,
     private val preferencesRepository: UserPreferencesRepository,
-    private val scamDetector: ScamDetector
+    private val scamDetector: ScamDetector,
+    private val mlClassifier: SpamMlClassifier,
+    private val personalAdapter: PersonalSpamAdapter
 ) : ViewModel() {
 
     private val _agentStats = MutableStateFlow<SpamAgentStats?>(null)
@@ -45,17 +52,28 @@ class SmartSecureViewModel @Inject constructor(
             latestSpam = spamMessages.firstOrNull(),
             scamDetectionEnabled = scamEnabled,
             filterInternationalSenders = filterIntl,
-            agentStats = stats
+            agentStats = stats,
+            mlModelAvailable = mlClassifier.isModelAvailable,
+            mlModelVersion = mlClassifier.modelVersion,
+            personalModelReady = personalAdapter.isReady
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SmartSecureUiState())
 
     init {
         loadAgentStats()
+        loadMlStatus()
     }
 
     private fun loadAgentStats() {
         viewModelScope.launch {
             _agentStats.value = scamDetector.getLearningStats()
+        }
+    }
+
+    private fun loadMlStatus() {
+        viewModelScope.launch {
+            mlClassifier.ensureLoaded()
+            personalAdapter.refresh()
         }
     }
 

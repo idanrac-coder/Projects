@@ -2,6 +2,9 @@ package com.novachat.core.sms
 
 import com.novachat.core.sms.hebrew.HebrewSpamEngine
 import com.novachat.core.sms.hebrew.SpamCategory
+import com.novachat.core.sms.ml.PersonalSpamAdapter
+import com.novachat.core.sms.ml.SpamMlClassifier
+import com.novachat.core.sms.ml.SpamScoreFusionEngine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
@@ -9,18 +12,21 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Zero-Trust spam filter orchestrator. Runs three-layer pipeline:
+ * Zero-Trust spam filter orchestrator. Runs four-layer pipeline:
  * Layer 1: Deterministic regex
  * Layer 2: Weighted heuristic scoring
  * Layer 3: Semantic (ML Kit + short-code whitelist)
+ * Layer 4: TFLite ML classifier (when model available)
+ * Score fusion engine combines all signals. Personal adaptive model blended when ready.
  * When body contains Hebrew, runs HebrewSpamEngine first; maps result to SpamClassification.
- * Integrates with ScamDetector for user feedback (reportSpam / reportNotSpam).
  */
 @Singleton
 class SpamFilter @Inject constructor(
     private val scamDetector: ScamDetector,
     private val semanticSpamLayer: SemanticSpamLayer,
-    private val hebrewSpamEngine: HebrewSpamEngine
+    private val hebrewSpamEngine: HebrewSpamEngine,
+    private val mlClassifier: SpamMlClassifier,
+    private val personalAdapter: PersonalSpamAdapter
 ) {
 
     data class ClassificationResult(
@@ -119,13 +125,26 @@ class SpamFilter @Inject constructor(
             deterministicBonus = deterministicBonus
         )
 
-        var finalScore = heuristicResult.score
-        val semanticResult = semanticSpamLayer.analyze(body, address, finalScore)
-        finalScore = (finalScore + semanticResult.scoreAdjustment).coerceAtLeast(0)
+        val semanticResult = semanticSpamLayer.analyze(body, address, heuristicResult.score)
+
+        val mlProb = withTimeoutOrNull(100L) { mlClassifier.classify(body) } ?: -1f
+        val personalScore = if (personalAdapter.isReady) personalAdapter.score(body) else -1f
+
+        val fusionInput = SpamScoreFusionEngine.FusionInput(
+            deterministicScore = deterministicBonus,
+            heuristicScore = heuristicResult.score,
+            semanticAdjustment = semanticResult.scoreAdjustment,
+            mlProbability = mlProb,
+            personalScore = personalScore,
+            isModelAvailable = mlClassifier.isModelAvailable,
+            isPersonalModelReady = personalAdapter.isReady
+        )
+        val fusionResult = SpamScoreFusionEngine.fuse(fusionInput)
+        val finalScore = fusionResult.finalScore
 
         val classification = when {
             finalScore > 75 -> SpamClassification.SPAM
-            finalScore >= 55 -> SpamClassification.SUSPICIOUS  // 55 = require 2+ signals (unknown alone=40 stays Safe)
+            finalScore >= 55 -> SpamClassification.SUSPICIOUS
             else -> SpamClassification.SAFE
         }
 
