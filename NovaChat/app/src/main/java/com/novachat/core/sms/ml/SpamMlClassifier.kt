@@ -65,7 +65,7 @@ class SpamMlClassifier @Inject constructor(
             }
             interpreter = Interpreter(modelBuffer, options)
             Log.i(TAG, "TFLite model loaded successfully")
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Log.w(TAG, "Failed to load TFLite model", e)
             interpreter = null
         }
@@ -89,7 +89,7 @@ class SpamMlClassifier @Inject constructor(
             }
             SpamTextPreprocessor.loadVocabulary(vocabMap)
             Log.i(TAG, "Vocabulary loaded: ${vocabMap.size} tokens")
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Log.w(TAG, "Failed to load vocabulary", e)
         }
     }
@@ -115,7 +115,7 @@ class SpamMlClassifier @Inject constructor(
                 val outputArray = Array(1) { FloatArray(1) }
                 interp.run(inputArray, outputArray)
                 outputArray[0][0].coerceIn(0f, 1f)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 Log.w(TAG, "TFLite inference failed", e)
                 -1f
             }

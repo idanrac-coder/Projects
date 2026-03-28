@@ -1,4 +1,4 @@
-Bug fixes and performance improvements
+Bug fixes and stability improvements
 
-- Fixed compatibility with newer Android 15 devices
-- Improved app startup reliability
+- Fixed a crash that could occur when opening the app
+- Improved spam detection reliability

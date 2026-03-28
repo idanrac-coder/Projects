@@ -15,6 +15,7 @@ import com.novachat.core.sms.SmsNotificationHandler
 import com.novachat.core.sms.SmsProvider
 import com.novachat.domain.repository.ConversationRepository
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -37,7 +38,11 @@ class NovaChatApplication : Application(), Configuration.Provider {
     lateinit var smsProvider: SmsProvider
 
     private var smsObserver: ContentObserver? = null
-    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val appScope = CoroutineScope(
+        SupervisorJob() + Dispatchers.IO + CoroutineExceptionHandler { _, throwable ->
+            Log.e("NovaChatApp", "Uncaught coroutine error", throwable)
+        }
+    )
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()

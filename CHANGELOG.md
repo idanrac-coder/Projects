@@ -3,6 +3,14 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.24.2] - 2026-03-28
+
+### Fixed
+- Crash on launch caused by LiteRT 2.1.0 (beta) missing Interpreter API — downgrade to stable 1.4.1
+- SpamMlClassifier now catches Throwable (not just Exception) to survive NoClassDefFoundError from native libs
+- Uncaught coroutine errors in Application scope no longer crash the process (added CoroutineExceptionHandler)
+- Add ProGuard keep rules for LiteRT/TFLite classes to prevent R8 from stripping JNI-loaded internals
+
 ## [3.24.1] - 2026-03-28
 
 ### Changed

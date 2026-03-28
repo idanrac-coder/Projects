@@ -22,7 +22,7 @@ mlkitLanguageId = "17.0.6"
 mlkitEntityExtraction = "16.0.0-beta6"
 playServicesCoroutines = "1.9.0"
 playReview = "2.0.2"
-litert = "2.1.0"
+litert = "1.4.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
