@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 13,
-    "identityHash": "eedb248ef80c9c5bb14e3d0e507852e9",
+    "identityHash": "9552299f809bd02bf5ed0f8faf949b9b",
     "entities": [
       {
         "tableName": "block_rules",
@@ -897,14 +897,24 @@
             "id"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_message_edits_messageId",
+            "unique": false,
+            "columnNames": [
+              "messageId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_message_edits_messageId` ON `${TABLE_NAME}` (`messageId`)"
+          }
+        ],
         "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'eedb248ef80c9c5bb14e3d0e507852e9')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9552299f809bd02bf5ed0f8faf949b9b')"
     ]
   }
 }

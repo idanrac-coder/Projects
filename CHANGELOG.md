@@ -3,6 +3,16 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.25.0] - 2026-03-29
+
+### Changed
+- Move Theme Mode selector from Settings into the Themes screen for better organization
+- Remove Protection Engine and AI Learning Progress sections from Smart & Secure screen (internal details not useful to users)
+
+### Fixed
+- Send Feedback button doing nothing on Android 11+ due to package visibility restrictions on resolveActivity — use try-catch with fallback instead
+- Messages from senders with prior spam history not appearing in inbox despite receiving a notification — remove aggressive address-based conversation filtering that hid entire threads when any single message was ever flagged as spam
+
 ## [3.24.3] - 2026-03-28
 
 ### Fixed

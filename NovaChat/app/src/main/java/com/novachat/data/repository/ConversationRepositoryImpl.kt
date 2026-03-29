@@ -87,24 +87,9 @@ class ConversationRepositoryImpl @Inject constructor(
 
     override suspend fun getConversations(): List<Conversation> {
         if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "### Repo.getConversations() START")
-        val spamAddresses = spamMessageDao.getSpamAddresses().toSet()
-        val normalizeAddress: (String) -> String = { a ->
-            a.replace(Regex("[^0-9]"), "").let { d ->
-                if (d.startsWith("972") && d.length >= 12) "0" + d.drop(3) else d
-            }
-        }
-        val spamNormalized = spamAddresses.map { normalizeAddress(it) }.toSet()
-        // Trusted senders (allowlist): always show their conversations in main inbox even if in spam_messages
-        val allowlistedNorm = spamLearningDao.getAllAllowlisted().map { normalizeAddress(it.address) }.toSet()
-        val allowlistedRaw = spamLearningDao.getAllAllowlisted().map { it.address }.toSet()
         val rawConversations = smsProvider.getConversations()
-        val conversations = rawConversations.filter { conv ->
-            val norm = normalizeAddress(conv.address)
-            val isTrusted = norm in allowlistedNorm || conv.address in allowlistedRaw
-            val isSpam = norm in spamNormalized || spamAddresses.contains(conv.address)
-            isTrusted || !isSpam
-        }
-        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "### Repo.getConversations() raw=${rawConversations.size} filtered=${conversations.size} spamAddrs=${spamAddresses.size} allowlisted=${allowlistedNorm.size}")
+        val conversations = rawConversations
+        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "### Repo.getConversations() raw=${rawConversations.size}")
         val allMetas = conversationMetaDao.getAllMetas().associateBy { it.threadId }
         val result = conversations
             .map { conversation ->

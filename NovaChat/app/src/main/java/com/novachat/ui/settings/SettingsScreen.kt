@@ -33,8 +33,6 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.filled.SwipeRight
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
@@ -46,7 +44,6 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -85,7 +82,6 @@ fun SettingsScreen(
     val whatsAppForwardEnabled by viewModel.whatsAppForwardEnabled.collectAsState()
     val undoSendEnabled by viewModel.undoSendEnabled.collectAsState()
     val isPremium by viewModel.isPremium.collectAsState()
-    val themeMode by viewModel.themeMode.collectAsState()
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -183,11 +179,6 @@ fun SettingsScreen(
                         title = "Themes",
                         subtitle = "Colors, bubbles & wallpapers",
                         onClick = onThemesClick
-                    )
-                    SettingsDivider()
-                    ThemeModeSelector(
-                        currentMode = themeMode,
-                        onModeSelected = { viewModel.setThemeMode(it) }
                     )
                     SettingsDivider()
                     SettingsItem(
@@ -325,8 +316,11 @@ fun SettingsScreen(
                                 data = Uri.parse("mailto:novachat.feedback@gmail.com")
                                 putExtra(Intent.EXTRA_SUBJECT, "Aura Feedback v${BuildConfig.VERSION_NAME}")
                             }
-                            if (intent.resolveActivity(context.packageManager) != null) {
+                            try {
                                 context.startActivity(intent)
+                            } catch (_: Exception) {
+                                val fallback = Intent(Intent.ACTION_VIEW, Uri.parse("mailto:novachat.feedback@gmail.com"))
+                                try { context.startActivity(fallback) } catch (_: Exception) { }
                             }
                         }
                     )
@@ -432,45 +426,6 @@ private fun SettingsItem(
             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
             modifier = Modifier.size(20.dp)
         )
-    }
-}
-
-@Composable
-private fun ThemeModeSelector(
-    currentMode: String,
-    onModeSelected: (String) -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-    ) {
-        Text(
-            text = "Theme Mode",
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Medium
-        )
-        Text(
-            text = "How the app chooses light or dark appearance",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            listOf("system" to "System", "custom" to "Custom Theme").forEach { (value, label) ->
-                FilterChip(
-                    selected = currentMode == value,
-                    onClick = { onModeSelected(value) },
-                    label = { Text(label) },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                        selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                )
-            }
-        }
     }
 }
 

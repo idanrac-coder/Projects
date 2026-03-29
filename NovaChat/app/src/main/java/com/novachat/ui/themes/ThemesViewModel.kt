@@ -19,7 +19,8 @@ data class ThemesUiState(
     val customThemes: List<NovaChatTheme> = emptyList(),
     val activeThemeId: Long = 1L,
     val isPremium: Boolean = false,
-    val activeBubbleShape: BubbleShape = BubbleShape.ROUNDED
+    val activeBubbleShape: BubbleShape = BubbleShape.ROUNDED,
+    val themeMode: String = "system"
 )
 
 @HiltViewModel
@@ -33,14 +34,18 @@ class ThemesViewModel @Inject constructor(
         themeRepository.getCustomThemes(),
         preferencesRepository.activeThemeId,
         preferencesRepository.isPremium,
-        preferencesRepository.activeBubbleShape
-    ) { builtIn, custom, activeId, premium, bubbleShape ->
+        combine(
+            preferencesRepository.activeBubbleShape,
+            preferencesRepository.themeMode
+        ) { bubble, mode -> bubble to mode }
+    ) { builtIn, custom, activeId, premium, (bubbleShape, themeMode) ->
         ThemesUiState(
             builtInThemes = builtIn,
             customThemes = custom,
             activeThemeId = activeId,
             isPremium = premium,
-            activeBubbleShape = bubbleShape ?: BubbleShape.ROUNDED
+            activeBubbleShape = bubbleShape ?: BubbleShape.ROUNDED,
+            themeMode = themeMode
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ThemesUiState())
 
@@ -59,6 +64,12 @@ class ThemesViewModel @Inject constructor(
     fun setBubbleShape(shape: BubbleShape) {
         viewModelScope.launch {
             preferencesRepository.setBubbleShape(shape)
+        }
+    }
+
+    fun setThemeMode(mode: String) {
+        viewModelScope.launch {
+            preferencesRepository.setThemeMode(mode)
         }
     }
 

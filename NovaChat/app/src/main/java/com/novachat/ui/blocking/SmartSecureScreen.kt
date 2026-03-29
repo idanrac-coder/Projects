@@ -272,68 +272,6 @@ fun SmartSecureScreen(
                 }
             }
 
-            // ML Engine Status
-            Spacer(modifier = Modifier.height(8.dp))
-            Surface(
-                shape = RoundedCornerShape(16.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "Protection Engine",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        StatItem(
-                            "ML Model",
-                            if (uiState.mlModelAvailable) "Active v${uiState.mlModelVersion}" else "Heuristic"
-                        )
-                        StatItem(
-                            "Personal AI",
-                            if (uiState.personalModelReady) "Learning" else "Training..."
-                        )
-                        StatItem(
-                            "Layers",
-                            if (uiState.mlModelAvailable) "4" else "3"
-                        )
-                    }
-                }
-            }
-
-            // Learning stats
-            val stats = uiState.agentStats
-            if (stats != null && (stats.totalSpamSamples > 0 || stats.totalHamSamples > 0)) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = "AI Learning Progress",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            StatItem("Spam samples", "${stats.totalSpamSamples}")
-                            StatItem("Safe samples", "${stats.totalHamSamples}")
-                            StatItem("Known spammers", "${stats.knownSpamSenders}")
-                        }
-                    }
-                }
-            }
-
             Spacer(modifier = Modifier.height(24.dp))
 
             Surface(
@@ -432,20 +370,4 @@ private fun NavItem(
     }
 }
 
-@Composable
-private fun StatItem(label: String, value: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
 
