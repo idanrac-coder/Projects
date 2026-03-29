@@ -4,4 +4,6 @@ Major spam protection upgrade!
 - 14 new spam categories: gambling, fake lottery, debt scams, diet scams, charity fraud, and more
 - Better detection of bank phishing with more Israeli banks and credit card companies
 - Improved delivery scam detection for Amazon, AliExpress, Shein, Temu, and other services
-- Expanded political spam and propaganda filtering
+
+Bug fixes:
+- Fixed Hebrew spam detection not catching some political and phishing messages

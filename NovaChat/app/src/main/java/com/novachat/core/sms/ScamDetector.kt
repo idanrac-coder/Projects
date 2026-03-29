@@ -6,6 +6,7 @@ import com.novachat.core.database.dao.SpamMessageDao
 import com.novachat.core.database.entity.SpamKeywordWeightEntity
 import com.novachat.core.database.entity.SpamLearningEntity
 import com.novachat.core.database.entity.SpamSenderReputationEntity
+import com.novachat.core.sms.hebrew.HebrewTextNormalizer
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
@@ -415,15 +416,19 @@ class ScamDetector @Inject constructor(
     fun analyze(body: String): ScamAnalysis {
         if (body.length < 10) return ScamAnalysis(false, 0f, null, null)
 
+        val matchBody = if (body.any { it in '\u0590'..'\u05FF' })
+            HebrewTextNormalizer.normalizeForMatching(body)
+        else body
+
         val signals = mutableListOf<String>()
         var combinedScore = 0f
         var bestCategory: ScamCategory? = null
         var bestReason: String? = null
         var bestRuleScore = 0f
 
-        // 1. Rule-based pattern matching
+        // 1. Rule-based pattern matching (uses normalized body for Hebrew)
         for (rule in rules) {
-            if (rule.regex.containsMatchIn(body)) {
+            if (rule.regex.containsMatchIn(matchBody)) {
                 signals.add(rule.description)
                 if (rule.baseScore > bestRuleScore) {
                     bestRuleScore = rule.baseScore

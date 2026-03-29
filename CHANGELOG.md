@@ -3,6 +3,12 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.27.1] - 2026-03-29
+
+### Fixed
+- Hebrew spam patterns not matching raw text in ScamDetector and DeterministicSpamLayer short-circuit path (final letters like ם/ן were normalized to מ/נ in patterns but input wasn't normalized)
+- Normalize Hebrew body before pattern matching in ScamDetector.analyze() and SpamFilter short-circuit
+
 ## [3.27.0] - 2026-03-29
 
 ### Added

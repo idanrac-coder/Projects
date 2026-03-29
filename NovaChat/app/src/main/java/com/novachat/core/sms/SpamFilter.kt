@@ -86,7 +86,8 @@ class SpamFilter @Inject constructor(
 
         val hasHebrew = body.any { it in '\u0590'..'\u05FF' }
         if (hasHebrew) {
-            val detRaw = DeterministicSpamLayer.analyze(body)
+            val normalizedBody = com.novachat.core.sms.hebrew.HebrewTextNormalizer.normalizeForMatching(body)
+            val detRaw = DeterministicSpamLayer.analyze(normalizedBody)
             val shortCircuitMatch = detRaw.matchedRuleTypes.firstOrNull { it in shortCircuitRules }
             if (detRaw.matched && shortCircuitMatch != null) {
                 return@withContext ClassificationResult(
