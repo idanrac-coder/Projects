@@ -33,6 +33,11 @@ class ScheduledMessageWorker @AssistedInject constructor(
             }
             if (success) {
                 scheduledMessageDao.markAsSent(scheduled.id)
+            } else {
+                scheduledMessageDao.incrementRetryCount(scheduled.id)
+                if (scheduled.retryCount + 1 >= MAX_RETRIES) {
+                    scheduledMessageDao.markAsFailed(scheduled.id)
+                }
             }
         }
         return Result.success()
@@ -40,6 +45,7 @@ class ScheduledMessageWorker @AssistedInject constructor(
 
     companion object {
         private const val WORK_NAME = "scheduled_messages_check"
+        private const val MAX_RETRIES = 3
 
         fun enqueue(context: Context) {
             val request = PeriodicWorkRequestBuilder<ScheduledMessageWorker>(

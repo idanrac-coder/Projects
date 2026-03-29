@@ -70,9 +70,8 @@ class NovaChatApplication : Application(), Configuration.Provider {
 
                 if (now - lastNotifyTime > 200) {
                     lastNotifyTime = now
-                    if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "~~~ ContentObserver: FIRING invalidateAllCaches + notifyNewMessage(-1)")
-                    conversationRepository.invalidateAllCaches()
-                    conversationRepository.notifyNewMessage(-1L)
+                    if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "~~~ ContentObserver: FIRING refreshAfterChange")
+                    conversationRepository.refreshAfterChange()
                 } else {
                     if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "~~~ ContentObserver: THROTTLED (too soon)")
                 }

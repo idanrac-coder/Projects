@@ -18,6 +18,10 @@ interface ConversationRepository {
     fun invalidateMessagesCache(threadId: Long)
     fun invalidateAllCaches()
     fun notifyNewMessage(threadId: Long)
+    fun refreshAfterChange(threadId: Long = -1L) {
+        invalidateAllCaches()
+        notifyNewMessage(threadId)
+    }
     suspend fun getArchivedConversations(): List<Conversation>
     suspend fun unarchiveConversation(threadId: Long)
     suspend fun getMessagesForThread(threadId: Long): List<Message>

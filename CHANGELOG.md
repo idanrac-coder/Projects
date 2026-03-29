@@ -3,6 +3,25 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.26.0] - 2026-03-29
+
+### Changed
+- Remove dead SMS_SENT/SMS_DELIVERED PendingIntents from SmsSender (no receiver was registered)
+- Add phone number validation and E.164 normalization to SmsSender before sending
+- Strip Log.w from release builds via ProGuard (previously only v/d/i were stripped)
+- Use app icon (ic_launcher_logo) for notification small icon instead of system email drawable
+- Extract duplicated cache-invalidation pattern into ConversationRepository.refreshAfterChange()
+- Remove billing debug message from user-facing purchase error text
+
+### Fixed
+- Privacy: Log.w in SmsNotificationHandler leaked real phone numbers in production logs
+- ScheduledMessageWorker silently retried failed sends indefinitely — add max 3 retries and mark permanently failed
+- Ungated Log.d calls in SmsNotificationHandler logged addresses without BuildConfig.DEBUG guard
+
+### Security
+- Redact all phone numbers from Log.w/Log.e calls that survive release builds
+- Gate all sensitive Log.d calls in SmsNotificationHandler and NotificationActionReceiver behind BuildConfig.DEBUG
+
 ## [3.25.1] - 2026-03-29
 
 ### Changed

@@ -9,5 +9,7 @@ data class ScheduledMessage(
     val contactName: String? = null,
     val isSent: Boolean = false,
     val sendViaWhatsApp: Boolean = false,
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    val retryCount: Int = 0,
+    val isFailed: Boolean = false
 )

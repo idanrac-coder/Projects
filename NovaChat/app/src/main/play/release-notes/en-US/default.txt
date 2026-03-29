@@ -1,1 +1,8 @@
-Improved spam protection! Election and political campaign spam messages are now detected and blocked automatically.
+Security and reliability improvements:
+
+- Scheduled messages now show a clear failure status instead of retrying silently
+- Better phone number handling when sending messages
+- Improved notification appearance with the NovaChat icon
+- Privacy hardening for production logs
+
+Bug fixes and performance improvements.

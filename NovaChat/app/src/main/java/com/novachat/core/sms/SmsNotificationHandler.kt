@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.novachat.BuildConfig
 import com.novachat.MainActivity
+import com.novachat.R
 import com.novachat.core.database.dao.SpamMessageDao
 import com.novachat.core.database.entity.SpamMessageEntity
 import com.novachat.core.datastore.UserPreferencesRepository
@@ -136,7 +137,7 @@ class SmsNotificationHandler @Inject constructor(
                 context.resources.configuration.locale?.country ?: Locale.getDefault().country
             } catch (_: Exception) { Locale.getDefault().country }
             if (userCountry != null && userCountry.isNotBlank() && isInternationalSender(address, userCountry)) {
-                Log.d(TAG, "International sender filter: $address from non-$userCountry country, hiding")
+                if (BuildConfig.DEBUG) Log.d(TAG, "International sender filter, hiding")
                 spamMessageDao.insertSpamMessage(
                     SpamMessageEntity(
                         smsId = System.currentTimeMillis(),
@@ -159,15 +160,15 @@ class SmsNotificationHandler @Inject constructor(
 
         var spamClassificationResult: SpamFilter.ClassificationResult? = null
         if (isKnownContact || !scamDetectionEnabled || isSenderAllowlisted) {
-            when {
-                isKnownContact -> Log.d(TAG, "Contact trust: $address is a known contact ($contactName), skipping spam analysis")
-                isSenderAllowlisted -> Log.d(TAG, "Sender allowlist: $address was marked as not spam by user, skipping spam analysis")
+            if (BuildConfig.DEBUG) when {
+                isKnownContact -> Log.d(TAG, "Contact trust: skipping spam analysis (known contact)")
+                isSenderAllowlisted -> Log.d(TAG, "Sender allowlist: skipping spam analysis")
                 else -> Log.d(TAG, "Scam detection disabled by user, skipping spam analysis")
             }
         } else {
             spamClassificationResult = spamFilter.classify(address, body, isKnownContact)
             if (spamClassificationResult.classification == SpamFilter.SpamClassification.SPAM) {
-                Log.d(TAG, "Spam filter: score=${spamClassificationResult.score} rule=${spamClassificationResult.matchedRuleType}, moving to Shadow Inbox")
+                if (BuildConfig.DEBUG) Log.d(TAG, "Spam filter: score=${spamClassificationResult.score} rule=${spamClassificationResult.matchedRuleType}, moving to Shadow Inbox")
                 spamMessageDao.insertSpamMessage(
                     SpamMessageEntity(
                         smsId = System.currentTimeMillis(),
@@ -183,7 +184,7 @@ class SmsNotificationHandler @Inject constructor(
                 // Repeat offender auto-block: permanently block after 2+ spam flags
                 val reputation = scamDetector.getSenderReputation(address)
                 if (reputation != null && reputation.spamCount >= 2) {
-                    Log.d(TAG, "Repeat offender auto-block: $address flagged ${reputation.spamCount} times, adding permanent block rule")
+                    if (BuildConfig.DEBUG) Log.d(TAG, "Repeat offender auto-block: flagged ${reputation.spamCount} times, adding permanent block rule")
                     try {
                         blockRepository.addRule(
                             com.novachat.domain.model.BlockRule(
@@ -192,7 +193,7 @@ class SmsNotificationHandler @Inject constructor(
                             )
                         )
                     } catch (e: Exception) {
-                        Log.w(TAG, "Failed to auto-create block rule for $address", e)
+                        Log.w(TAG, "Failed to auto-create block rule", e)
                     }
                 }
                 return
@@ -259,9 +260,8 @@ class SmsNotificationHandler @Inject constructor(
         )
 
         val effectiveThreadId = if (threadId != 0L) threadId else -1L
-        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== Handler: invalidateAllCaches + notifyNewMessage($effectiveThreadId)")
-        conversationRepository.invalidateAllCaches()
-        conversationRepository.notifyNewMessage(effectiveThreadId)
+        if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== Handler: refreshAfterChange($effectiveThreadId)")
+        conversationRepository.refreshAfterChange(effectiveThreadId)
         if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== handleIncomingSms END ===")
     }
 
@@ -299,8 +299,7 @@ class SmsNotificationHandler @Inject constructor(
                 )
             }
             try { smsProvider.deleteMessage(messageId) } catch (_: Exception) { }
-            conversationRepository.invalidateAllCaches()
-            conversationRepository.notifyNewMessage(-1L)
+            conversationRepository.refreshAfterChange()
             return
         }
 
@@ -311,7 +310,7 @@ class SmsNotificationHandler @Inject constructor(
                 context.resources.configuration.locale?.country ?: Locale.getDefault().country
             } catch (_: Exception) { Locale.getDefault().country }
             if (userCountry != null && userCountry.isNotBlank() && isInternationalSender(address, userCountry)) {
-                Log.d(TAG, "Provider-inserted: International filter, moving to Shadow Inbox messageId=$messageId")
+                if (BuildConfig.DEBUG) Log.d(TAG, "Provider-inserted: International filter, moving to Shadow Inbox messageId=$messageId")
                 spamMessageDao.insertSpamMessage(
                     SpamMessageEntity(
                         smsId = System.currentTimeMillis(),
@@ -323,8 +322,7 @@ class SmsNotificationHandler @Inject constructor(
                     )
                 )
                 try { smsProvider.deleteMessage(messageId) } catch (_: Exception) { }
-                conversationRepository.invalidateAllCaches()
-                conversationRepository.notifyNewMessage(-1L)
+                conversationRepository.refreshAfterChange()
                 return
             }
         }
@@ -338,7 +336,7 @@ class SmsNotificationHandler @Inject constructor(
 
         val spamClassificationResult = spamFilter.classify(address, body, isKnownContact)
         if (spamClassificationResult.classification == SpamFilter.SpamClassification.SPAM) {
-            Log.d(TAG, "Provider-inserted spam filter: score=${spamClassificationResult.score} rule=${spamClassificationResult.matchedRuleType}, moving to Shadow Inbox messageId=$messageId")
+            if (BuildConfig.DEBUG) Log.d(TAG, "Provider-inserted spam filter: score=${spamClassificationResult.score} rule=${spamClassificationResult.matchedRuleType}, moving to Shadow Inbox messageId=$messageId")
             spamMessageDao.insertSpamMessage(
                 SpamMessageEntity(
                     smsId = System.currentTimeMillis(),
@@ -354,7 +352,7 @@ class SmsNotificationHandler @Inject constructor(
 
             val reputation = scamDetector.getSenderReputation(address)
             if (reputation != null && reputation.spamCount >= 2) {
-                Log.d(TAG, "Repeat offender auto-block: $address flagged ${reputation.spamCount} times")
+                if (BuildConfig.DEBUG) Log.d(TAG, "Repeat offender auto-block: flagged ${reputation.spamCount} times")
                 try {
                     blockRepository.addRule(
                         com.novachat.domain.model.BlockRule(
@@ -364,8 +362,7 @@ class SmsNotificationHandler @Inject constructor(
                     )
                 } catch (e: Exception) { Log.w(TAG, "Failed to auto-create block rule", e) }
             }
-            conversationRepository.invalidateAllCaches()
-            conversationRepository.notifyNewMessage(-1L)
+            conversationRepository.refreshAfterChange()
         }
     }
 
@@ -402,8 +399,7 @@ class SmsNotificationHandler @Inject constructor(
      * may have already written the MMS to the provider when we are the default SMS app.
      */
     fun handleIncomingMms() {
-        conversationRepository.invalidateAllCaches()
-        conversationRepository.notifyNewMessage(-1L)
+        conversationRepository.refreshAfterChange()
         showNotification(
             title = "New MMS",
             body = "You have received a new multimedia message. Open the app to view.",
@@ -460,7 +456,7 @@ class SmsNotificationHandler @Inject constructor(
         )
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_dialog_email)
+            .setSmallIcon(R.drawable.ic_launcher_logo)
             .setContentTitle(title)
             .setContentText(body)
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))

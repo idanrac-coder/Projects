@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.novachat.BuildConfig
 import com.novachat.core.database.dao.SpamMessageDao
 import com.novachat.core.sms.ScamCategory
 import com.novachat.core.database.entity.SpamMessageEntity
@@ -64,13 +65,12 @@ class NotificationActionReceiver : BroadcastReceiver() {
 
         when (intent.action) {
             ACTION_MARK_READ -> {
-                Log.d(TAG, "Mark as read: threadId=$threadId")
+                if (BuildConfig.DEBUG) Log.d(TAG, "Mark as read: threadId=$threadId")
                 val pendingResult = goAsync()
                 scope.launch {
                     try {
                         conversationRepository.markThreadAsRead(threadId)
-                        conversationRepository.invalidateAllCaches()
-                        conversationRepository.notifyNewMessage(-1L)
+                        conversationRepository.refreshAfterChange()
                     } catch (e: Exception) {
                         Log.e(TAG, "Failed to mark as read", e)
                     } finally {
@@ -83,13 +83,12 @@ class NotificationActionReceiver : BroadcastReceiver() {
             }
 
             ACTION_DELETE -> {
-                Log.d(TAG, "Delete thread: threadId=$threadId")
+                if (BuildConfig.DEBUG) Log.d(TAG, "Delete thread: threadId=$threadId")
                 val pendingResult = goAsync()
                 scope.launch {
                     try {
                         smsProvider.deleteThread(threadId)
-                        conversationRepository.invalidateAllCaches()
-                        conversationRepository.notifyNewMessage(-1L)
+                        conversationRepository.refreshAfterChange()
                     } catch (e: Exception) {
                         Log.e(TAG, "Failed to delete thread", e)
                     } finally {
@@ -108,7 +107,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 val category = categoryStr?.let { str ->
                     try { ScamCategory.valueOf(str) } catch (_: Exception) { null }
                 }
-                Log.d(TAG, "Report spam: address=$address threadId=$threadId")
+                if (BuildConfig.DEBUG) Log.d(TAG, "Report spam: threadId=$threadId")
                 val pendingResult = goAsync()
                 scope.launch {
                     try {
@@ -131,8 +130,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
                             )
                         }
                         smsProvider.deleteThread(threadId)
-                        conversationRepository.invalidateAllCaches()
-                        conversationRepository.notifyNewMessage(-1L)
+                        conversationRepository.refreshAfterChange()
                     } catch (e: Exception) {
                         Log.e(TAG, "Failed to report spam", e)
                     } finally {

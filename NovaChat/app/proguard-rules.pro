@@ -1,8 +1,9 @@
-# Strip verbose/debug/info logs in release (keep error/warning)
+# Strip verbose/debug/info/warning logs in release (keep only error)
 -assumenosideeffects class android.util.Log {
     public static int v(...);
     public static int d(...);
     public static int i(...);
+    public static int w(...);
 }
 
 # Room

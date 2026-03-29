@@ -40,8 +40,7 @@ class SpamFolderViewModel @Inject constructor(
                 val result = smsProvider.insertIncomingSms(spam.address, spam.body, spam.timestamp)
                 if (result.uri != null) {
                     spamMessageDao.deleteSpamMessageById(id)
-                    conversationRepository.invalidateAllCaches()
-                    conversationRepository.notifyNewMessage(result.threadId)
+                    conversationRepository.refreshAfterChange(result.threadId)
                     _restoredEvent.value = spam.address
                 } else {
                     Log.e("SpamFolderVM", "Failed to restore message to inbox: insert returned null")

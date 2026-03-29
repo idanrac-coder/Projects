@@ -291,7 +291,9 @@ class ConversationRepositoryImpl @Inject constructor(
                     contactName = entity.contactName,
                     isSent = entity.isSent,
                     sendViaWhatsApp = entity.sendViaWhatsApp,
-                    createdAt = entity.createdAt
+                    createdAt = entity.createdAt,
+                    retryCount = entity.retryCount,
+                    isFailed = entity.isFailed
                 )
             }
         }

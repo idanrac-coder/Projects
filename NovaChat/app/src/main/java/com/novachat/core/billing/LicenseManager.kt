@@ -181,7 +181,7 @@ class LicenseManager @Inject constructor(
                 _error.value = null
             }
             else -> {
-                _error.value = "Purchase failed: ${result.debugMessage}"
+                _error.value = "Purchase failed. Please try again."
             }
         }
     }
@@ -214,7 +214,7 @@ class LicenseManager @Inject constructor(
                             Log.d(TAG, "Purchase consumed for testing")
                             scope.launch { preferencesRepository.setPremium(false) }
                         } else {
-                            Log.e(TAG, "Failed to consume purchase: ${billingResult.debugMessage}")
+                            Log.e(TAG, "Failed to consume purchase")
                         }
                     }
                 }
