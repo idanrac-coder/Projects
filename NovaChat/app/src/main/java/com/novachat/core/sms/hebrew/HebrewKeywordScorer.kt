@@ -21,6 +21,7 @@ object HebrewKeywordScorer {
         Rule("panic_disinformation", Regex("מתקפת.*טילים|חפש.*מקלט|אזהרה.*טילים|Red.?Alert|אזעקה"), 0.8f, "Panic / war misinformation"),
         Rule("government_impersonation", Regex("(משטרה|רשות.*המיסים|פיקוד.*העורף).*(הודעה.*חשובה|תגובה.*נדרשת)"), 0.65f, "Government impersonation"),
         Rule("otp_phishing", Regex("שלח.*הקוד|קוד.*אימות.*לחץ|הזן.*הקוד"), 0.85f, "OTP phishing"),
+        Rule("political_campaign", Regex("בבחירות.*בוחרים|בוחרים ב|הצביעו ל|בחירות.*הקרובות|קלפי"), 0.7f, "Political campaign spam"),
         Rule("soft_urgency", Regex("חשוב.*מאוד|תוקף.*פג|פעולה.*נדרשת|הודעה.*קריטית"), 0.55f, "Soft urgency"),
         Rule("לחץ_כאן", Regex("לחץ.*כאן|עדכן.*פרטים"), 0.7f, "Click here / update details")
     )

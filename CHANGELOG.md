@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.25.1] - 2026-03-29
+
+### Changed
+- Broaden Hebrew political spam detection across all three spam layers (DeterministicSpamLayer, ScamDetector, HebrewKeywordScorer) to catch election campaign messages like "בבחירות בוחרים ב...", "הצביעו ל...", "יום הבחירות", "קלפי"
+
 ## [3.25.0] - 2026-03-29
 
 ### Changed

@@ -4,7 +4,7 @@ package com.novachat.core.sms
  * Layer 1: High-performance deterministic regex engine for common phishing patterns.
  * Catches shortened URLs, suspicious TLDs, urgent keywords, OTP/Verify patterns,
  * Hebrew tax refund scams (החזרי/החזר מס), survey/political spam (להסרה: השיבו),
- * and political polls (סקר, מנדטים).
+ * and political/election campaign spam (סקר, מנדטים, בחירות, הצביעו, קלפי).
  * Runs first before heuristic/semantic layers.
  */
 object DeterministicSpamLayer {
@@ -31,8 +31,8 @@ object DeterministicSpamLayer {
     private val taxRefundScamRegex = Regex("החזרי?\\s*מס")
     // Survey/political spam with unsubscribe reply (common in bulk SMS)
     private val surveyUnsubscribeRegex = Regex("להסרה:\\s*השיבו")
-    // Political polls: survey or Knesset mandates (Israeli political context)
-    private val politicalPollRegex = Regex("סקר|מנדטים")
+    // Political polls & election campaign spam (Israeli political context)
+    private val politicalPollRegex = Regex("סקר|מנדטים|בבחירות.*בוחרים|בוחרים ב\\S+!|הצביעו ל|להצביע ל|יום הבחירות|קלפי")
     // Israeli bank phishing (normalized: ם→מ, ן→נ)
     private val israeliBankRegex = Regex("בנק.*(נחסמ|ננעל)|כרטיס.*נחסמ|חשבנ.*נחסמ|לאומי|הפועלים|דיסקונט|מזרחי")
     // Israeli delivery scam

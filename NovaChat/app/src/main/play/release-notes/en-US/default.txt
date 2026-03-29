@@ -1,6 +1,1 @@
-Theme Mode is now inside the Themes screen for easier access.
-
-Bug fixes:
-- Send Feedback button now works correctly on all devices
-- Messages that triggered a notification now always appear in your inbox
-- Cleaned up the Smart & Secure screen for a simpler experience
+Improved spam protection! Election and political campaign spam messages are now detected and blocked automatically.
