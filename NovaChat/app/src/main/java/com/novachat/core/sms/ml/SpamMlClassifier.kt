@@ -37,7 +37,7 @@ class SpamMlClassifier @Inject constructor(
         private const val TAG = "SpamMlClassifier"
         private const val MODEL_FILENAME = "spam_classifier.tflite"
         private const val VOCAB_FILENAME = "spam_vocab.txt"
-        const val MODEL_VERSION = 0
+        const val MODEL_VERSION = 1
     }
 
     suspend fun ensureLoaded() {

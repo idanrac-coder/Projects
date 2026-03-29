@@ -3,6 +3,24 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.27.0] - 2026-03-29
+
+### Added
+- 14 new spam categories: Insurance, Gambling, Hebrew Lottery, Debt Collection, Health/Diet, Real Estate, Car Accident Claims, Charity, Utility Fraud, Carrier, Legal, Commercial, Chain Message, Service Impersonation
+- TFLite ML spam classifier (v1) trained on ~2,850 synthetic Hebrew/English examples across 35 categories with 99.8% validation accuracy
+- Comprehensive Hebrew patterns for prize/lottery and job scam categories (previously English-only)
+
+### Changed
+- Expand all 21 existing spam categories with more Hebrew keywords, brand names, and pattern variations across ScamDetector, DeterministicSpamLayer, and HebrewKeywordScorer
+- Add Israeli credit card companies (Cal, Isracard, Max, Visa Cal, Leumi Card) to bank phishing detection
+- Add international delivery services (FedEx, Amazon, AliExpress, Shein, Temu, iHerb, eBay) to delivery scam detection
+- Add Israeli carriers (Partner, Cellcom, HOT, Pelephone, We4G, Golan) to carrier scam detection
+- Expand crypto/investment patterns with Ethereum, NFT, forex, passive income, trading signals
+- Expand political spam with party names, reform terms, petitions
+- Expand pension/severance with pension fund, provident fund, executive insurance terms
+- Add Hebrew urgency phrases (last opportunity, today only, hours remaining, before it ends)
+- Bump ML MODEL_VERSION from 0 to 1
+
 ## [3.26.0] - 2026-03-29
 
 ### Changed
