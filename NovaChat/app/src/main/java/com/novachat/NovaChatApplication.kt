@@ -62,13 +62,13 @@ class NovaChatApplication : Application(), Configuration.Provider {
             override fun onChange(selfChange: Boolean, uri: Uri?) {
                 super.onChange(selfChange, uri)
                 val now = System.currentTimeMillis()
-                Log.e("NC_DIAG", "~~~ ContentObserver.onChange uri=$uri timeSinceLast=${now - lastNotifyTime}ms")
+                if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "~~~ ContentObserver.onChange uri=$uri timeSinceLast=${now - lastNotifyTime}ms")
 
                 appScope.launch {
                     try {
                         processProviderInsertedMessages(uri)
                     } catch (e: Exception) {
-                        Log.e("NC_DIAG", "~~~ processProviderInsertedMessages THREW", e)
+                        Log.e("NovaChatApp", "processProviderInsertedMessages failed", e)
                     }
                 }
 

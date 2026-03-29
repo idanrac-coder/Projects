@@ -157,19 +157,17 @@ class SmsNotificationHandler @Inject constructor(
         }
         val scamDetectionEnabled = userPreferencesRepository.scamDetectionEnabled.first()
         val isSenderAllowlisted = spamFilter.isAllowlisted(address)
-        Log.e("NC_DIAG", "handleIncomingSms: scamEnabled=$scamDetectionEnabled allowlisted=$isSenderAllowlisted knownContact=$isKnownContact")
 
         var spamClassificationResult: SpamFilter.ClassificationResult? = null
         if (isKnownContact || !scamDetectionEnabled || isSenderAllowlisted) {
-            Log.e("NC_DIAG", "handleIncomingSms: SKIPPING spam (known=$isKnownContact disabled=${!scamDetectionEnabled} allowlisted=$isSenderAllowlisted)")
+            if (BuildConfig.DEBUG) Log.d(TAG, "Skipping spam: known=$isKnownContact disabled=${!scamDetectionEnabled} allowlisted=$isSenderAllowlisted")
         } else {
             spamClassificationResult = try {
                 spamFilter.classify(address, body, isKnownContact)
             } catch (e: Exception) {
-                Log.e("NC_DIAG", "handleIncomingSms: classify THREW exception", e)
+                Log.e(TAG, "classify threw exception", e)
                 null
             }
-            Log.e("NC_DIAG", "handleIncomingSms: classify result=${spamClassificationResult?.classification} score=${spamClassificationResult?.score} rule=${spamClassificationResult?.matchedRuleType}")
             if (spamClassificationResult?.classification == SpamFilter.SpamClassification.SPAM) {
                 if (BuildConfig.DEBUG) Log.d(TAG, "Spam filter: score=${spamClassificationResult.score} rule=${spamClassificationResult.matchedRuleType}, moving to Shadow Inbox")
                 spamMessageDao.insertSpamMessage(
@@ -203,7 +201,6 @@ class SmsNotificationHandler @Inject constructor(
             }
         }
 
-        Log.e("NC_DIAG", "handleIncomingSms: PASSED spam filter, inserting into inbox. classification=${spamClassificationResult?.classification}")
         var threadId = 0L
         if (isDefaultApp) {
             if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== Handler: inserting SMS (we are default app)")
@@ -333,19 +330,17 @@ class SmsNotificationHandler @Inject constructor(
 
         val scamDetectionEnabled = userPreferencesRepository.scamDetectionEnabled.first()
         val isSenderAllowlisted = spamFilter.isAllowlisted(address)
-        Log.e("NC_DIAG", "providerInserted: scamEnabled=$scamDetectionEnabled allowlisted=$isSenderAllowlisted knownContact=$isKnownContact messageId=$messageId")
         if (isKnownContact || !scamDetectionEnabled || isSenderAllowlisted) {
-            Log.e("NC_DIAG", "providerInserted: SKIPPING spam messageId=$messageId")
+            if (BuildConfig.DEBUG) Log.d(TAG, "Provider-inserted: skipping spam (contact/allowlist/disabled), messageId=$messageId")
             return
         }
 
         val spamClassificationResult = try {
             spamFilter.classify(address, body, isKnownContact)
         } catch (e: Exception) {
-            Log.e("NC_DIAG", "providerInserted: classify THREW exception messageId=$messageId", e)
+            Log.e(TAG, "Provider-inserted classify threw exception, messageId=$messageId", e)
             null
         }
-        Log.e("NC_DIAG", "providerInserted: classify result=${spamClassificationResult?.classification} score=${spamClassificationResult?.score} messageId=$messageId")
         if (spamClassificationResult?.classification == SpamFilter.SpamClassification.SPAM) {
             if (BuildConfig.DEBUG) Log.d(TAG, "Provider-inserted spam filter: score=${spamClassificationResult.score} rule=${spamClassificationResult.matchedRuleType}, moving to Shadow Inbox messageId=$messageId")
             spamMessageDao.insertSpamMessage(
@@ -359,12 +354,7 @@ class SmsNotificationHandler @Inject constructor(
                 )
             )
             spamFilter.reportSpam(address, body, ScamCategory.SUSPICIOUS_LINK)
-            try {
-                smsProvider.deleteMessage(messageId)
-                Log.e("NC_DIAG", "providerInserted: DELETED messageId=$messageId from provider")
-            } catch (e: Exception) {
-                Log.e("NC_DIAG", "providerInserted: FAILED to delete messageId=$messageId", e)
-            }
+            try { smsProvider.deleteMessage(messageId) } catch (_: Exception) { }
 
             val reputation = scamDetector.getSenderReputation(address)
             if (reputation != null && reputation.spamCount >= 2) {

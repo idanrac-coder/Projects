@@ -3,6 +3,15 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.28.0] - 2026-03-29
+
+### Fixed
+- **Critical**: HebrewTextNormalizer EMOJI_RANGES regex contained `[\u1F300-\u1F9FF]` which, due to Kotlin's 4-digit `\uXXXX` limit, expanded to a character range (U+0030–U+1F9F) that included the entire Hebrew Unicode block — causing all Hebrew characters to be stripped during normalization and making ALL Hebrew spam detection rules non-functional
+- Remove broken emoji range; surrogate pair pattern already covers emoji above U+FFFF
+
+### Removed
+- Temporary NC_DIAG diagnostic logging (no longer needed)
+
 ## [3.27.3] - 2026-03-29
 
 ### Added

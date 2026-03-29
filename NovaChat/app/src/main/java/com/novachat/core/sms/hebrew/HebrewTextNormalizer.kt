@@ -17,8 +17,7 @@ object HebrewTextNormalizer {
         "[\u2600-\u26FF\u2700-\u27BF]|" +
         "[\u231A-\u231B\u23E9-\u23F3\u23F8-\u23FA\u25AA-\u25AB\u25B6\u25C0\u25FB-\u25FE]|" +
         "[\u2B05-\u2B07\u2B1B-\u2B1C\u2B50\u2B55\u3030\u303D\u3297\u3299]|" +
-        "(?:[\uD83C-\uDBFF][\uDC00-\uDFFF])|" +
-        "[\u1F300-\u1F9FF]"
+        "(?:[\uD83C-\uDBFF][\uDC00-\uDFFF])"
     )
     private val SEPARATORS_BETWEEN_LETTERS = Regex("([\\p{L}\\u0590-\\u05FF])([\\s\\-*·_•\u2002\u2003\u2009\u00A0]+)([\\p{L}\\u0590-\\u05FF])")
 
