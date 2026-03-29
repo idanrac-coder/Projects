@@ -1,5 +1,6 @@
 package com.novachat.core.sms
 
+import android.util.Log
 import com.novachat.core.sms.hebrew.HebrewSpamEngine
 import com.novachat.core.sms.hebrew.SpamCategory
 import com.novachat.core.sms.ml.PersonalSpamAdapter
@@ -67,6 +68,7 @@ class SpamFilter @Inject constructor(
         }
 
         val scamAnalysis = scamDetector.analyzeWithReputation(body, address, isKnownContact)
+        Log.e("NC_DIAG", "classify: scamAnalysis isScam=${scamAnalysis.isScam} conf=${scamAnalysis.confidence} cat=${scamAnalysis.category} reason=${scamAnalysis.reason}")
         if (scamAnalysis.isScam) {
             val scoreInt = (scamAnalysis.confidence * 100).toInt().coerceIn(0, 100)
             val classification = if (scamAnalysis.confidence >= 0.72f) {
@@ -74,6 +76,7 @@ class SpamFilter @Inject constructor(
             } else {
                 SpamClassification.SUSPICIOUS
             }
+            Log.e("NC_DIAG", "classify: returning $classification score=$scoreInt")
             return@withContext ClassificationResult(
                 classification = classification,
                 score = scoreInt,

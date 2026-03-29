@@ -7,3 +7,4 @@ Major spam protection upgrade!
 
 Bug fixes:
 - Fixed Hebrew spam detection not catching some political and phishing messages
+- Improved error handling in spam detection pipeline for greater reliability

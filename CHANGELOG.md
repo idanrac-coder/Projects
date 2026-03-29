@@ -3,6 +3,16 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.27.2] - 2026-03-29
+
+### Added
+- Release-safe diagnostic logging (Log.e) at all spam detection decision points for troubleshooting
+
+### Fixed
+- SmsReceiver catch block silently swallowing exceptions in release builds — now always logs errors
+- Wrap SpamFilter.classify calls in try-catch so an exception no longer silently kills the handler
+- ContentObserver processProviderInsertedMessages exceptions now caught and logged
+
 ## [3.27.1] - 2026-03-29
 
 ### Fixed
