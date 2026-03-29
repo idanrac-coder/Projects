@@ -420,15 +420,27 @@ class ScamDetector @Inject constructor(
             HebrewTextNormalizer.normalizeForMatching(body)
         else body
 
+        Log.e("NC_DIAG", "analyze: bodyLen=${body.length} matchBodyLen=${matchBody.length} rulesCount=${rules.size} matchBody50='${matchBody.take(50)}'")
+        val probeRegex = Regex("בבחירות.*בוחרימ")
+        val probeMatch = probeRegex.containsMatchIn(matchBody)
+        Log.e("NC_DIAG", "analyze: PROBE regex 'בבחירות.*בוחרימ' match=$probeMatch body_hex=${matchBody.take(30).map { String.format("%04x", it.code) }.joinToString(",")}")
+        if (rules.isNotEmpty()) {
+            val r0 = rules[0]
+            Log.e("NC_DIAG", "analyze: rule[0] pattern='${r0.regex.pattern.take(40)}' cat=${r0.category} score=${r0.baseScore} matchesBody=${r0.regex.containsMatchIn(matchBody)}")
+        }
+
         val signals = mutableListOf<String>()
         var combinedScore = 0f
         var bestCategory: ScamCategory? = null
         var bestReason: String? = null
         var bestRuleScore = 0f
 
-        // 1. Rule-based pattern matching (uses normalized body for Hebrew)
+        var rulesChecked = 0
+        var rulesMatched = 0
         for (rule in rules) {
+            rulesChecked++
             if (rule.regex.containsMatchIn(matchBody)) {
+                rulesMatched++
                 signals.add(rule.description)
                 if (rule.baseScore > bestRuleScore) {
                     bestRuleScore = rule.baseScore
@@ -438,6 +450,7 @@ class ScamDetector @Inject constructor(
             }
         }
         combinedScore = bestRuleScore
+        Log.e("NC_DIAG", "analyze: rulesChecked=$rulesChecked rulesMatched=$rulesMatched bestScore=$bestRuleScore cat=$bestCategory")
 
         // 2. Text heuristics
         val heuristicScore = computeHeuristics(body, signals)

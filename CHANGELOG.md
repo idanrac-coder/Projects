@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.27.3] - 2026-03-29
+
+### Added
+- Deep diagnostic logging inside ScamDetector.analyze(): logs rules count, matchBody content, hex dump, probe regex test, and per-rule match results to trace why pattern matching returns zero hits in release builds
+
 ## [3.27.2] - 2026-03-29
 
 ### Added
