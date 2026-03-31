@@ -3,6 +3,13 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.28.2] - 2026-03-31
+
+### Fixed
+- Fix black screen on startup: NavHost missing `fillMaxSize()` causing zero-height content on some devices/Android versions
+- Fix `isFirstLaunch` initial state mismatch causing wrong UI branch on first Compose frame before DataStore emits
+- Add explicit `windowBackground` to activity theme to prevent black flash between splash screen exit and Compose content rendering
+
 ## [3.28.1] - 2026-03-30
 
 ### Fixed

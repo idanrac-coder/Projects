@@ -1,5 +1,6 @@
 package com.novachat.ui.navigation
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -37,7 +38,7 @@ fun NovaChatNavHost(
     NavHost(
         navController = navController,
         startDestination = ConversationsRoute,
-        modifier = modifier
+        modifier = modifier.fillMaxSize()
     ) {
         composable<ConversationsRoute> {
             ConversationsScreen(
