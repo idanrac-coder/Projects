@@ -3,6 +3,13 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.28.3] - 2026-03-31
+
+### Fixed
+- Fix black screen caused by system splash screen layer never being dismissed on Android 16 — the `starting_reveal` animation would get stuck at max z-order, covering all app content with an empty (black) surface buffer
+- Add AndroidX SplashScreen compat library (`core-splashscreen:1.2.0`) with explicit `setOnExitAnimationListener` + `remove()` to guarantee splash screen cleanup
+- Migrate theme from raw `android:windowSplashScreen*` attributes to `Theme.SplashScreen` parent with `postSplashScreenTheme` for proper lifecycle management
+
 ## [3.28.2] - 2026-03-31
 
 ### Fixed

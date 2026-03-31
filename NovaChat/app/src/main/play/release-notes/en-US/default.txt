@@ -1,3 +1,4 @@
 Bug fix:
 
-- Fixed an issue where the app could show a black screen on startup instead of loading your conversations
+- Fixed black screen on startup affecting Android 16 devices
+- Improved splash screen handling for faster and more reliable app launch

@@ -22,6 +22,7 @@ mlkitLanguageId = "17.0.6"
 mlkitEntityExtraction = "16.0.0-beta6"
 playServicesCoroutines = "1.9.0"
 playReview = "2.0.2"
+splashscreen = "1.2.0"
 litert = "1.4.1"
 
 [libraries]
@@ -82,6 +83,9 @@ mlkit-language-id = { group = "com.google.mlkit", name = "language-id", version.
 # ML Kit Entity Extraction (Financial/Package semantic detection)
 mlkit-entity-extraction = { group = "com.google.mlkit", name = "entity-extraction", version.ref = "mlkitEntityExtraction" }
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "playServicesCoroutines" }
+
+# SplashScreen
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
 
 # In-App Review
 play-review-ktx = { group = "com.google.android.play", name = "review-ktx", version.ref = "playReview" }
