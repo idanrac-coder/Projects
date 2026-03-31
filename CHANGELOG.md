@@ -3,6 +3,13 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.28.4] - 2026-03-31
+
+### Fixed
+- Eliminate startup lag from `Theme.SplashScreen` parent causing a heavy theme switch on splash exit — revert to `android:Theme.Material.Light.NoActionBar` with direct system splash attributes while keeping `installSplashScreen()` for lifecycle safety
+- Remove `prefsReady` guard that added an empty recomposition frame before rendering content
+- Fix double `loadConversations()` on startup — the `ON_RESUME` `forceRefresh()` was immediately cancelling the `init` load and re-fetching with full cache invalidation; skip the first resume since `init` already handles it
+
 ## [3.28.3] - 2026-03-31
 
 ### Fixed

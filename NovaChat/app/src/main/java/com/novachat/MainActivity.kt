@@ -176,10 +176,8 @@ class MainActivity : ComponentActivity() {
                 conversationBackgroundOverride = conversationBackgroundOverride
             ) {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    val isFirstLaunchRaw by userPreferencesRepository.isFirstLaunch
-                        .collectAsState(initial = null)
-                    val isFirstLaunch = isFirstLaunchRaw ?: false
-                    val prefsReady = isFirstLaunchRaw != null
+                    val isFirstLaunch by userPreferencesRepository.isFirstLaunch
+                        .collectAsState(initial = false)
                     val scope = rememberCoroutineScope()
 
                     if (!hasPermissions) {
@@ -213,8 +211,6 @@ class MainActivity : ComponentActivity() {
                                 Text("Grant Permissions")
                             }
                         }
-                    } else if (!prefsReady) {
-                        // Wait for DataStore before deciding which screen to show
                     } else if (isFirstLaunch) {
                         RestoreOnboardingScreen(
                             onSkip = {

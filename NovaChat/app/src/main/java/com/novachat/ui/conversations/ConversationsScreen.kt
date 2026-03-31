@@ -136,8 +136,14 @@ fun ConversationsScreen(
 
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
+        var firstResume = true
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
+                if (firstResume) {
+                    firstResume = false
+                    viewModel.checkDefaultSmsApp()
+                    return@LifecycleEventObserver
+                }
                 viewModel.checkDefaultSmsApp()
                 viewModel.forceRefresh()
             }

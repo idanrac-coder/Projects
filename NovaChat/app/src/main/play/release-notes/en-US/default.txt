@@ -1,4 +1,5 @@
-Bug fix:
+Performance improvements:
 
+- Faster app startup with reduced unnecessary data reloading
 - Fixed black screen on startup affecting Android 16 devices
-- Improved splash screen handling for faster and more reliable app launch
+- Smoother splash screen transition
