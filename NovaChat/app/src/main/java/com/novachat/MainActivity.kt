@@ -1,6 +1,7 @@
 package com.novachat
 
 import android.Manifest
+import android.app.role.RoleManager
 import com.novachat.BuildConfig
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -88,10 +89,40 @@ class MainActivity : ComponentActivity() {
         Manifest.permission.POST_NOTIFICATIONS
     )
 
+    private val defaultSmsLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        requestPermissionsIfNeeded()
+    }
+
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         hasPermissions = permissions.entries.all { it.value }
+    }
+
+    /**
+     * Google Play policy requires the default handler prompt to appear
+     * before any runtime permission requests. This method enforces that order:
+     * default SMS role prompt first, then runtime permissions in its callback.
+     */
+    private fun startSetupFlow() {
+        val roleManager = getSystemService(RoleManager::class.java)
+        if (roleManager.isRoleHeld(RoleManager.ROLE_SMS)) {
+            requestPermissionsIfNeeded()
+        } else {
+            defaultSmsLauncher.launch(
+                roleManager.createRequestRoleIntent(RoleManager.ROLE_SMS)
+            )
+        }
+    }
+
+    private fun requestPermissionsIfNeeded() {
+        hasPermissions = requiredPermissions
+            .all { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
+        if (!hasPermissions) {
+            permissionLauncher.launch(requiredPermissions)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,7 +133,7 @@ class MainActivity : ComponentActivity() {
             .all { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
 
         if (!hasPermissions) {
-            permissionLauncher.launch(requiredPermissions)
+            startSetupFlow()
         }
 
         handleNotificationIntent(intent)
@@ -171,7 +202,7 @@ class MainActivity : ComponentActivity() {
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Spacer(modifier = Modifier.height(24.dp))
-                            Button(onClick = { permissionLauncher.launch(requiredPermissions) }) {
+                            Button(onClick = { startSetupFlow() }) {
                                 Text("Grant Permissions")
                             }
                         }

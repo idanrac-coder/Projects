@@ -1,10 +1,4 @@
-Major spam protection upgrade!
+Bug fixes and improvements:
 
-- Smart ML spam filter now active — catches spam in Hebrew and English using on-device AI
-- 14 new spam categories: gambling, fake lottery, debt scams, diet scams, charity fraud, and more
-- Better detection of bank phishing with more Israeli banks and credit card companies
-- Improved delivery scam detection for Amazon, AliExpress, Shein, Temu, and other services
-
-Bug fixes:
-- Fixed a critical issue where Hebrew spam messages were not being detected
-- Improved reliability of the spam detection pipeline
+- Fixed app setup flow to show the default messaging app prompt before requesting permissions
+- Improved edge-to-edge display compatibility for Android 15

@@ -3,6 +3,12 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.28.1] - 2026-03-30
+
+### Fixed
+- Show default SMS handler prompt before runtime permissions to comply with Google Play policy (rejection fix)
+- Remove deprecated `statusBarColor`, `navigationBarColor`, and `windowLightStatusBar` theme attributes (edge-to-edge compliance for Android 15)
+
 ## [3.28.0] - 2026-03-29
 
 ### Fixed
