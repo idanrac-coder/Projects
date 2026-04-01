@@ -161,11 +161,8 @@ class MainActivity : ComponentActivity() {
             }
             val useSystemTheme = themeMode == "system"
 
-            LaunchedEffect(Unit) {
-                themeRepository.seedBuiltInThemes()
-            }
-
             LaunchedEffect(activeThemeId) {
+                themeRepository.seedBuiltInThemes()
                 activeTheme = themeRepository.getThemeById(activeThemeId)
             }
 

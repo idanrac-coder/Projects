@@ -402,6 +402,8 @@ class ScamDetector @Inject constructor(
         PatternRule(Regex("שלח\\s*לכל\\s*אנשי\\s*הקשר"), ScamCategory.CHAIN_MESSAGE, 0.78f, "Hebrew: send to all contacts"),
         PatternRule(Regex("הודעה\\s*דחופה.*העבר|העבר.*הודעה\\s*דחופה"), ScamCategory.CHAIN_MESSAGE, 0.76f, "Hebrew: urgent message forward"),
         PatternRule(Regex("שתפ\\s*עמ\\s*חברימ"), ScamCategory.CHAIN_MESSAGE, 0.72f, "Hebrew: share with friends"),
+        PatternRule(Regex("שתפ\\s*\$|\\bשתפ\\b\\s*[!.]"), ScamCategory.CHAIN_MESSAGE, 0.72f, "Hebrew: share at end of message"),
+        PatternRule(Regex("שלח\\s*הלאה"), ScamCategory.CHAIN_MESSAGE, 0.72f, "Hebrew: send along"),
 
         // ── Service impersonation ────────────────────────────────────────
         PatternRule(Regex("(?i)(Wolt|10bis|תנ\\s*ביס).*הזמנ"), ScamCategory.SERVICE_IMPERSONATION, 0.74f, "Hebrew: Wolt/10bis order"),
@@ -409,6 +411,15 @@ class ScamDetector @Inject constructor(
         PatternRule(Regex("(?i)Waze.*עדכונ"), ScamCategory.SERVICE_IMPERSONATION, 0.70f, "Hebrew: Waze update"),
         PatternRule(Regex("(?i)(Wolt|10bis|Gett|Yango|Waze).*לחצ\\s*כאנ"), ScamCategory.SERVICE_IMPERSONATION, 0.78f, "Hebrew: service name + click here"),
         PatternRule(Regex("הזמנה\\s*שלכ.*משלוח\\s*בדרכ"), ScamCategory.SERVICE_IMPERSONATION, 0.70f, "Hebrew: your order delivery on way"),
+
+        // ── Toll road / traffic fine phishing ────────────────────────────
+        PatternRule(Regex("כביש\\s*(6|שש|ששה)"), ScamCategory.SERVICE_IMPERSONATION, 0.80f, "Hebrew: Highway 6 reference"),
+        PatternRule(Regex("(כביש|אגרה|אגרת)\\s*(דרכ|נתיבי)"), ScamCategory.SERVICE_IMPERSONATION, 0.78f, "Hebrew: toll road / Nativei Israel"),
+        PatternRule(Regex("יתרה\\s*לא\\s*סולקה"), ScamCategory.SERVICE_IMPERSONATION, 0.82f, "Hebrew: unpaid balance"),
+        PatternRule(Regex("הליכימ\\s*משפטיימ"), ScamCategory.SERVICE_IMPERSONATION, 0.80f, "Hebrew: legal proceedings threat"),
+        PatternRule(Regex("להסדיר\\s*את\\s*התשלומ"), ScamCategory.SERVICE_IMPERSONATION, 0.78f, "Hebrew: settle the payment"),
+        PatternRule(Regex("חיוב\\s*נוספ.*אגרות|אגרות\\s*נוספות"), ScamCategory.SERVICE_IMPERSONATION, 0.78f, "Hebrew: additional charges/fees"),
+        PatternRule(Regex("(כביש|אגרה|אגרת|דרכ).*לשלמ.*קישור"), ScamCategory.SERVICE_IMPERSONATION, 0.82f, "Hebrew: toll + payment link combo"),
     )
 
     // ── Analysis ─────────────────────────────────────────────────────────

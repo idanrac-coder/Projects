@@ -3,6 +3,17 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.28.5] - 2026-03-31
+
+### Fixed
+- Fix theme selection having no visible effect — `applyTheme()` now auto-switches to custom mode so tapping a theme card immediately applies it
+- Fix startup race condition where theme could fail to load because `getThemeById()` ran before `seedBuiltInThemes()` completed
+- Fix `LinkRiskAnalyzer` not detecting bare shortener URLs (e.g. `t.co/xxx`) without `http://` prefix
+
+### Added
+- Add toll road / Highway 6 phishing detection patterns to ScamDetector, DeterministicSpamLayer, and HebrewKeywordScorer
+- Broaden chain message detection to catch standalone "share" (`שתפ`) CTA at end of messages, covering seasonal/Chametz spam
+
 ## [3.28.4] - 2026-03-31
 
 ### Fixed

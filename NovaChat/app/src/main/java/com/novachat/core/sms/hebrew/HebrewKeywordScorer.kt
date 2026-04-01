@@ -53,8 +53,9 @@ object HebrewKeywordScorer {
         Rule("carrier_scam", Regex("חבילת\\s*גלישה.*חינמ|גיגה\\s*חינמ|שדרוג\\s*חינמ.*סלולר|(?i)(Partner|Cellcom|HOT|Pelephone|We4G|Golan).*חבילה\\s*בלעדית"), 0.55f, "Carrier scam"),
         Rule("legal_scam", Regex("תביעה\\s*ייצוגית|זכאות\\s*לפיצוי|זכויות\\s*צרכנימ|פיצוי\\s*כספי.*לחצ"), 0.55f, "Legal scam"),
         Rule("commercial_spam", Regex("מבצע\\s*חד\\s*פעמי|מכירת\\s*חיסול|מבצע\\s*בלעדי|הנחה\\s*של\\s*\\d+%|קופונ\\s*הנחה"), 0.45f, "Commercial spam"),
-        Rule("chain_message", Regex("העבר\\s*ל-?\\d+\\s*אנשימ|שלח\\s*לכל\\s*אנשי\\s*הקשר|העבר\\s*הלאה|שתפ\\s*עמ\\s*חברימ"), 0.60f, "Chain message"),
-        Rule("service_impersonation", Regex("(?i)(Wolt|10bis|תנ\\s*ביס).*הזמנ|(?i)(Gett|Yango).*נסיעה|(?i)(Wolt|10bis|Gett|Yango|Waze).*לחצ\\s*כאנ"), 0.60f, "Service impersonation")
+        Rule("chain_message", Regex("העבר\\s*ל-?\\d+\\s*אנשימ|שלח\\s*לכל\\s*אנשי\\s*הקשר|העבר\\s*הלאה|שתפ\\s*עמ\\s*חברימ|שתפ(?:\\s|\$)|שלח\\s*הלאה"), 0.60f, "Chain message"),
+        Rule("service_impersonation", Regex("(?i)(Wolt|10bis|תנ\\s*ביס).*הזמנ|(?i)(Gett|Yango).*נסיעה|(?i)(Wolt|10bis|Gett|Yango|Waze).*לחצ\\s*כאנ"), 0.60f, "Service impersonation"),
+        Rule("toll_road_phishing", Regex("כביש\\s*(6|שש|ששה)|יתרה\\s*לא\\s*סולקה|הליכימ\\s*משפטיימ|(כביש|אגרה|אגרת)\\s*(דרכ|נתיבי)|להסדיר\\s*את\\s*התשלומ"), 0.70f, "Toll road phishing")
     )
 
     data class ScoreResult(

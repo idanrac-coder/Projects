@@ -1,5 +1,5 @@
-Performance improvements:
+Bug fixes & spam detection improvements:
 
-- Faster app startup with reduced unnecessary data reloading
-- Fixed black screen on startup affecting Android 16 devices
-- Smoother splash screen transition
+- Selecting a theme now applies it immediately
+- Better detection of toll road payment scams and chain messages
+- Fixed startup theme loading issue

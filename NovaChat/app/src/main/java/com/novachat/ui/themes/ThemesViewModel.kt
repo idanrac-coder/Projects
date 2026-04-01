@@ -58,6 +58,7 @@ class ThemesViewModel @Inject constructor(
     fun applyTheme(themeId: Long) {
         viewModelScope.launch {
             preferencesRepository.setActiveThemeId(themeId)
+            preferencesRepository.setThemeMode("custom")
         }
     }
 

@@ -9,7 +9,7 @@ import java.net.URL
  */
 object LinkRiskAnalyzer {
 
-    private val URL_REGEX = Regex("https?://[^\\s]+")
+    private val URL_REGEX = Regex("(?:https?://[^\\s]+|(?:bit\\.ly|tinyurl\\.com|t\\.co|goo\\.gl|rb\\.gy|cutt\\.ly|is\\.gd|v\\.gd)/[^\\s]+)")
 
     private val SHORTENER_DOMAINS = setOf(
         "bit.ly", "tinyurl.com", "t.co", "goo.gl", "rb.gy", "cutt.ly", "is.gd", "v.gd",
@@ -43,8 +43,9 @@ object LinkRiskAnalyzer {
     fun analyze(body: String, normalizedBody: String): LinkRiskResult {
         val risks = mutableListOf<String>()
         val urls = URL_REGEX.findAll(body).map { it.value }.toList()
-        for (urlStr in urls) {
+        for (rawUrl in urls) {
             try {
+                val urlStr = if (rawUrl.startsWith("http")) rawUrl else "https://$rawUrl"
                 val url = URL(urlStr)
                 val host = url.host ?: continue
                 val domain = host.lowercase().removePrefix("www.")
