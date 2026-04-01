@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.ManageSearch
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.VerifiedUser
@@ -58,6 +59,7 @@ fun SmartSecureScreen(
     onBlockingClick: () -> Unit = {},
     onSpamFolderClick: () -> Unit = {},
     onTrustedSendersClick: () -> Unit = {},
+    onScanInboxClick: () -> Unit = {},
     viewModel: SmartSecureViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -311,6 +313,19 @@ fun SmartSecureScreen(
                         title = "Trusted Senders",
                         subtitle = "Senders that skip spam checks",
                         onClick = onTrustedSendersClick
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 56.dp)
+                            .height(0.5.dp)
+                            .background(MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                    )
+                    NavItem(
+                        icon = Icons.Default.ManageSearch,
+                        title = "Scan Inbox",
+                        subtitle = "Find old spam in your inbox",
+                        onClick = onScanInboxClick
                     )
                 }
             }

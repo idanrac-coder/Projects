@@ -10,6 +10,7 @@ import androidx.navigation.toRoute
 import com.novachat.ui.archived.ArchivedConversationsScreen
 import com.novachat.ui.backup.BackupRestoreScreen
 import com.novachat.ui.blocking.BlockingScreen
+import com.novachat.ui.blocking.InboxSpamScanScreen
 import com.novachat.ui.blocking.SmartSecureScreen
 import com.novachat.ui.blocking.SpamFolderScreen
 import com.novachat.ui.blocking.TrustedSendersScreen
@@ -114,7 +115,18 @@ fun NovaChatNavHost(
                 onBack = { navController.popBackStack() },
                 onBlockingClick = { navController.navigate(BlockingRoute) },
                 onSpamFolderClick = { navController.navigate(SpamFolderRoute) },
-                onTrustedSendersClick = { navController.navigate(TrustedSendersRoute) }
+                onTrustedSendersClick = { navController.navigate(TrustedSendersRoute) },
+                onScanInboxClick = { navController.navigate(InboxSpamScanRoute) }
+            )
+        }
+
+        composable<InboxSpamScanRoute> {
+            InboxSpamScanScreen(
+                onBack = { navController.popBackStack() },
+                onSpamFolderClick = {
+                    navController.popBackStack()
+                    navController.navigate(SpamFolderRoute)
+                }
             )
         }
 

@@ -1,5 +1,3 @@
-Bug fixes & spam detection improvements:
+New: Scan your inbox for spam!
 
-- Selecting a theme now applies it immediately
-- Better detection of toll road payment scams and chain messages
-- Fixed startup theme loading issue
+Go to Smart & Secure and tap "Scan Inbox" to find old spam messages hiding in your inbox. Review what was found, remove false positives, then choose to move them to the spam folder or delete them permanently.

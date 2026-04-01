@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.29.0] - 2026-04-01
+
+### Added
+- Add Inbox Spam Scanner feature accessible from Smart & Secure menu — scans all inbox messages through the full spam detection pipeline and shows a review screen where users can deselect false positives before choosing to move messages to the spam folder or permanently delete them
+
 ## [3.28.5] - 2026-03-31
 
 ### Fixed

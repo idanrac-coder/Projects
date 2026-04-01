@@ -315,6 +315,49 @@ class SmsProvider @Inject constructor(
         } ?: emptyList()
     }
 
+    data class InboxScanMessage(
+        val smsId: Long,
+        val threadId: Long,
+        val address: String,
+        val body: String,
+        val timestamp: Long
+    )
+
+    suspend fun getInboxMessages(): List<InboxScanMessage> = withContext(Dispatchers.IO) {
+        val messages = mutableListOf<InboxScanMessage>()
+        contentResolver.query(
+            Telephony.Sms.CONTENT_URI,
+            arrayOf(
+                Telephony.Sms._ID,
+                Telephony.Sms.THREAD_ID,
+                Telephony.Sms.ADDRESS,
+                Telephony.Sms.BODY,
+                Telephony.Sms.DATE
+            ),
+            "${Telephony.Sms.TYPE} = ?",
+            arrayOf(Telephony.Sms.MESSAGE_TYPE_INBOX.toString()),
+            "${Telephony.Sms.DATE} DESC"
+        )?.use { cursor ->
+            val colId = cursor.getColumnIndexOrThrow(Telephony.Sms._ID)
+            val colThread = cursor.getColumnIndexOrThrow(Telephony.Sms.THREAD_ID)
+            val colAddress = cursor.getColumnIndexOrThrow(Telephony.Sms.ADDRESS)
+            val colBody = cursor.getColumnIndexOrThrow(Telephony.Sms.BODY)
+            val colDate = cursor.getColumnIndexOrThrow(Telephony.Sms.DATE)
+            while (cursor.moveToNext()) {
+                messages.add(
+                    InboxScanMessage(
+                        smsId = cursor.getLong(colId),
+                        threadId = cursor.getLong(colThread),
+                        address = cursor.getString(colAddress) ?: "",
+                        body = cursor.getString(colBody) ?: "",
+                        timestamp = cursor.getLong(colDate)
+                    )
+                )
+            }
+        }
+        messages
+    }
+
     private fun cursorToMessage(cursor: Cursor): Message {
         val typeInt = cursor.getInt(cursor.getColumnIndexOrThrow(Telephony.Sms.TYPE))
         return Message(

@@ -67,3 +67,6 @@ object SmartSecureRoute
 
 @Serializable
 object TrustedSendersRoute
+
+@Serializable
+object InboxSpamScanRoute
