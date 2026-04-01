@@ -149,7 +149,6 @@ class SmsProvider @Inject constructor(
                 messages.add(cursorToMessage(it))
             }
         }
-        messages.sortWith(compareBy({ it.timestamp }, { it.id }))
         if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "*** SmsProvider.getMessagesForThread($threadId) found ${messages.size} messages")
         messages
     }

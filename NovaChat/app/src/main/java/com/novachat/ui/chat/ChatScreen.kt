@@ -623,35 +623,37 @@ fun ChatScreen(
             val gradientAlpha = if (chatWallpaper.isCustomBackground) 0.95f else 0.15f
             val patternAlpha1 = if (chatWallpaper.isCustomBackground) 0.4f else 0.08f
             val patternAlpha2 = if (chatWallpaper.isCustomBackground) 0.2f else 0.04f
-            val wallpaperModifier = when (chatWallpaper.type) {
-                WallpaperType.IMAGE -> Modifier.background(
-                    chatWallpaper.primaryColor.takeIf { it != Color.Transparent } ?: Color.White
-                )
-                WallpaperType.GRADIENT -> Modifier.background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            chatWallpaper.primaryColor.copy(alpha = gradientAlpha),
-                            chatWallpaper.secondaryColor.copy(alpha = gradientAlpha)
+            val wallpaperModifier = remember(chatWallpaper) {
+                when (chatWallpaper.type) {
+                    WallpaperType.IMAGE -> Modifier.background(
+                        chatWallpaper.primaryColor.takeIf { it != Color.Transparent } ?: Color.White
+                    )
+                    WallpaperType.GRADIENT -> Modifier.background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                chatWallpaper.primaryColor.copy(alpha = gradientAlpha),
+                                chatWallpaper.secondaryColor.copy(alpha = gradientAlpha)
+                            )
                         )
                     )
-                )
-                WallpaperType.SOLID -> {
-                    val solidColor = chatWallpaper.backgroundColor ?: chatWallpaper.primaryColor
-                    if (solidColor != Color.Transparent) Modifier.background(solidColor) else Modifier
+                    WallpaperType.SOLID -> {
+                        val solidColor = chatWallpaper.backgroundColor ?: chatWallpaper.primaryColor
+                        if (solidColor != Color.Transparent) Modifier.background(solidColor) else Modifier
+                    }
+                    WallpaperType.PATTERN_BOTANICAL,
+                    WallpaperType.PATTERN_GEOMETRIC,
+                    WallpaperType.PATTERN_WAVES,
+                    WallpaperType.PATTERN_DOTS,
+                    WallpaperType.PATTERN_LEAVES -> Modifier.background(
+                        Brush.radialGradient(
+                            colors = listOf(
+                                chatWallpaper.primaryColor.copy(alpha = patternAlpha1),
+                                chatWallpaper.secondaryColor.copy(alpha = patternAlpha2)
+                            )
+                        )
+                    )
+                    else -> Modifier
                 }
-                WallpaperType.PATTERN_BOTANICAL,
-                WallpaperType.PATTERN_GEOMETRIC,
-                WallpaperType.PATTERN_WAVES,
-                WallpaperType.PATTERN_DOTS,
-                WallpaperType.PATTERN_LEAVES -> Modifier.background(
-                    Brush.radialGradient(
-                        colors = listOf(
-                            chatWallpaper.primaryColor.copy(alpha = patternAlpha1),
-                            chatWallpaper.secondaryColor.copy(alpha = patternAlpha2)
-                        )
-                    )
-                )
-                else -> Modifier
             }
 
             Box(
@@ -661,11 +663,13 @@ fun ChatScreen(
                     .then(wallpaperModifier)
             ) {
                 if (chatWallpaper.type == WallpaperType.IMAGE && chatWallpaper.imageResName != null) {
-                    val imageResId = context.resources.getIdentifier(
-                        chatWallpaper.imageResName,
-                        "drawable",
-                        context.packageName
-                    )
+                    val imageResId = remember(chatWallpaper.imageResName) {
+                        context.resources.getIdentifier(
+                            chatWallpaper.imageResName,
+                            "drawable",
+                            context.packageName
+                        )
+                    }
                     if (imageResId != 0) {
                         Image(
                             painter = painterResource(imageResId),
@@ -810,7 +814,7 @@ fun ChatScreen(
                                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                items(ReactionEmojis.allReactions) { emoji ->
+                                items(ReactionEmojis.allReactions, key = { it }) { emoji ->
                                     Surface(
                                         shape = CircleShape,
                                         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -956,7 +960,7 @@ fun ChatScreen(
                         .padding(horizontal = 14.dp, vertical = 6.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(uiState.smartReplies) { reply ->
+                    items(uiState.smartReplies, key = { it }) { reply ->
                         Surface(
                             shape = RoundedCornerShape(14.dp),
                             color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),

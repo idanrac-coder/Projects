@@ -14,6 +14,12 @@ interface BlockRuleDao {
     @Query("SELECT * FROM block_rules ORDER BY createdAt DESC")
     fun getAllRules(): Flow<List<BlockRuleEntity>>
 
+    @Query("SELECT * FROM block_rules ORDER BY createdAt DESC")
+    suspend fun getAllRulesOnce(): List<BlockRuleEntity>
+
+    @Query("SELECT COUNT(*) FROM block_rules")
+    suspend fun getRuleCountOnce(): Int
+
     @Query("SELECT * FROM block_rules WHERE type = :type ORDER BY createdAt DESC")
     fun getRulesByType(type: String): Flow<List<BlockRuleEntity>>
 

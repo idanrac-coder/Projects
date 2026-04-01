@@ -25,6 +25,26 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+val MIGRATION_14_15 = object : Migration(14, 15) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_spam_messages_smsId ON spam_messages(smsId)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_spam_messages_address ON spam_messages(address)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_spam_messages_matchedRuleId ON spam_messages(matchedRuleId)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_message_reactions_messageId ON message_reactions(messageId)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_pinned_messages_threadId ON pinned_messages(threadId)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_scheduled_messages_isSent_isFailed_scheduledTime ON scheduled_messages(isSent, isFailed, scheduledTime)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_block_rules_type ON block_rules(type)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_block_rules_type_value ON block_rules(type, value)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_conversation_meta_isPinned ON conversation_meta(isPinned)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_conversation_meta_isArchived ON conversation_meta(isArchived)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_conversation_meta_isMuted ON conversation_meta(isMuted)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_message_reminders_isTriggered_reminderTime ON message_reminders(isTriggered, reminderTime)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_short_code_whitelist_address ON short_code_whitelist(address)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_spam_learning_isSpam ON spam_learning(isSpam)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_spam_learning_timestamp ON spam_learning(timestamp)")
+    }
+}
+
 val MIGRATION_13_14 = object : Migration(13, 14) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("ALTER TABLE scheduled_messages ADD COLUMN retryCount INTEGER NOT NULL DEFAULT 0")
@@ -255,7 +275,7 @@ object DatabaseModule {
             context,
             NovaChatDatabase::class.java,
             "novachat.db"
-        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14).build()
+        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15).build()
     }
 
     @Provides

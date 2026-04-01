@@ -22,6 +22,7 @@ class BlockRepositoryImpl @Inject constructor(
 ) : BlockRepository {
 
     private val languageIdentifier = LanguageIdentification.getClient()
+    private val regexCache = java.util.concurrent.ConcurrentHashMap<String, Regex>()
 
     override fun getAllRules(): Flow<List<BlockRule>> {
         return blockRuleDao.getAllRules().map { entities ->
@@ -44,7 +45,7 @@ class BlockRepositoryImpl @Inject constructor(
         val existing = blockRuleDao.getRuleByTypeAndValue(rule.type.name, trimmedValue)
         if (existing != null) return existing.id
 
-        val count = blockRuleDao.getRuleCount().first()
+        val count = blockRuleDao.getRuleCountOnce()
         val isPremium = preferencesRepository.isPremium.first()
         if (!isPremium && count >= BlockRepository.FREE_RULE_LIMIT) {
             throw BlockRuleLimitException()
@@ -54,10 +55,11 @@ class BlockRepositoryImpl @Inject constructor(
 
     override suspend fun deleteRule(id: Long) {
         blockRuleDao.deleteRuleById(id)
+        regexCache.clear()
     }
 
     override suspend fun isBlocked(address: String, senderName: String?, body: String): BlockRule? {
-        val rules = blockRuleDao.getAllRules().first()
+        val rules = blockRuleDao.getAllRulesOnce()
         if (rules.isEmpty()) return null
         
         var detectedLanguage: String? = null
@@ -94,14 +96,15 @@ class BlockRepositoryImpl @Inject constructor(
         return null
     }
 
+    private fun getCachedRegex(pattern: String): Regex {
+        return regexCache.getOrPut(pattern) { Regex(pattern, RegexOption.IGNORE_CASE) }
+    }
+
     private fun matchesPattern(input: String, pattern: String, isRegex: Boolean, exactMatch: Boolean = false): Boolean {
         return if (isRegex) {
             try {
-                if (exactMatch) {
-                    Regex(pattern, RegexOption.IGNORE_CASE).matches(input)
-                } else {
-                    Regex(pattern, RegexOption.IGNORE_CASE).containsMatchIn(input)
-                }
+                val regex = getCachedRegex(pattern)
+                if (exactMatch) regex.matches(input) else regex.containsMatchIn(input)
             } catch (e: Exception) {
                 false
             }
@@ -110,7 +113,7 @@ class BlockRepositoryImpl @Inject constructor(
                 if (pattern.contains("*")) {
                     val regexPattern = Regex.escape(pattern).replace("\\*", ".*")
                     try {
-                        Regex("^$regexPattern\$", RegexOption.IGNORE_CASE).matches(input)
+                        getCachedRegex("^$regexPattern\$").matches(input)
                     } catch (e: Exception) {
                         false
                     }
@@ -121,7 +124,7 @@ class BlockRepositoryImpl @Inject constructor(
                 if (pattern.contains("*")) {
                     val regexPattern = Regex.escape(pattern).replace("\\*", ".*")
                     try {
-                        Regex(regexPattern, RegexOption.IGNORE_CASE).containsMatchIn(input)
+                        getCachedRegex(regexPattern).containsMatchIn(input)
                     } catch (e: Exception) {
                         false
                     }

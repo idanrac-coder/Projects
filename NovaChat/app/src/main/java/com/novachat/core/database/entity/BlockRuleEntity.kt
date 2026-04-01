@@ -1,11 +1,15 @@
 package com.novachat.core.database.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.novachat.domain.model.BlockRule
 import com.novachat.domain.model.BlockType
 
-@Entity(tableName = "block_rules")
+@Entity(
+    tableName = "block_rules",
+    indices = [Index(value = ["type"]), Index(value = ["type", "value"])]
+)
 data class BlockRuleEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,

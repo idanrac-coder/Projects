@@ -26,7 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,6 +53,7 @@ import com.novachat.ui.navigation.NovaChatNavHost
 import com.novachat.ui.onboarding.RestoreOnboardingScreen
 import com.google.android.play.core.review.ReviewManagerFactory
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -148,13 +149,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val themeMode by userPreferencesRepository.themeMode
-                .collectAsState(initial = "system")
+                .collectAsStateWithLifecycle(initialValue = "system")
             val activeThemeId by userPreferencesRepository.activeThemeId
-                .collectAsState(initial = 1L)
+                .collectAsStateWithLifecycle(initialValue = 1L)
             val bubbleShapeOverride by userPreferencesRepository.activeBubbleShape
-                .collectAsState(initial = null)
+                .collectAsStateWithLifecycle(initialValue = null)
             val conversationBackgroundId by userPreferencesRepository.conversationBackgroundId
-                .collectAsState(initial = "default")
+                .collectAsStateWithLifecycle(initialValue = "default")
             var activeTheme by remember { mutableStateOf<NovaChatTheme?>(null) }
             val conversationBackgroundOverride = remember(conversationBackgroundId) {
                 com.novachat.domain.model.BuiltInBackgrounds.findById(conversationBackgroundId)
@@ -174,7 +175,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     val isFirstLaunch by userPreferencesRepository.isFirstLaunch
-                        .collectAsState(initial = false)
+                        .collectAsStateWithLifecycle(initialValue = false)
                     val scope = rememberCoroutineScope()
 
                     if (!hasPermissions) {
@@ -253,7 +254,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun maybePromptReview() {
-        kotlinx.coroutines.MainScope().launch {
+        lifecycleScope.launch {
             userPreferencesRepository.setInstallTimeIfNeeded()
             val alreadyShown = userPreferencesRepository.reviewShown.first()
             if (alreadyShown) return@launch
@@ -266,7 +267,7 @@ class MainActivity : ComponentActivity() {
             reviewManager.requestReviewFlow().addOnSuccessListener { reviewInfo ->
                 reviewManager.launchReviewFlow(this@MainActivity, reviewInfo)
                     .addOnCompleteListener {
-                        kotlinx.coroutines.MainScope().launch {
+                        lifecycleScope.launch {
                             userPreferencesRepository.setReviewShown()
                         }
                     }

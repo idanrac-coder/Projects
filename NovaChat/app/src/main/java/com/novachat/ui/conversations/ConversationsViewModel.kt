@@ -17,6 +17,7 @@ import com.novachat.core.database.dao.SpamMessageDao
 import com.novachat.core.database.entity.SpamMessageEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -66,6 +67,7 @@ class ConversationsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ConversationsUiState())
     val uiState: StateFlow<ConversationsUiState> = _uiState.asStateFlow()
     private var loadJob: Job? = null
+    private var searchJob: Job? = null
 
     val swipeLeftAction: StateFlow<SwipeAction> = preferencesRepository.swipeLeftAction
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SwipeAction.ARCHIVE)
@@ -240,15 +242,17 @@ class ConversationsViewModel @Inject constructor(
     }
 
     fun updateSearchQuery(query: String) {
-        val current = _uiState.value
-        val filtered = filterConversations(
-            current.conversations, current.selectedCategory,
-            current.selectedCustomCategory, query
-        )
-        _uiState.value = current.copy(
-            searchQuery = query,
-            filteredConversations = filtered
-        )
+        _uiState.value = _uiState.value.copy(searchQuery = query)
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            delay(200)
+            val current = _uiState.value
+            val filtered = filterConversations(
+                current.conversations, current.selectedCategory,
+                current.selectedCustomCategory, current.searchQuery
+            )
+            _uiState.value = current.copy(filteredConversations = filtered)
+        }
     }
 
     private fun filterConversations(
@@ -718,8 +722,8 @@ class ConversationsViewModel @Inject constructor(
 
     private suspend fun moveThreadToSpam(threadId: Long, ruleId: Long, ruleType: String) {
         val messages = conversationRepository.getMessagesForThread(threadId)
-        messages.forEach { msg ->
-            spamMessageDao.insertSpamMessage(
+        spamMessageDao.insertSpamMessages(
+            messages.map { msg ->
                 SpamMessageEntity(
                     smsId = msg.id,
                     address = msg.address,
@@ -728,8 +732,8 @@ class ConversationsViewModel @Inject constructor(
                     matchedRuleId = ruleId,
                     matchedRuleType = ruleType
                 )
-            )
-        }
+            }
+        )
         try { conversationRepository.deleteThread(threadId) } catch (e: Exception) {}
     }
 }

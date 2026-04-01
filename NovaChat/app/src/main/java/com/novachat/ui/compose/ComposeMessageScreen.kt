@@ -103,7 +103,7 @@ fun ComposeMessageScreen(
                     tonalElevation = 2.dp
                 ) {
                     LazyColumn(modifier = Modifier.height(200.dp)) {
-                        items(uiState.filteredContacts) { contact ->
+                        items(uiState.filteredContacts, key = { it.phoneNumber }) { contact ->
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()

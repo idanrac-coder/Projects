@@ -1,9 +1,17 @@
 package com.novachat.core.database.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "spam_messages")
+@Entity(
+    tableName = "spam_messages",
+    indices = [
+        Index(value = ["smsId"]),
+        Index(value = ["address"]),
+        Index(value = ["matchedRuleId"])
+    ]
+)
 data class SpamMessageEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,

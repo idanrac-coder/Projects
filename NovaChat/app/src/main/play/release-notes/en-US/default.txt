@@ -1,5 +1,8 @@
-New: Scan your inbox for spam!
+Performance improvements throughout the app!
 
-Go to Smart & Secure and tap "Scan Inbox" to find old spam messages hiding in your inbox. Review what was found, remove false positives, then choose to move them to the spam folder or delete them permanently.
-
-Spam senders are now automatically blocked so they can't message you again.
+- Conversations and messages load faster with optimized database queries
+- Smoother scrolling in conversation list, chat, and search screens
+- Faster search with smart debounce — no more lag while typing
+- Reduced memory usage when viewing long conversations
+- Fixed background processing to prevent occasional UI freezes
+- Improved battery efficiency — flows stop collecting when app is in background

@@ -305,7 +305,7 @@ fun ConversationsScreen(
                 contentPadding = PaddingValues(horizontal = 20.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(MessageCategory.entries) { category ->
+                items(MessageCategory.entries, key = { it.name }) { category ->
                     val isSelected = uiState.selectedCategory == category && uiState.selectedCustomCategory == null
                     Surface(
                         onClick = { viewModel.setCategory(category) },
@@ -325,7 +325,7 @@ fun ConversationsScreen(
                     }
                 }
 
-                items(uiState.customCategories) { (_, name) ->
+                items(uiState.customCategories, key = { it.first }) { (_, name) ->
                     val isSelected = uiState.selectedCustomCategory == name
                     Surface(
                         onClick = { viewModel.setCustomCategoryFilter(name) },

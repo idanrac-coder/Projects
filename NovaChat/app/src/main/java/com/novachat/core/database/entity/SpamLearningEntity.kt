@@ -1,9 +1,13 @@
 package com.novachat.core.database.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "spam_learning")
+@Entity(
+    tableName = "spam_learning",
+    indices = [Index(value = ["isSpam"]), Index(value = ["timestamp"])]
+)
 data class SpamLearningEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,

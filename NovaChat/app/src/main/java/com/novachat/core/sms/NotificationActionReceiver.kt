@@ -50,8 +50,6 @@ class NotificationActionReceiver : BroadcastReceiver() {
     @Inject
     lateinit var spamMessageDao: SpamMessageDao
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
     override fun onReceive(context: Context, intent: Intent) {
         val threadId = intent.getLongExtra(EXTRA_THREAD_ID, -1L)
         val notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1)
@@ -67,6 +65,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
             ACTION_MARK_READ -> {
                 if (BuildConfig.DEBUG) Log.d(TAG, "Mark as read: threadId=$threadId")
                 val pendingResult = goAsync()
+                val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
                 scope.launch {
                     try {
                         conversationRepository.markThreadAsRead(threadId)
@@ -85,7 +84,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
             ACTION_DELETE -> {
                 if (BuildConfig.DEBUG) Log.d(TAG, "Delete thread: threadId=$threadId")
                 val pendingResult = goAsync()
-                scope.launch {
+                CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
                     try {
                         smsProvider.deleteThread(threadId)
                         conversationRepository.refreshAfterChange()
@@ -109,7 +108,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 }
                 if (BuildConfig.DEBUG) Log.d(TAG, "Report spam: threadId=$threadId")
                 val pendingResult = goAsync()
-                scope.launch {
+                CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
                     try {
                         scamDetector.reportSpam(address, body, category)
                         val ruleId = try {
@@ -117,8 +116,8 @@ class NotificationActionReceiver : BroadcastReceiver() {
                         } catch (_: Exception) { -1L }
                         val messages = conversationRepository.getMessagesForThread(threadId)
                         val ruleType = "SCAM_REPORT"
-                        messages.forEach { msg ->
-                            spamMessageDao.insertSpamMessage(
+                        spamMessageDao.insertSpamMessages(
+                            messages.map { msg ->
                                 SpamMessageEntity(
                                     smsId = msg.id,
                                     address = msg.address,
@@ -127,8 +126,8 @@ class NotificationActionReceiver : BroadcastReceiver() {
                                     matchedRuleId = ruleId,
                                     matchedRuleType = ruleType
                                 )
-                            )
-                        }
+                            }
+                        )
                         smsProvider.deleteThread(threadId)
                         conversationRepository.refreshAfterChange()
                     } catch (e: Exception) {

@@ -6,6 +6,8 @@ import com.novachat.domain.model.Contact
 import com.novachat.domain.repository.ContactRepository
 import com.novachat.domain.repository.ConversationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,6 +30,7 @@ class ComposeMessageViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(ComposeUiState())
     val uiState: StateFlow<ComposeUiState> = _uiState.asStateFlow()
+    private var searchJob: Job? = null
 
     init {
         loadContacts()
@@ -51,14 +54,19 @@ class ComposeMessageViewModel @Inject constructor(
 
     fun updateSearch(query: String) {
         _uiState.value = _uiState.value.copy(searchQuery = query)
+        searchJob?.cancel()
         if (query.isBlank()) {
             _uiState.value = _uiState.value.copy(filteredContacts = _uiState.value.contacts)
-        } else {
-            val filtered = _uiState.value.contacts.filter {
-                it.name.contains(query, ignoreCase = true) ||
-                    it.phoneNumber.contains(query)
+            return
+        }
+        searchJob = viewModelScope.launch {
+            delay(150)
+            val current = _uiState.value
+            val filtered = current.contacts.filter {
+                it.name.contains(current.searchQuery, ignoreCase = true) ||
+                    it.phoneNumber.contains(current.searchQuery)
             }
-            _uiState.value = _uiState.value.copy(filteredContacts = filtered)
+            _uiState.value = current.copy(filteredContacts = filtered)
         }
     }
 

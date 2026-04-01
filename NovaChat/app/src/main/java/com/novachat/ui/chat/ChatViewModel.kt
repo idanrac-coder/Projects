@@ -95,6 +95,7 @@ class ChatViewModel @Inject constructor(
     private var currentThreadId: Long = -1
     private var loadJob: Job? = null
     private var undoJob: Job? = null
+    private var searchJob: Job? = null
 
     init {
         _uiState.value = _uiState.value.copy(
@@ -493,23 +494,26 @@ class ChatViewModel @Inject constructor(
     }
 
     fun updateSearchQuery(query: String) {
-        val current = _uiState.value
+        _uiState.value = _uiState.value.copy(searchQuery = query)
+        searchJob?.cancel()
         if (query.isBlank()) {
-            _uiState.value = current.copy(
-                searchQuery = query,
+            _uiState.value = _uiState.value.copy(
                 matchingMessageIds = emptyList(),
                 activeMatchIndex = -1
             )
             return
         }
-        val matches = current.messages
-            .filter { it.body.contains(query, ignoreCase = true) }
-            .map { it.id }
-        _uiState.value = current.copy(
-            searchQuery = query,
-            matchingMessageIds = matches,
-            activeMatchIndex = if (matches.isNotEmpty()) matches.size - 1 else -1
-        )
+        searchJob = viewModelScope.launch {
+            delay(200)
+            val current = _uiState.value
+            val matches = current.messages
+                .filter { it.body.contains(current.searchQuery, ignoreCase = true) }
+                .map { it.id }
+            _uiState.value = current.copy(
+                matchingMessageIds = matches,
+                activeMatchIndex = if (matches.isNotEmpty()) matches.size - 1 else -1
+            )
+        }
     }
 
     fun navigateMatchUp() {
@@ -661,8 +665,8 @@ class ChatViewModel @Inject constructor(
     private suspend fun moveThreadToSpamAndClose(ruleId: Long, ruleType: String) {
         if (currentThreadId != -1L) {
             val messages = conversationRepository.getMessagesForThread(currentThreadId)
-            messages.forEach { msg ->
-                spamMessageDao.insertSpamMessage(
+            spamMessageDao.insertSpamMessages(
+                messages.map { msg ->
                     SpamMessageEntity(
                         smsId = msg.id,
                         address = msg.address,
@@ -671,12 +675,12 @@ class ChatViewModel @Inject constructor(
                         matchedRuleId = ruleId,
                         matchedRuleType = ruleType
                     )
-                )
-                if (msg.type == MessageType.RECEIVED) {
-                    personalSpamAdapter.recordImplicitSignal(
-                        msg.address, msg.body, PersonalSpamAdapter.ImplicitSignal.BLOCKED
-                    )
                 }
+            )
+            messages.filter { it.type == MessageType.RECEIVED }.forEach { msg ->
+                personalSpamAdapter.recordImplicitSignal(
+                    msg.address, msg.body, PersonalSpamAdapter.ImplicitSignal.BLOCKED
+                )
             }
             try { conversationRepository.deleteThread(currentThreadId) } catch (e: Exception) {}
         }

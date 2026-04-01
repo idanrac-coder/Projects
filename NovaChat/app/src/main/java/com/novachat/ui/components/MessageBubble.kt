@@ -378,6 +378,9 @@ private fun ScamWarningBanner(
     }
 }
 
+private val SHORT_CODE_REGEX = Regex("\\b\\d{4,6}\\b")
+private val PHONE_REGEX = Regex("(?<!\\w)(?:\\+?\\d[\\d()\\s.-]{7,}\\d)")
+
 fun parseFormattedText(text: String): AnnotatedString {
     val builder = AnnotatedString.Builder()
     var i = 0
@@ -467,8 +470,7 @@ fun parseFormattedText(text: String): AnnotatedString {
         )
     }
 
-    // Find short codes (4-6 digits) — tapping copies to clipboard, not a phone action.
-    val shortCodeRegex = Regex("\\b\\d{4,6}\\b")
+    val shortCodeRegex = SHORT_CODE_REGEX
     shortCodeRegex.findAll(resultText).forEach { matchResult ->
         val start = matchResult.range.first
         val end = matchResult.range.last + 1
@@ -492,8 +494,7 @@ fun parseFormattedText(text: String): AnnotatedString {
         )
     }
 
-    // Find likely phone numbers like +1 555-123-4567, (555) 123 4567, etc.
-    val phoneRegex = Regex("(?<!\\w)(?:\\+?\\d[\\d()\\s.-]{7,}\\d)")
+    val phoneRegex = PHONE_REGEX
     phoneRegex.findAll(resultText).forEach { matchResult ->
         val start = matchResult.range.first
         val end = matchResult.range.last + 1

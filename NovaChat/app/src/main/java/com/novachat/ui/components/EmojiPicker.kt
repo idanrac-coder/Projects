@@ -161,7 +161,7 @@ fun EmojiPicker(
                     contentPadding = PaddingValues(4.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    items(emojiCategories[selectedTab].emojis) { emoji ->
+                    items(emojiCategories[selectedTab].emojis, key = { it }) { emoji ->
                         Text(
                             text = emoji,
                             fontSize = 26.sp,

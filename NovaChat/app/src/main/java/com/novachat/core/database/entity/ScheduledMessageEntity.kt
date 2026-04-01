@@ -1,9 +1,13 @@
 package com.novachat.core.database.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "scheduled_messages")
+@Entity(
+    tableName = "scheduled_messages",
+    indices = [Index(value = ["isSent", "isFailed", "scheduledTime"])]
+)
 data class ScheduledMessageEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,

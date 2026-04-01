@@ -1,9 +1,13 @@
 package com.novachat.core.database.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "message_reminders")
+@Entity(
+    tableName = "message_reminders",
+    indices = [Index(value = ["isTriggered", "reminderTime"])]
+)
 data class MessageReminderEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,

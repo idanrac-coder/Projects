@@ -3,6 +3,28 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.30.0] - 2026-04-01
+
+### Changed
+- Add database indexes to 10 entities (spam_messages, message_reactions, pinned_messages, scheduled_messages, block_rules, conversation_meta, message_reminders, short_code_whitelist, spam_learning) — eliminates full table scans on frequently queried columns
+- Replace N+1 `insertSpamMessage` loops with batch `insertSpamMessages` in ChatViewModel, ConversationsViewModel, and NotificationActionReceiver
+- Replace Flow `.first()` with direct suspend DAO queries in BlockRepositoryImpl (`getAllRulesOnce`, `getRuleCountOnce`) for hot paths
+- Cache compiled Regex patterns in BlockRepositoryImpl to avoid recompilation per incoming SMS
+- Add search debounce (200ms) to ConversationsViewModel, ChatViewModel, and ComposeMessageViewModel
+- Add proper `key` parameters to LazyColumn/LazyRow in SearchScreen, ConversationsScreen, ChatScreen, EmojiPicker, and ComposeMessageScreen
+- Replace `collectAsState` with `collectAsStateWithLifecycle` in MainActivity (5 flows) and SettingsScreen (3 flows)
+- Cache SimpleDateFormat instances via ThreadLocal in ConversationItem, and `remember` in PinnedMessagesScreen, SpamFolderScreen, SearchScreen
+- Cache wallpaper modifier and image resource ID lookup with `remember` in ChatScreen
+- Hoist short-code and phone-number Regex as top-level constants in MessageBubble
+
+### Fixed
+- Fix MmsReceiver blocking main thread — add `goAsync()` + coroutine dispatch to Dispatchers.IO
+- Fix MainScope leak in MainActivity.maybePromptReview — replace with lifecycleScope
+- Fix class-level CoroutineScope leak in NotificationActionReceiver — create scoped coroutines inside each action handler
+- Fix thread-safety in ContactResolver — replace plain HashMap/MutableMap with ConcurrentHashMap and add double-checked locking on preloadContacts
+- Remove redundant in-memory re-sort in SmsProvider.getMessagesForThread (data already sorted by SQL ORDER BY)
+- Fix Regex allocation in ContactResolver.miniMatch and getAllContacts — hoist as companion object constants
+
 ## [3.29.1] - 2026-04-01
 
 ### Changed

@@ -111,7 +111,7 @@ fun SearchScreen(
             }
 
             LazyColumn {
-                items(uiState.results) { result ->
+                items(uiState.results, key = { it.message.id }) { result ->
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -135,9 +135,12 @@ fun SearchScreen(
                                 modifier = Modifier.weight(1f)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
+                            val dateText = remember(result.message.timestamp) {
+                                SimpleDateFormat("MMM d", Locale.getDefault())
+                                    .format(Date(result.message.timestamp))
+                            }
                             Text(
-                                text = SimpleDateFormat("MMM d", Locale.getDefault())
-                                    .format(Date(result.message.timestamp)),
+                                text = dateText,
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

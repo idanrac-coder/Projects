@@ -193,9 +193,12 @@ fun SpamFolderScreen(
                                     overflow = TextOverflow.Ellipsis
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
+                                val dateText = remember(spam.timestamp) {
+                                    SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
+                                        .format(Date(spam.timestamp))
+                                }
                                 Text(
-                                    text = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
-                                        .format(Date(spam.timestamp)),
+                                    text = dateText,
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                 )

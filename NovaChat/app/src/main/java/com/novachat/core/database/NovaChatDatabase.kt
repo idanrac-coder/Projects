@@ -52,7 +52,7 @@ import com.novachat.core.database.entity.ThemeEntity
         ShortCodeWhitelistEntity::class,
         MessageEditEntity::class
     ],
-    version = 14,
+    version = 15,
     exportSchema = true
 )
 abstract class NovaChatDatabase : RoomDatabase() {

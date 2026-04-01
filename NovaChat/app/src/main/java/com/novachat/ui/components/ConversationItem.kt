@@ -290,25 +290,31 @@ private fun UnreadCountBadge(unreadCount: Int) {
     }
 }
 
+private val timeFormat = ThreadLocal.withInitial { SimpleDateFormat("h:mm a", Locale.getDefault()) }
+private val dayFormat = ThreadLocal.withInitial { SimpleDateFormat("EEE", Locale.getDefault()) }
+private val dateYearFormat = ThreadLocal.withInitial { SimpleDateFormat("MMM d, yyyy", Locale.getDefault()) }
+private val dateFormat = ThreadLocal.withInitial { SimpleDateFormat("MMM d", Locale.getDefault()) }
+
 private fun formatTimestamp(timestamp: Long): String {
     val now = Calendar.getInstance()
     val msgTime = Calendar.getInstance().apply { timeInMillis = timestamp }
+    val date = Date(timestamp)
 
     return when {
         now.get(Calendar.DATE) == msgTime.get(Calendar.DATE) &&
             now.get(Calendar.YEAR) == msgTime.get(Calendar.YEAR) -> {
             val diff = System.currentTimeMillis() - timestamp
             if (diff < 60_000) "Now"
-            else SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date(timestamp))
+            else timeFormat.get()!!.format(date)
         }
         now.get(Calendar.DATE) - msgTime.get(Calendar.DATE) == 1 &&
             now.get(Calendar.YEAR) == msgTime.get(Calendar.YEAR) -> "Yesterday"
         now.get(Calendar.WEEK_OF_YEAR) == msgTime.get(Calendar.WEEK_OF_YEAR) &&
             now.get(Calendar.YEAR) == msgTime.get(Calendar.YEAR) -> {
-            SimpleDateFormat("EEE", Locale.getDefault()).format(Date(timestamp))
+            dayFormat.get()!!.format(date)
         }
         now.get(Calendar.YEAR) != msgTime.get(Calendar.YEAR) ->
-            SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(Date(timestamp))
-        else -> SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(timestamp))
+            dateYearFormat.get()!!.format(date)
+        else -> dateFormat.get()!!.format(date)
     }
 }

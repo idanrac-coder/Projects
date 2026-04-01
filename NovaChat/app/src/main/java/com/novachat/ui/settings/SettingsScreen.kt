@@ -44,7 +44,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -79,9 +79,9 @@ fun SettingsScreen(
     onSmartSecureClick: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
-    val whatsAppForwardEnabled by viewModel.whatsAppForwardEnabled.collectAsState()
-    val undoSendEnabled by viewModel.undoSendEnabled.collectAsState()
-    val isPremium by viewModel.isPremium.collectAsState()
+    val whatsAppForwardEnabled by viewModel.whatsAppForwardEnabled.collectAsStateWithLifecycle()
+    val undoSendEnabled by viewModel.undoSendEnabled.collectAsStateWithLifecycle()
+    val isPremium by viewModel.isPremium.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()

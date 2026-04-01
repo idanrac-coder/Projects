@@ -19,6 +19,9 @@ interface SpamMessageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSpamMessage(message: SpamMessageEntity): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSpamMessages(messages: List<SpamMessageEntity>)
+
     @Query("SELECT * FROM spam_messages WHERE id = :id")
     suspend fun getSpamMessageById(id: Long): SpamMessageEntity?
 

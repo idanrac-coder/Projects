@@ -1,9 +1,17 @@
 package com.novachat.core.database.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "conversation_meta")
+@Entity(
+    tableName = "conversation_meta",
+    indices = [
+        Index(value = ["isPinned"]),
+        Index(value = ["isArchived"]),
+        Index(value = ["isMuted"])
+    ]
+)
 data class ConversationMetaEntity(
     @PrimaryKey
     val threadId: Long,
