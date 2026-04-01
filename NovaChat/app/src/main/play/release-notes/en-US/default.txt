@@ -1,3 +1,5 @@
 New: Scan your inbox for spam!
 
 Go to Smart & Secure and tap "Scan Inbox" to find old spam messages hiding in your inbox. Review what was found, remove false positives, then choose to move them to the spam folder or delete them permanently.
+
+Spam senders are now automatically blocked so they can't message you again.

@@ -8,6 +8,9 @@ import com.novachat.core.database.entity.SpamMessageEntity
 import com.novachat.core.sms.ContactResolver
 import com.novachat.core.sms.SmsProvider
 import com.novachat.core.sms.SpamFilter
+import com.novachat.domain.model.BlockRule
+import com.novachat.domain.model.BlockType
+import com.novachat.domain.repository.BlockRepository
 import com.novachat.domain.repository.ConversationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -53,7 +56,8 @@ class InboxSpamScanViewModel @Inject constructor(
     private val spamFilter: SpamFilter,
     private val spamMessageDao: SpamMessageDao,
     private val contactResolver: ContactResolver,
-    private val conversationRepository: ConversationRepository
+    private val conversationRepository: ConversationRepository,
+    private val blockRepository: BlockRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(InboxSpamScanUiState())
@@ -176,6 +180,7 @@ class InboxSpamScanViewModel @Inject constructor(
                         )
                     )
                     smsProvider.deleteMessage(msg.smsId)
+                    spamFilter.reportSpam(msg.address, msg.body, null)
                     affectedThreads.add(msg.threadId)
                     count++
                     _uiState.update { it.copy(processedCount = count) }
@@ -183,6 +188,7 @@ class InboxSpamScanViewModel @Inject constructor(
                     Log.e("InboxSpamScanVM", "Failed to move message ${msg.smsId} to spam", e)
                 }
             }
+            addBlockRulesForAddresses(selected)
             for (threadId in affectedThreads) {
                 conversationRepository.refreshAfterChange(threadId)
             }
@@ -201,6 +207,7 @@ class InboxSpamScanViewModel @Inject constructor(
             for (msg in selected) {
                 try {
                     smsProvider.deleteMessage(msg.smsId)
+                    spamFilter.reportSpam(msg.address, msg.body, null)
                     affectedThreads.add(msg.threadId)
                     count++
                     _uiState.update { it.copy(processedCount = count) }
@@ -208,10 +215,22 @@ class InboxSpamScanViewModel @Inject constructor(
                     Log.e("InboxSpamScanVM", "Failed to delete message ${msg.smsId}", e)
                 }
             }
+            addBlockRulesForAddresses(selected)
             for (threadId in affectedThreads) {
                 conversationRepository.refreshAfterChange(threadId)
             }
             _uiState.update { it.copy(phase = ScanPhase.DONE, processedCount = count) }
+        }
+    }
+
+    private suspend fun addBlockRulesForAddresses(messages: List<ScannedSpamMessage>) {
+        val distinctAddresses = messages.map { it.address }.distinct()
+        for (address in distinctAddresses) {
+            try {
+                blockRepository.addRule(BlockRule(type = BlockType.NUMBER, value = address))
+            } catch (e: Exception) {
+                Log.w("InboxSpamScanVM", "Could not add block rule for $address", e)
+            }
         }
     }
 }

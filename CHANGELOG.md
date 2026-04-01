@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.29.1] - 2026-04-01
+
+### Changed
+- Inbox Spam Scanner now adds number block rules and reports spam for learning when messages are moved to spam or permanently deleted
+
 ## [3.29.0] - 2026-04-01
 
 ### Added
