@@ -3,6 +3,12 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.32.1] - 2026-04-03
+
+### Fixed
+- Hebrew address regex patterns were too greedy — limited street name matching to max 3 words to prevent entire sentences from being highlighted as addresses
+- Reduced regex backtracking overhead that caused lag on messages with Hebrew text
+
 ## [3.32.0] - 2026-04-03
 
 ### Added

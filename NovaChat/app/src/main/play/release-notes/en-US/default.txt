@@ -1,7 +1,5 @@
-New Messaging Settings screen in Settings for easier control over your messaging preferences.
+New Messaging Settings screen for easier control over your messaging preferences.
 
-You can now disable Calendar and Maps smart links individually:
-- Turn off date detection if you don't want tappable calendar links
-- Turn off address detection if you don't want tappable map links
+You can now disable Calendar and Maps smart links individually in Settings.
 
-Undo send and WhatsApp forwarding settings moved here too for a cleaner Settings page.
+Fixed address detection in Hebrew messages — only actual addresses are highlighted, no more false positives on regular text.
