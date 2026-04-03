@@ -15,8 +15,8 @@ android {
         applicationId = "com.novachat"
         minSdk = 31
         targetSdk = 35
-        versionCode = 130
-        versionName = "3.31.0"
+        versionCode = 131
+        versionName = "3.31.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

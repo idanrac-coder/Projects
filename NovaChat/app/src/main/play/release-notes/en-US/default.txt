@@ -1,4 +1,4 @@
-Smart links in messages! Tap dates to add to Calendar or addresses to open Maps.
+Smart links in messages! Tap dates to add to Calendar or addresses to open Maps — now with full Hebrew address support.
 
 Pinch to zoom on chat messages for easier reading.
 

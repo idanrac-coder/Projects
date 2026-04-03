@@ -18,53 +18,29 @@ enum class SmartLinkType {
 object SmartLinkDetector {
 
     private val DATE_PATTERNS = listOf(
+        // "January 15, 2026", "Dec 3rd", "March 12 at 3:00 PM"
         Pattern.compile(
-            "\\b(?:(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|" +
-            "Mon|Tue|Wed|Thu|Fri|Sat|Sun)[,.]?\\s+)?" +
-            "(?:January|February|March|April|May|June|July|August|September|October|November|December|" +
+            "\\b(?:January|February|March|April|May|June|July|August|September|October|November|December|" +
             "Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\.?\\s+\\d{1,2}(?:st|nd|rd|th)?" +
             "(?:[,.]?\\s+\\d{4})?" +
             "(?:\\s+(?:at\\s+)?\\d{1,2}(?::\\d{2})?\\s*(?:AM|PM|am|pm)?)?\\b",
             Pattern.CASE_INSENSITIVE
         ),
+        // "12/25/2024", "3-4-26", "15.03.2026"
         Pattern.compile(
             "\\b\\d{1,2}[/\\-.]\\d{1,2}[/\\-.]\\d{2,4}" +
             "(?:\\s+(?:at\\s+)?\\d{1,2}(?::\\d{2})?\\s*(?:AM|PM|am|pm)?)?\\b",
             Pattern.CASE_INSENSITIVE
         ),
+        // "15 בינואר 2026", "3 במרץ", Hebrew month names with day number
         Pattern.compile(
-            "\\b(?:today|tomorrow|tonight|yesterday)" +
-            "(?:\\s+at\\s+\\d{1,2}(?::\\d{2})?\\s*(?:AM|PM|am|pm)?)?\\b",
-            Pattern.CASE_INSENSITIVE
-        ),
-        Pattern.compile(
-            "\\b(?:next|this)\\s+(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|" +
-            "Mon|Tue|Wed|Thu|Fri|Sat|Sun|week|month)" +
-            "(?:\\s+at\\s+\\d{1,2}(?::\\d{2})?\\s*(?:AM|PM|am|pm)?)?\\b",
-            Pattern.CASE_INSENSITIVE
-        ),
-        Pattern.compile(
-            "\\b(?:at|by|from|until|before|after)\\s+\\d{1,2}(?::\\d{2})\\s*(?:AM|PM|am|pm)\\b",
-            Pattern.CASE_INSENSITIVE
-        ),
-        // Hebrew date patterns
-        Pattern.compile(
-            "\\b\\d{1,2}[/\\-.]\\d{1,2}[/\\-.]\\d{2,4}\\b"
-        ),
-        Pattern.compile(
-            "(?:יום\\s+)?(?:ראשון|שני|שלישי|רביעי|חמישי|שישי|שבת)" +
-            "(?:\\s+(?:הקרוב|הבא))?" +
-            "(?:\\s+(?:ב-?)?\\s*\\d{1,2}(?::\\d{2})?)?",
-            Pattern.CASE_INSENSITIVE
-        ),
-        Pattern.compile(
-            "(?:מחר|היום|הערב|אתמול)" +
-            "(?:\\s+(?:ב-?)?\\s*(?:שעה\\s+)?\\d{1,2}(?::\\d{2})?)?",
-            Pattern.CASE_INSENSITIVE
+            "\\b\\d{1,2}\\s+(?:ב)?(?:ינואר|פברואר|מרץ|מרס|אפריל|מאי|יוני|יולי|אוגוסט|ספטמבר|אוקטובר|נובמבר|דצמבר)" +
+            "(?:\\s+\\d{4})?\\b"
         )
     )
 
     private val ADDRESS_PATTERNS = listOf(
+        // English: "123 Main Street", "45 Oak Ave, Apt 3B"
         Pattern.compile(
             "\\b\\d{1,5}\\s+(?:[A-Z][a-zA-Z'-]+\\s+){1,4}" +
             "(?:Street|St|Avenue|Ave|Boulevard|Blvd|Road|Rd|Drive|Dr|Lane|Ln|" +
@@ -74,10 +50,32 @@ object SmartLinkDetector {
             "\\b",
             Pattern.CASE_INSENSITIVE
         ),
-        // Hebrew street addresses: רחוב/רח' X 12, or שד' X 12
+        // Hebrew with prefix: "רחוב הרצל 5", "רח' ביאליק 12", "שדרות רוטשילד 30", "סמטת השלום 3"
         Pattern.compile(
-            "(?:רחוב|רח['\u2019]|שדרות|שד['\u2019])\\s+[\\u0590-\\u05FF]+(?:\\s+[\\u0590-\\u05FF]+)*\\s+\\d{1,4}",
-            Pattern.CASE_INSENSITIVE
+            "(?:רחוב|רח['\u2019]|שדרות|שד['\u2019]|סמטת|סמ['\u2019]|כיכר|דרך)" +
+            "\\s+[\\u0590-\\u05FF]+(?:[\\s\\-][\\u0590-\\u05FF]+)*" +
+            "\\s+\\d{1,4}" +
+            "(?:\\s*[/\\-]\\s*\\d{1,3})?"
+        ),
+        // Hebrew with ב prefix: "ברחוב הרצל 5", "בשדרות בן גוריון 23"
+        Pattern.compile(
+            "ב(?:רחוב|רח['\u2019]|שדרות|שד['\u2019]|סמטת|סמ['\u2019]|דרך)" +
+            "\\s+[\\u0590-\\u05FF]+(?:[\\s\\-][\\u0590-\\u05FF]+)*" +
+            "\\s+\\d{1,4}" +
+            "(?:\\s*[/\\-]\\s*\\d{1,3})?"
+        ),
+        // Hebrew street name + number (no prefix): "הרצל 5", "בן גוריון 23", "העצמאות 14/2"
+        Pattern.compile(
+            "[\\u0590-\\u05FF]+(?:[\\s\\-][\\u0590-\\u05FF]+){0,3}" +
+            "\\s+\\d{1,4}\\s*[/\\-]\\s*\\d{1,3}"
+        ),
+        // Hebrew with city suffix: "הרצל 5, תל אביב", "רחוב ביאליק 12, חיפה"
+        Pattern.compile(
+            "(?:(?:רחוב|רח['\u2019]|שדרות|שד['\u2019]|סמטת|דרך|כיכר)\\s+)?" +
+            "[\\u0590-\\u05FF]+(?:[\\s\\-][\\u0590-\\u05FF]+)*" +
+            "\\s+\\d{1,4}" +
+            "(?:\\s*[/\\-]\\s*\\d{1,3})?" +
+            "\\s*,\\s*[\\u0590-\\u05FF]+(?:[\\s\\-][\\u0590-\\u05FF]+){0,2}"
         )
     )
 

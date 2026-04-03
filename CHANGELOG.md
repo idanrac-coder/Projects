@@ -3,6 +3,12 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.31.1] - 2026-04-03
+
+### Changed
+- Smart link detection now only highlights actual dates (e.g. "January 15", "12/03/2026", "3 במרץ") — no longer marks relative words like today, yesterday, Sunday, יום שני, מחר, etc.
+- Add Hebrew address detection patterns — recognizes רחוב/שדרות/סמטת/דרך/כיכר prefixes, ב-prefix forms, street+number without prefix, and addresses with city suffix
+
 ## [3.31.0] - 2026-04-03
 
 ### Added
