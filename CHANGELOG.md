@@ -3,6 +3,14 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.31.2] - 2026-04-03
+
+### Fixed
+- Scroll jank in chat caused by pinch-to-zoom gesture intercepting all touch events — now only activates on multi-touch (2+ fingers)
+- MediaPlayer memory leak in VoiceMessageContent — properly release on composition exit and stop/release on pause
+- MMS N+1 query bottleneck — batch load addresses and parts in 2 queries instead of 2-3 per MMS message
+- Redundant regex execution in parseFormattedText — short-code ranges now cached instead of computed twice
+
 ## [3.31.1] - 2026-04-03
 
 ### Changed

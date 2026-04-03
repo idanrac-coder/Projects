@@ -163,8 +163,12 @@ class SmsProvider @Inject constructor(
     }
 
     private fun loadMmsForThread(threadId: Long): List<Message> {
-        val messages = mutableListOf<Message>()
-        val mmsCursor = contentResolver.query(
+        data class MmsRow(
+            val mmsId: Long, val dateSec: Long, val messageBox: Int, val isRead: Boolean
+        )
+
+        val mmsRows = mutableListOf<MmsRow>()
+        contentResolver.query(
             Telephony.Mms.CONTENT_URI,
             arrayOf(
                 Telephony.Mms._ID,
@@ -176,105 +180,115 @@ class SmsProvider @Inject constructor(
             "${Telephony.Mms.THREAD_ID} = ?",
             arrayOf(threadId.toString()),
             "${Telephony.Mms.DATE} ASC"
-        )
-
-        mmsCursor?.use { cursor ->
+        )?.use { cursor ->
             while (cursor.moveToNext()) {
-                val mmsId = cursor.getLong(cursor.getColumnIndexOrThrow(Telephony.Mms._ID))
-                val dateSec = cursor.getLong(cursor.getColumnIndexOrThrow(Telephony.Mms.DATE))
-                val messageBox = cursor.getInt(cursor.getColumnIndexOrThrow(Telephony.Mms.MESSAGE_BOX))
-                val isRead = cursor.getInt(cursor.getColumnIndexOrThrow(Telephony.Mms.READ)) == 1
-
-                val type = when (messageBox) {
-                    Telephony.Mms.MESSAGE_BOX_INBOX -> MessageType.RECEIVED
-                    Telephony.Mms.MESSAGE_BOX_SENT -> MessageType.SENT
-                    Telephony.Mms.MESSAGE_BOX_DRAFTS -> MessageType.DRAFT
-                    Telephony.Mms.MESSAGE_BOX_OUTBOX -> MessageType.OUTBOX
-                    else -> MessageType.RECEIVED
-                }
-
-                val address = getMmsAddress(mmsId, type)
-                val parts = getMmsParts(mmsId)
-                val textBody = parts.firstOrNull { it.contentType?.startsWith("text/") == true }?.text ?: ""
-                val audioPart = parts.firstOrNull { it.contentType?.startsWith("audio/") == true }
-                val imagePart = parts.firstOrNull { it.contentType?.startsWith("image/") == true }
-                val attachmentPart = audioPart ?: imagePart
-
-                messages.add(
-                    Message(
-                        id = -mmsId,
-                        threadId = threadId,
-                        address = address,
-                        body = textBody.ifEmpty {
-                            when {
-                                audioPart != null -> "\uD83C\uDFA4 Voice message"
-                                imagePart != null -> "\uD83D\uDDBC\uFE0F Image"
-                                else -> "(MMS)"
-                            }
-                        },
-                        timestamp = dateSec * 1000,
-                        type = type,
-                        isRead = isRead,
-                        isMms = true,
-                        attachmentUri = attachmentPart?.uri,
-                        isVoiceMessage = audioPart != null
-                    )
-                )
+                mmsRows.add(MmsRow(
+                    mmsId = cursor.getLong(cursor.getColumnIndexOrThrow(Telephony.Mms._ID)),
+                    dateSec = cursor.getLong(cursor.getColumnIndexOrThrow(Telephony.Mms.DATE)),
+                    messageBox = cursor.getInt(cursor.getColumnIndexOrThrow(Telephony.Mms.MESSAGE_BOX)),
+                    isRead = cursor.getInt(cursor.getColumnIndexOrThrow(Telephony.Mms.READ)) == 1
+                ))
             }
         }
-        return messages
+
+        if (mmsRows.isEmpty()) return emptyList()
+
+        val mmsIds = mmsRows.map { it.mmsId }
+        val addressMap = batchLoadMmsAddresses(mmsIds)
+        val partsMap = batchLoadMmsParts(mmsIds)
+
+        return mmsRows.map { row ->
+            val type = when (row.messageBox) {
+                Telephony.Mms.MESSAGE_BOX_INBOX -> MessageType.RECEIVED
+                Telephony.Mms.MESSAGE_BOX_SENT -> MessageType.SENT
+                Telephony.Mms.MESSAGE_BOX_DRAFTS -> MessageType.DRAFT
+                Telephony.Mms.MESSAGE_BOX_OUTBOX -> MessageType.OUTBOX
+                else -> MessageType.RECEIVED
+            }
+
+            val addrType = if (type == MessageType.RECEIVED) 137 else 151
+            val address = addressMap[row.mmsId]?.get(addrType)
+                ?: addressMap[row.mmsId]?.values?.firstOrNull { it != "insert-address-token" }
+                ?: ""
+
+            val parts = partsMap[row.mmsId] ?: emptyList()
+            val textBody = parts.firstOrNull { it.contentType?.startsWith("text/") == true }?.text ?: ""
+            val audioPart = parts.firstOrNull { it.contentType?.startsWith("audio/") == true }
+            val imagePart = parts.firstOrNull { it.contentType?.startsWith("image/") == true }
+            val attachmentPart = audioPart ?: imagePart
+
+            Message(
+                id = -row.mmsId,
+                threadId = threadId,
+                address = address,
+                body = textBody.ifEmpty {
+                    when {
+                        audioPart != null -> "\uD83C\uDFA4 Voice message"
+                        imagePart != null -> "\uD83D\uDDBC\uFE0F Image"
+                        else -> "(MMS)"
+                    }
+                },
+                timestamp = row.dateSec * 1000,
+                type = type,
+                isRead = row.isRead,
+                isMms = true,
+                attachmentUri = attachmentPart?.uri,
+                isVoiceMessage = audioPart != null
+            )
+        }
     }
 
-    private fun getMmsAddress(mmsId: Long, type: MessageType): String {
-        val addrUri = Uri.parse("content://mms/$mmsId/addr")
-        val addrType = if (type == MessageType.RECEIVED) 137 else 151 // PduHeaders.FROM / TO
-        val cursor = contentResolver.query(
-            addrUri,
-            arrayOf(Telephony.Mms.Addr.ADDRESS),
-            "${Telephony.Mms.Addr.TYPE} = ?",
-            arrayOf(addrType.toString()),
-            null
-        )
-        var address = ""
-        cursor?.use {
-            if (it.moveToFirst()) {
-                address = it.getString(0) ?: ""
-            }
-        }
-        if (address.isBlank() || address == "insert-address-token") {
-            val fallback = contentResolver.query(addrUri, arrayOf(Telephony.Mms.Addr.ADDRESS), null, null, null)
-            fallback?.use {
-                if (it.moveToFirst()) {
-                    val a = it.getString(0) ?: ""
-                    if (a != "insert-address-token") address = a
+    private fun batchLoadMmsAddresses(mmsIds: List<Long>): Map<Long, Map<Int, String>> {
+        val result = mutableMapOf<Long, MutableMap<Int, String>>()
+        val uri = Uri.parse("content://mms/addr")
+        contentResolver.query(
+            uri,
+            arrayOf(Telephony.Mms.Addr.MSG_ID, Telephony.Mms.Addr.ADDRESS, Telephony.Mms.Addr.TYPE),
+            "${Telephony.Mms.Addr.MSG_ID} IN (${mmsIds.joinToString(",")})",
+            null, null
+        )?.use { cursor ->
+            val colMsgId = cursor.getColumnIndexOrThrow(Telephony.Mms.Addr.MSG_ID)
+            val colAddr = cursor.getColumnIndexOrThrow(Telephony.Mms.Addr.ADDRESS)
+            val colType = cursor.getColumnIndexOrThrow(Telephony.Mms.Addr.TYPE)
+            while (cursor.moveToNext()) {
+                val msgId = cursor.getLong(colMsgId)
+                val addr = cursor.getString(colAddr) ?: ""
+                val type = cursor.getInt(colType)
+                if (addr.isNotBlank() && addr != "insert-address-token") {
+                    result.getOrPut(msgId) { mutableMapOf() }[type] = addr
                 }
             }
         }
-        return address
+        return result
     }
 
     data class MmsPart(val contentType: String?, val text: String?, val uri: String?)
 
-    private fun getMmsParts(mmsId: Long): List<MmsPart> {
-        val parts = mutableListOf<MmsPart>()
-        val partUri = Uri.parse("content://mms/$mmsId/part")
-        val cursor = contentResolver.query(
-            partUri,
-            arrayOf(Telephony.Mms.Part._ID, Telephony.Mms.Part.CONTENT_TYPE, Telephony.Mms.Part.TEXT),
-            null, null, null
-        )
-        cursor?.use {
-            while (it.moveToNext()) {
-                val partId = it.getLong(it.getColumnIndexOrThrow(Telephony.Mms.Part._ID))
-                val ct = it.getString(it.getColumnIndexOrThrow(Telephony.Mms.Part.CONTENT_TYPE))
-                val text = it.getString(it.getColumnIndexOrThrow(Telephony.Mms.Part.TEXT))
+    private fun batchLoadMmsParts(mmsIds: List<Long>): Map<Long, List<MmsPart>> {
+        val result = mutableMapOf<Long, MutableList<MmsPart>>()
+        val uri = Uri.parse("content://mms/part")
+        contentResolver.query(
+            uri,
+            arrayOf(Telephony.Mms.Part._ID, Telephony.Mms.Part.MSG_ID, Telephony.Mms.Part.CONTENT_TYPE, Telephony.Mms.Part.TEXT),
+            "${Telephony.Mms.Part.MSG_ID} IN (${mmsIds.joinToString(",")})",
+            null, null
+        )?.use { cursor ->
+            val colPartId = cursor.getColumnIndexOrThrow(Telephony.Mms.Part._ID)
+            val colMsgId = cursor.getColumnIndexOrThrow(Telephony.Mms.Part.MSG_ID)
+            val colCt = cursor.getColumnIndexOrThrow(Telephony.Mms.Part.CONTENT_TYPE)
+            val colText = cursor.getColumnIndexOrThrow(Telephony.Mms.Part.TEXT)
+            while (cursor.moveToNext()) {
+                val msgId = cursor.getLong(colMsgId)
+                val partId = cursor.getLong(colPartId)
+                val ct = cursor.getString(colCt)
+                val text = cursor.getString(colText)
                 val dataUri = if (ct?.startsWith("text/") != true) {
-                    ContentUris.withAppendedId(partUri, partId).toString()
+                    ContentUris.withAppendedId(uri, partId).toString()
                 } else null
-                parts.add(MmsPart(ct, text, dataUri))
+                result.getOrPut(msgId) { mutableListOf() }.add(MmsPart(ct, text, dataUri))
             }
         }
-        return parts
+        return result
     }
 
     suspend fun searchMessages(query: String): List<Message> = withContext(Dispatchers.IO) {

@@ -522,14 +522,15 @@ fun parseFormattedText(text: String): AnnotatedString {
         )
     }
 
-    val shortCodeRegex = SHORT_CODE_REGEX
-    shortCodeRegex.findAll(resultText).forEach { matchResult ->
+    val shortCodeRanges = mutableListOf<IntRange>()
+    SHORT_CODE_REGEX.findAll(resultText).forEach { matchResult ->
         val start = matchResult.range.first
         val end = matchResult.range.last + 1
         val code = matchResult.value
         val overlapUrl = urlRanges.any { start < it.last + 1 && end > it.first }
         if (overlapUrl) return@forEach
 
+        shortCodeRanges += start until end
         builder.addStyle(
             style = SpanStyle(
                 color = Color(0xFFFFB74D),
@@ -547,8 +548,7 @@ fun parseFormattedText(text: String): AnnotatedString {
     }
 
     val phoneRanges = mutableListOf<IntRange>()
-    val phoneRegex = PHONE_REGEX
-    phoneRegex.findAll(resultText).forEach { matchResult ->
+    PHONE_REGEX.findAll(resultText).forEach { matchResult ->
         val start = matchResult.range.first
         val end = matchResult.range.last + 1
         val overlapUrl = urlRanges.any { start < it.last + 1 && end > it.first }
@@ -574,8 +574,7 @@ fun parseFormattedText(text: String): AnnotatedString {
         )
     }
 
-    val allExcluded = urlRanges + phoneRanges +
-        shortCodeRegex.findAll(resultText).map { it.range.first until (it.range.last + 1) }
+    val allExcluded = urlRanges + phoneRanges + shortCodeRanges
     val smartLinks = SmartLinkDetector.detect(resultText, allExcluded)
     for (link in smartLinks) {
         val tag = when (link.type) {
@@ -660,6 +659,17 @@ fun VoiceMessageContent(
     var isPlaying by remember { mutableStateOf(false) }
     var showTranscription by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val playerRef = remember { mutableStateOf<android.media.MediaPlayer?>(null) }
+
+    androidx.compose.runtime.DisposableEffect(attachmentUri) {
+        onDispose {
+            playerRef.value?.let { p ->
+                try { p.stop() } catch (_: Exception) {}
+                try { p.release() } catch (_: Exception) {}
+            }
+            playerRef.value = null
+        }
+    }
 
     Column {
         Row(
@@ -670,16 +680,25 @@ fun VoiceMessageContent(
                 shape = CircleShape,
                 color = textColor.copy(alpha = 0.15f),
                 onClick = {
-                    isPlaying = !isPlaying
                     if (isPlaying) {
+                        playerRef.value?.let { p ->
+                            try { p.stop() } catch (_: Exception) {}
+                            try { p.release() } catch (_: Exception) {}
+                        }
+                        playerRef.value = null
+                        isPlaying = false
+                    } else {
                         try {
                             val player = android.media.MediaPlayer()
                             player.setDataSource(context, android.net.Uri.parse(attachmentUri))
                             player.prepare()
                             player.start()
+                            playerRef.value = player
+                            isPlaying = true
                             player.setOnCompletionListener {
                                 isPlaying = false
                                 player.release()
+                                playerRef.value = null
                             }
                         } catch (_: Exception) {
                             isPlaying = false

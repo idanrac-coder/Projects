@@ -27,7 +27,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -712,8 +714,20 @@ fun ChatScreen(
                                 .fillMaxSize()
                                 .padding(horizontal = 14.dp)
                                 .pointerInput(Unit) {
-                                    detectTransformGestures { _, _, zoom, _ ->
-                                        textScale = (textScale * zoom).coerceIn(0.8f, 2.5f)
+                                    awaitEachGesture {
+                                        awaitFirstDown(requireUnconsumed = false)
+                                        do {
+                                            val event = awaitPointerEvent(
+                                                pass = androidx.compose.ui.input.pointer.PointerEventPass.Initial
+                                            )
+                                            if (event.changes.size >= 2) {
+                                                val zoom = event.calculateZoom()
+                                                if (zoom != 1f) {
+                                                    textScale = (textScale * zoom).coerceIn(0.8f, 2.5f)
+                                                    event.changes.forEach { it.consume() }
+                                                }
+                                            }
+                                        } while (event.changes.any { it.pressed })
                                     }
                                 },
                             verticalArrangement = Arrangement.spacedBy(2.dp)

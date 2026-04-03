@@ -1,11 +1,6 @@
-Smart links in messages! Tap dates to add to Calendar or addresses to open Maps — now with full Hebrew address support.
+Performance improvements for a smoother experience:
+- Scrolling in chats is now buttery smooth — pinch-to-zoom no longer interferes with normal scrolling
+- Messages load faster in conversations with MMS/multimedia messages
+- Fixed audio player not stopping properly when leaving a conversation
 
-Pinch to zoom on chat messages for easier reading.
-
-Voice message support — play audio messages and transcribe them to text.
-
-Spam scan improvements:
-- Mark false positives as "Not Spam" so they won't appear again
-- Trusted senders are now skipped automatically
-
-Fixed bottom bar overlapping with phone navigation buttons.
+Smart links now support Hebrew addresses and only highlight real dates.
