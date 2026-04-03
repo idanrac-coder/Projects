@@ -66,7 +66,9 @@ data class ChatUiState(
     val editHistoryEntries: List<MessageEdit> = emptyList(),
     val showEditHistory: Boolean = false,
     val transcriptions: Map<Long, String> = emptyMap(),
-    val transcribingMessageIds: Set<Long> = emptySet()
+    val transcribingMessageIds: Set<Long> = emptySet(),
+    val calendarLinksEnabled: Boolean = true,
+    val mapsLinksEnabled: Boolean = true
 ) {
     val matchCount: Int get() = matchingMessageIds.size
     val activeMatchMessageId: Long? get() =
@@ -106,6 +108,20 @@ class ChatViewModel @Inject constructor(
             isWhatsAppAvailable = whatsAppForwarder.isWhatsAppInstalled()
         )
         observeIncomingMessages()
+        observeSmartLinkPrefs()
+    }
+
+    private fun observeSmartLinkPrefs() {
+        viewModelScope.launch {
+            userPreferencesRepository.smartLinksCalendarEnabled.collect { enabled ->
+                _uiState.value = _uiState.value.copy(calendarLinksEnabled = enabled)
+            }
+        }
+        viewModelScope.launch {
+            userPreferencesRepository.smartLinksMapsEnabled.collect { enabled ->
+                _uiState.value = _uiState.value.copy(mapsLinksEnabled = enabled)
+            }
+        }
     }
 
     private fun observeIncomingMessages() {

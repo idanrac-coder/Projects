@@ -3,6 +3,16 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.32.0] - 2026-04-03
+
+### Added
+- New "Messaging Settings" sub-screen under Messages in Settings — groups messaging-related preferences in one place
+- Toggle to enable/disable Calendar smart links (date detection in messages)
+- Toggle to enable/disable Maps smart links (address detection in messages)
+
+### Changed
+- Move "Undo send" and "Forward SMS to WhatsApp" toggles from main Settings into the new Messaging Settings screen
+
 ## [3.31.2] - 2026-04-03
 
 ### Fixed

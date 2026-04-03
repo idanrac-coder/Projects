@@ -1,6 +1,7 @@
-Performance improvements for a smoother experience:
-- Scrolling in chats is now buttery smooth — pinch-to-zoom no longer interferes with normal scrolling
-- Messages load faster in conversations with MMS/multimedia messages
-- Fixed audio player not stopping properly when leaving a conversation
+New Messaging Settings screen in Settings for easier control over your messaging preferences.
 
-Smart links now support Hebrew addresses and only highlight real dates.
+You can now disable Calendar and Maps smart links individually:
+- Turn off date detection if you don't want tappable calendar links
+- Turn off address detection if you don't want tappable map links
+
+Undo send and WhatsApp forwarding settings moved here too for a cleaner Settings page.

@@ -1596,6 +1596,8 @@ private fun SwipeableMessageItem(
             scamAnalysis = scamWarning,
             transcription = uiState.transcriptions[message.id],
             isTranscribing = message.id in uiState.transcribingMessageIds,
+            calendarLinksEnabled = uiState.calendarLinksEnabled,
+            mapsLinksEnabled = uiState.mapsLinksEnabled,
             onTranscribe = { msgId, uri -> viewModel.transcribeVoiceMessage(msgId, uri) },
             onLongClick = {
                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)

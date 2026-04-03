@@ -70,3 +70,6 @@ object TrustedSendersRoute
 
 @Serializable
 object InboxSpamScanRoute
+
+@Serializable
+object MessagingSettingsRoute

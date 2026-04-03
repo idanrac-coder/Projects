@@ -163,4 +163,20 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun setReviewShown() {
         dataStore.edit { it[PreferencesKeys.REVIEW_SHOWN] = true }
     }
+
+    val smartLinksCalendarEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[PreferencesKeys.SMART_LINKS_CALENDAR_ENABLED] ?: true
+    }
+
+    suspend fun setSmartLinksCalendarEnabled(enabled: Boolean) {
+        dataStore.edit { it[PreferencesKeys.SMART_LINKS_CALENDAR_ENABLED] = enabled }
+    }
+
+    val smartLinksMapsEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[PreferencesKeys.SMART_LINKS_MAPS_ENABLED] ?: true
+    }
+
+    suspend fun setSmartLinksMapsEnabled(enabled: Boolean) {
+        dataStore.edit { it[PreferencesKeys.SMART_LINKS_MAPS_ENABLED] = enabled }
+    }
 }

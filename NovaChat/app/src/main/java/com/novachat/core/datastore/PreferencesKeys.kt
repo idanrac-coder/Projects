@@ -32,4 +32,6 @@ object PreferencesKeys {
     val THEME_MODE = stringPreferencesKey("theme_mode")
     val INSTALL_TIME = longPreferencesKey("install_time")
     val REVIEW_SHOWN = booleanPreferencesKey("review_shown")
+    val SMART_LINKS_CALENDAR_ENABLED = booleanPreferencesKey("smart_links_calendar_enabled")
+    val SMART_LINKS_MAPS_ENABLED = booleanPreferencesKey("smart_links_maps_enabled")
 }

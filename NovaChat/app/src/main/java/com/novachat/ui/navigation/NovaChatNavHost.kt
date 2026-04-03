@@ -25,6 +25,7 @@ import com.novachat.ui.notifications.NotificationSettingsScreen
 import com.novachat.ui.qr.QrContactScreen
 import com.novachat.ui.scheduled.ScheduledMessagesScreen
 import com.novachat.ui.search.SearchScreen
+import com.novachat.ui.settings.MessagingSettingsScreen
 import com.novachat.ui.settings.SettingsScreen
 import com.novachat.ui.swipe.SwipeActionsScreen
 import com.novachat.ui.themes.BackgroundsScreen
@@ -106,7 +107,14 @@ fun NovaChatNavHost(
                 onScheduledClick = { navController.navigate(ScheduledMessagesRoute) },
                 onArchivedClick = { navController.navigate(ArchivedConversationsRoute) },
                 onNotificationProfilesClick = { navController.navigate(NotificationProfilesRoute) },
-                onSmartSecureClick = { navController.navigate(SmartSecureRoute) }
+                onSmartSecureClick = { navController.navigate(SmartSecureRoute) },
+                onMessagingSettingsClick = { navController.navigate(MessagingSettingsRoute) }
+            )
+        }
+
+        composable<MessagingSettingsRoute> {
+            MessagingSettingsScreen(
+                onBack = { navController.popBackStack() }
             )
         }
 

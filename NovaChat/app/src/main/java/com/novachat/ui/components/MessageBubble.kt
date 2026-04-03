@@ -103,6 +103,8 @@ fun MessageBubble(
     scamAnalysis: ScamAnalysis? = null,
     transcription: String? = null,
     isTranscribing: Boolean = false,
+    calendarLinksEnabled: Boolean = true,
+    mapsLinksEnabled: Boolean = true,
     onTranscribe: ((Long, String) -> Unit)? = null,
     onLongClick: () -> Unit = {},
     onReactionClick: (String) -> Unit = {},
@@ -233,7 +235,9 @@ fun MessageBubble(
                     } else {
                         val uriHandler = LocalUriHandler.current
                         val context = LocalContext.current
-                        val formatted = remember(message.body) { parseFormattedText(message.body) }
+                        val formatted = remember(message.body, calendarLinksEnabled, mapsLinksEnabled) {
+                            parseFormattedText(message.body, calendarLinksEnabled, mapsLinksEnabled)
+                        }
                         val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
                         val isSuspicious = scamAnalysis != null && scamAnalysis.isScam
                         Text(
@@ -433,7 +437,11 @@ private fun ScamWarningBanner(
 private val SHORT_CODE_REGEX = Regex("\\b\\d{4,6}\\b")
 private val PHONE_REGEX = Regex("(?<!\\w)(?:\\+?\\d[\\d()\\s.-]{7,}\\d)")
 
-fun parseFormattedText(text: String): AnnotatedString {
+fun parseFormattedText(
+    text: String,
+    calendarLinksEnabled: Boolean = true,
+    mapsLinksEnabled: Boolean = true
+): AnnotatedString {
     val builder = AnnotatedString.Builder()
     var i = 0
     while (i < text.length) {
@@ -575,7 +583,12 @@ fun parseFormattedText(text: String): AnnotatedString {
     }
 
     val allExcluded = urlRanges + phoneRanges + shortCodeRanges
-    val smartLinks = SmartLinkDetector.detect(resultText, allExcluded)
+    val smartLinks = SmartLinkDetector.detect(resultText, allExcluded).filter { link ->
+        when (link.type) {
+            SmartLinkType.DATE_TIME -> calendarLinksEnabled
+            SmartLinkType.ADDRESS -> mapsLinksEnabled
+        }
+    }
     for (link in smartLinks) {
         val tag = when (link.type) {
             SmartLinkType.DATE_TIME -> "SMART_DATE"

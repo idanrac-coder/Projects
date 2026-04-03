@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.RateReview
@@ -77,10 +78,9 @@ fun SettingsScreen(
     onArchivedClick: () -> Unit = {},
     onNotificationProfilesClick: () -> Unit = {},
     onSmartSecureClick: () -> Unit = {},
+    onMessagingSettingsClick: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
-    val whatsAppForwardEnabled by viewModel.whatsAppForwardEnabled.collectAsStateWithLifecycle()
-    val undoSendEnabled by viewModel.undoSendEnabled.collectAsStateWithLifecycle()
     val isPremium by viewModel.isPremium.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
@@ -219,18 +219,11 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column {
-                    SettingsToggleItem(
-                        title = "Undo send",
-                        subtitle = "Allow undoing a sent message for a few seconds",
-                        checked = undoSendEnabled,
-                        onCheckedChange = { viewModel.setUndoSendEnabled(it) }
-                    )
-                    SettingsDivider()
-                    SettingsToggleItem(
-                        title = "Forward SMS to WhatsApp",
-                        subtitle = "Auto-forward contact SMS to WhatsApp",
-                        checked = whatsAppForwardEnabled,
-                        onCheckedChange = { viewModel.setWhatsAppForwardEnabled(it) }
+                    SettingsItem(
+                        icon = Icons.Default.ChatBubbleOutline,
+                        title = "Messaging Settings",
+                        subtitle = "Undo send, smart links & forwarding",
+                        onClick = onMessagingSettingsClick
                     )
                     SettingsDivider()
                     SettingsItem(
