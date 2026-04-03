@@ -1,5 +1,1 @@
-The "Why was this flagged?" sheet in Blocked / Spam is now much cleaner:
-
-- Spam score only appears for messages caught by our AI filters — no more misleading zeros
-- Reasons are shown in plain language instead of technical codes
-- Rule-based blocks (number, keyword, sender) show a clear explanation of why the message was blocked
+Bug fixes and performance improvements.

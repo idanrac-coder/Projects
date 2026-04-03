@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.32.5] - 2026-04-03
+
+### Fixed
+- Corrected the "Send Feedback" email address in Settings to the right contact address
+
 ## [3.32.4] - 2026-04-03
 
 ### Changed

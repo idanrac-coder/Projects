@@ -306,13 +306,13 @@ fun SettingsScreen(
                         subtitle = "Report bugs or suggest features",
                         onClick = {
                             val intent = Intent(Intent.ACTION_SENDTO).apply {
-                                data = Uri.parse("mailto:novachat.feedback@gmail.com")
+                                data = Uri.parse("mailto:iracsoftware@gmail.com")
                                 putExtra(Intent.EXTRA_SUBJECT, "Aura Feedback v${BuildConfig.VERSION_NAME}")
                             }
                             try {
                                 context.startActivity(intent)
                             } catch (_: Exception) {
-                                val fallback = Intent(Intent.ACTION_VIEW, Uri.parse("mailto:novachat.feedback@gmail.com"))
+                                val fallback = Intent(Intent.ACTION_VIEW, Uri.parse("mailto:iracsoftware@gmail.com"))
                                 try { context.startActivity(fallback) } catch (_: Exception) { }
                             }
                         }
