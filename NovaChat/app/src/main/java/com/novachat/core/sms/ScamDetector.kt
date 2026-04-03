@@ -94,7 +94,7 @@ class ScamDetector @Inject constructor(
         val description: String
     )
 
-    private val rules: List<PatternRule> = listOf(
+    private val rules: List<PatternRule> by lazy { listOf(
         // ── Phishing ─────────────────────────────────────────────────────
         PatternRule(Regex("(?i)your\\s+account\\s+(has been|is|was)\\s+(suspend|block|lock|compromis|restrict|deactivat|limit)"), ScamCategory.PHISHING, 0.82f, "Account suspension phishing"),
         PatternRule(Regex("(?i)verify\\s+your\\s+(identity|account|bank|card|details|information)\\s*(immediately|now|urgently|within)"), ScamCategory.PHISHING, 0.84f, "Identity verification phishing"),
@@ -420,7 +420,7 @@ class ScamDetector @Inject constructor(
         PatternRule(Regex("להסדיר\\s*את\\s*התשלומ"), ScamCategory.SERVICE_IMPERSONATION, 0.78f, "Hebrew: settle the payment"),
         PatternRule(Regex("חיוב\\s*נוספ.*אגרות|אגרות\\s*נוספות"), ScamCategory.SERVICE_IMPERSONATION, 0.78f, "Hebrew: additional charges/fees"),
         PatternRule(Regex("(כביש|אגרה|אגרת|דרכ).*לשלמ.*קישור"), ScamCategory.SERVICE_IMPERSONATION, 0.82f, "Hebrew: toll + payment link combo"),
-    )
+    ) }
 
     // ── Analysis ─────────────────────────────────────────────────────────
 

@@ -32,10 +32,10 @@ class NovaChatApplication : Application(), Configuration.Provider {
     lateinit var conversationRepository: ConversationRepository
 
     @Inject
-    lateinit var smsNotificationHandler: SmsNotificationHandler
+    lateinit var smsNotificationHandler: dagger.Lazy<SmsNotificationHandler>
 
     @Inject
-    lateinit var smsProvider: SmsProvider
+    lateinit var smsProvider: dagger.Lazy<SmsProvider>
 
     private var smsObserver: ContentObserver? = null
     private val appScope = CoroutineScope(
@@ -96,24 +96,24 @@ class NovaChatApplication : Application(), Configuration.Provider {
 
     private suspend fun processProviderInsertedMessages(uri: Uri?) {
         val candidateIds = when {
-            uri == null -> smsProvider.getRecentInboxMessageIds(5000L)
+            uri == null -> smsProvider.get().getRecentInboxMessageIds(5000L)
             uri == Telephony.Sms.CONTENT_URI || uri.toString() == "content://mms-sms/" ->
-                smsProvider.getRecentInboxMessageIds(5000L)
+                smsProvider.get().getRecentInboxMessageIds(5000L)
             else -> {
                 try {
                     val id = ContentUris.parseId(uri)
                     listOf(id)
                 } catch (_: Exception) {
-                    smsProvider.getRecentInboxMessageIds(5000L)
+                    smsProvider.get().getRecentInboxMessageIds(5000L)
                 }
             }
         }
 
         for (messageId in candidateIds) {
-            if (smsProvider.wasInsertedByUs(messageId)) continue
-            val info = smsProvider.getInboxMessageById(messageId) ?: continue
+            if (smsProvider.get().wasInsertedByUs(messageId)) continue
+            val info = smsProvider.get().getInboxMessageById(messageId) ?: continue
             if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "~~~ processProviderInsertedMessages: processing messageId=$messageId address=${info.address}")
-            smsNotificationHandler.handleProviderInsertedIncomingMessage(
+            smsNotificationHandler.get().handleProviderInsertedIncomingMessage(
                 address = info.address,
                 body = info.body,
                 timestamp = info.timestamp,

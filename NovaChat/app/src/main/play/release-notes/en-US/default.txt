@@ -1,5 +1,5 @@
-New Messaging Settings screen for easier control over your messaging preferences.
+Faster app startup and smoother screen transitions!
 
-You can now disable Calendar and Maps smart links individually in Settings.
-
-Fixed address detection in Hebrew messages — only actual addresses are highlighted, no more false positives on regular text.
+- App opens noticeably faster — heavy background work is now deferred until needed
+- Opening a chat is snappier — messages appear instantly while spam checks run in the background
+- Reduced unnecessary work when switching between screens

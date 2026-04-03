@@ -187,23 +187,29 @@ class ChatViewModel @Inject constructor(
                     conversationRepository.markThreadAsRead(threadId)
                 }
                 val pinnedMsgs = messages.filter { it.isPinned }
-                val quickReplyOn = userPreferencesRepository.quickReplyEnabled.first()
-                val smartReplies = if (quickReplyOn) generateSmartReplies(messages) else emptyList()
                 val editedIds = conversationRepository.getEditedMessageIds(messages.map { it.id })
                 val enrichedMessages = messages.map { msg ->
                     if (msg.id in editedIds) msg.copy(isEdited = true) else msg
                 }
+                _uiState.value = _uiState.value.copy(
+                    messages = enrichedMessages,
+                    isLoading = false,
+                    pinnedMessages = pinnedMsgs,
+                    error = null
+                )
+
+                val quickReplyOn = userPreferencesRepository.quickReplyEnabled.first()
+                if (quickReplyOn) {
+                    val smartReplies = generateSmartReplies(enrichedMessages)
+                    _uiState.value = _uiState.value.copy(smartReplies = smartReplies)
+                }
+
                 val scamWarnings = analyzeForScams(enrichedMessages)
                 val senderAddress = enrichedMessages.firstOrNull { it.type == MessageType.RECEIVED }?.address
                 val allowlisted = if (senderAddress != null) scamDetector.isAllowlisted(senderAddress) else false
                 _uiState.value = _uiState.value.copy(
-                    messages = enrichedMessages,
-                    isLoading = false,
-                    smartReplies = smartReplies,
-                    pinnedMessages = pinnedMsgs,
                     scamWarnings = scamWarnings,
-                    isSenderAllowlisted = allowlisted,
-                    error = null
+                    isSenderAllowlisted = allowlisted
                 )
             } catch (e: Exception) {
                 val stillEmpty = _uiState.value.messages.isEmpty()

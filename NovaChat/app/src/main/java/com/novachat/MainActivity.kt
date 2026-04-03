@@ -144,8 +144,11 @@ class MainActivity : ComponentActivity() {
 
         handleNotificationIntent(intent)
         bubbleNotificationHelper.createBubbleChannel()
-        ScheduledMessageWorker.enqueue(this)
-        SpamLearningDecayWorker.enqueue(this)
+        val activity = this
+        window.decorView.post {
+            ScheduledMessageWorker.enqueue(activity)
+            SpamLearningDecayWorker.enqueue(activity)
+        }
 
         setContent {
             val themeMode by userPreferencesRepository.themeMode
@@ -162,8 +165,12 @@ class MainActivity : ComponentActivity() {
             }
             val useSystemTheme = themeMode == "system"
 
-            LaunchedEffect(activeThemeId) {
+            var themeSeeded by remember { mutableStateOf(false) }
+            LaunchedEffect(Unit) {
                 themeRepository.seedBuiltInThemes()
+                themeSeeded = true
+            }
+            LaunchedEffect(activeThemeId, themeSeeded) {
                 activeTheme = themeRepository.getThemeById(activeThemeId)
             }
 

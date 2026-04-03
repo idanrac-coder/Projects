@@ -3,6 +3,17 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.32.2] - 2026-04-03
+
+### Fixed
+- App startup time significantly reduced by lazy-initializing ScamDetector's 251 regex patterns instead of compiling them on the main thread during Hilt graph construction
+- Defer SmsNotificationHandler and SmsProvider construction via dagger.Lazy — entire spam pipeline no longer built during Application.onCreate
+- Defer WorkManager enqueue calls (ScheduledMessageWorker, SpamLearningDecayWorker) to after first frame render
+- Separate theme seeding from theme loading — app shows theme immediately without waiting for seedBuiltInThemes() DB check
+- Screen transition lag when opening a chat — messages now display immediately, scam analysis and smart replies load in background
+- Remove redundant invalidateAllCaches() call in ConversationsViewModel refresh observer (already called by repository)
+- Remove per-conversation debug logging loop that caused jitter on large inboxes
+
 ## [3.32.1] - 2026-04-03
 
 ### Fixed

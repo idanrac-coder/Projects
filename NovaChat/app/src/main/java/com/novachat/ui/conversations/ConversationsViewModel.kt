@@ -105,8 +105,7 @@ class ConversationsViewModel @Inject constructor(
         viewModelScope.launch {
             if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "@@@ ConvVM: observeIncomingMessages() STARTED collecting")
             conversationRepository.refreshTrigger.collect { threadId ->
-                if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "@@@ ConvVM: refreshTrigger RECEIVED threadId=$threadId -> invalidateAllCaches + loadConversations")
-                conversationRepository.invalidateAllCaches()
+                if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "@@@ ConvVM: refreshTrigger RECEIVED threadId=$threadId -> loadConversations")
                 loadConversations()
             }
         }
@@ -173,9 +172,6 @@ class ConversationsViewModel @Inject constructor(
                 val conversations = conversationRepository.getConversations()
                     .filter { !it.isArchived }
                 if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "@@@ ConvVM: loadConversations() got ${conversations.size} non-archived conversations")
-                if (BuildConfig.DEBUG) conversations.forEach { c ->
-                    Log.d("NC_DEBUG", "@@@ ConvVM:   thread=${c.threadId} addr=${c.address} snippet=${c.snippet.take(20)} unread=${c.unreadCount}")
-                }
                 val latest = _uiState.value
                 val filtered = filterConversations(
                     conversations, latest.selectedCategory,
