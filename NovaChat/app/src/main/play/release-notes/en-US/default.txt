@@ -1,3 +1,5 @@
-Blocked / Spam folder: the "Why was this flagged?" sheet now shows the real spam score when we have one, and no longer shows a misleading zero for number or keyword blocks.
+The "Why was this flagged?" sheet in Blocked / Spam is now much cleaner:
 
-The score bar also reads left-to-right like the numbers, including in Hebrew.
+- Spam score only appears for messages caught by our AI filters — no more misleading zeros
+- Reasons are shown in plain language instead of technical codes
+- Rule-based blocks (number, keyword, sender) show a clear explanation of why the message was blocked

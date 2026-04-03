@@ -16,12 +16,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Analytics
-import androidx.compose.material.icons.filled.BugReport
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Psychology
-import androidx.compose.material.icons.filled.Rule
+import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Report
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -35,18 +37,14 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
-/**
- * "Why was this flagged?" bottom sheet for spam messages.
- * Parses the matchedRuleType string into a human-readable breakdown.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SpamDetailSheet(
@@ -58,6 +56,10 @@ fun SpamDetailSheet(
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val isRuleBasedBlock = matchedRuleType in setOf(
+        "NUMBER", "SENDER_NAME", "KEYWORD", "LANGUAGE",
+        "INTERNATIONAL_FILTER", "SCAM_REPORT"
+    )
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -85,18 +87,18 @@ fun SpamDetailSheet(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "Spam Score",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    if (score != null) {
+            if (!isRuleBasedBlock && score != null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Spam Score",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                         Text(
                             text = "$score / 100",
                             style = MaterialTheme.typography.headlineSmall,
@@ -107,22 +109,7 @@ fun SpamDetailSheet(
                                 else -> MaterialTheme.colorScheme.primary
                             }
                         )
-                    } else {
-                        Text(
-                            text = "Not available",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "No model score for this entry (blocked by number, keyword, or manual action).",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
                     }
-                }
-                if (score != null) {
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                         LinearProgressIndicator(
                             progress = { score / 100f },
@@ -139,24 +126,23 @@ fun SpamDetailSheet(
                         )
                     }
                 }
+                Spacer(modifier = Modifier.height(20.dp))
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
             Text(
-                text = "Detection Signals",
+                text = "Reason",
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
             )
             Spacer(modifier = Modifier.height(8.dp))
 
-            val signals = parseMatchedRuleType(matchedRuleType)
-            signals.forEach { signal ->
-                SignalRow(
-                    icon = signal.icon,
-                    label = signal.label,
-                    detail = signal.detail,
-                    iconTint = signal.color
+            val reasons = buildReasons(matchedRuleType)
+            reasons.forEach { reason ->
+                ReasonRow(
+                    icon = reason.icon,
+                    label = reason.label,
+                    detail = reason.detail,
+                    iconTint = reason.color
                 )
                 Spacer(modifier = Modifier.height(6.dp))
             }
@@ -188,7 +174,7 @@ fun SpamDetailSheet(
 }
 
 @Composable
-private fun SignalRow(
+private fun ReasonRow(
     icon: ImageVector,
     label: String,
     detail: String,
@@ -213,7 +199,11 @@ private fun SignalRow(
         }
         Spacer(modifier = Modifier.width(10.dp))
         Column {
-            Text(text = label, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium
+            )
             Text(
                 text = detail,
                 style = MaterialTheme.typography.bodySmall,
@@ -223,102 +213,197 @@ private fun SignalRow(
     }
 }
 
-private data class DetectionSignal(
+private data class ReasonInfo(
     val icon: ImageVector,
     val label: String,
     val detail: String,
     val color: Color
 )
 
-private fun parseMatchedRuleType(ruleType: String): List<DetectionSignal> {
-    val signals = mutableListOf<DetectionSignal>()
+private fun buildReasons(ruleType: String): List<ReasonInfo> {
+    val stripped = ruleType.replace(Regex("\\|SCORE_\\d+$"), "")
 
-    when {
-        ruleType.startsWith("SCAM:") -> {
-            val category = ruleType.removePrefix("SCAM:")
-            signals.add(
-                DetectionSignal(
-                    Icons.Default.BugReport, "Scam Pattern",
-                    formatCategory(category), Color(0xFFE53935)
+    return when {
+        stripped == "NUMBER" -> listOf(
+            ReasonInfo(
+                Icons.Default.Block, "Number blocked",
+                "This number is on your block list.",
+                Color(0xFFE53935)
+            )
+        )
+        stripped == "SENDER_NAME" -> listOf(
+            ReasonInfo(
+                Icons.Default.Person, "Sender blocked",
+                "This sender name is on your block list.",
+                Color(0xFFE53935)
+            )
+        )
+        stripped == "KEYWORD" -> listOf(
+            ReasonInfo(
+                Icons.Default.TextFields, "Keyword match",
+                "The message contains a word or phrase you've blocked.",
+                Color(0xFFE53935)
+            )
+        )
+        stripped == "LANGUAGE" -> listOf(
+            ReasonInfo(
+                Icons.Default.Language, "Language filtered",
+                "The message is in a language you've chosen to block.",
+                Color(0xFFFF9800)
+            )
+        )
+        stripped == "INTERNATIONAL_FILTER" -> listOf(
+            ReasonInfo(
+                Icons.Default.Public, "International number",
+                "This message came from a foreign number and your international filter is on.",
+                Color(0xFFFF9800)
+            )
+        )
+        stripped == "SCAM_REPORT" -> listOf(
+            ReasonInfo(
+                Icons.Default.Report, "Reported as spam",
+                "You or other users reported this number as spam.",
+                Color(0xFFE53935)
+            )
+        )
+        stripped.startsWith("SCAM:") -> {
+            val category = stripped.removePrefix("SCAM:")
+            listOf(
+                ReasonInfo(
+                    Icons.Default.Shield, "Scam detected",
+                    formatScamCategory(category),
+                    Color(0xFFE53935)
                 )
             )
         }
-        ruleType.startsWith("DET_RAW:") || ruleType.startsWith("DET:") -> {
-            val det = ruleType.removePrefix("DET_RAW:").removePrefix("DET:")
-            signals.add(
-                DetectionSignal(
-                    Icons.Default.Rule, "Pattern Match",
-                    formatCategory(det), Color(0xFFFF9800)
-                )
+        stripped.startsWith("SPAM_AGENT:") -> listOf(
+            ReasonInfo(
+                Icons.Default.Psychology, "AI flagged",
+                stripped.removePrefix("SPAM_AGENT:").replace('_', ' ')
+                    .lowercase().replaceFirstChar { it.uppercase() } + ".",
+                Color(0xFF1E88E5)
             )
-        }
-        ruleType.startsWith("HEBREW:") -> {
-            val reason = ruleType.removePrefix("HEBREW:")
-            signals.add(
-                DetectionSignal(
-                    Icons.Default.TextFields, "Hebrew Analysis",
-                    reason.replace('_', ' '), Color(0xFF1E88E5)
-                )
-            )
-        }
-        ruleType.startsWith("HEUR:") -> {
-            val parts = ruleType.removePrefix("HEUR:").split("+")
-            parts.forEach { part ->
-                val (key, value) = if ("=" in part) {
-                    val s = part.split("=")
-                    s[0] to s.getOrElse(1) { "" }
-                } else part to ""
-                val (icon, label, color) = when (key) {
-                    "sender_unknown" -> Triple(Icons.Default.Person, "Unknown Sender", Color(0xFFFF9800))
-                    "contains_url" -> Triple(Icons.Default.Link, "Contains URL", Color(0xFFE53935))
-                    "otp_verify" -> Triple(Icons.Default.TextFields, "Verification Code", Color(0xFF1E88E5))
-                    "high_special_chars" -> Triple(Icons.Default.TextFields, "Suspicious Characters", Color(0xFF7B1FA2))
-                    "deterministic" -> Triple(Icons.Default.Rule, "Pattern Match", Color(0xFFFF9800))
-                    else -> Triple(Icons.Default.Analytics, key.replace('_', ' '), Color(0xFF757575))
-                }
-                signals.add(DetectionSignal(icon, label, "+$value points", color))
-            }
-        }
-        ruleType.startsWith("SPAM_FILTER:") -> {
-            val inner = ruleType.removePrefix("SPAM_FILTER:").replace(Regex("\\|SCORE_\\d+$"), "")
-            signals.add(
-                DetectionSignal(
-                    Icons.Default.Psychology, "AI Classification",
-                    inner, Color(0xFF1E88E5)
-                )
-            )
-        }
-        ruleType.startsWith("INBOX_SCAN:") -> {
-            val inner = ruleType.removePrefix("INBOX_SCAN:").replace(Regex("\\|SCORE_\\d+$"), "")
-            signals.add(
-                DetectionSignal(
-                    Icons.Default.Psychology, "Inbox scan",
-                    inner, Color(0xFF1E88E5)
-                )
-            )
-        }
-    }
-
-    if (signals.isEmpty()) {
-        signals.add(
-            DetectionSignal(
-                Icons.Default.Analytics, "Classification",
-                ruleType.replace('_', ' '), Color(0xFF757575)
+        )
+        stripped.startsWith("SPAM_FILTER:") -> buildSpamFilterReasons(stripped.removePrefix("SPAM_FILTER:"))
+        stripped.startsWith("INBOX_SCAN:") -> buildSpamFilterReasons(stripped.removePrefix("INBOX_SCAN:"))
+        else -> listOf(
+            ReasonInfo(
+                Icons.Default.Shield, "Blocked",
+                stripped.replace('_', ' ').lowercase().replaceFirstChar { it.uppercase() } + ".",
+                Color(0xFF757575)
             )
         )
     }
-
-    return signals
 }
 
-private fun formatCategory(category: String): String = category
-    .replace('_', ' ')
-    .lowercase()
-    .replaceFirstChar { it.uppercase() }
+private fun buildSpamFilterReasons(inner: String): List<ReasonInfo> {
+    val cleaned = inner.replace(Regex("\\|SCORE_\\d+$"), "")
+
+    return when {
+        cleaned.startsWith("DET:") -> {
+            val det = cleaned.removePrefix("DET:")
+            listOf(
+                ReasonInfo(
+                    Icons.Default.Shield, "Suspicious content",
+                    formatDetReason(det),
+                    Color(0xFFFF9800)
+                )
+            )
+        }
+        cleaned.startsWith("HEUR:") -> {
+            val parts = cleaned.removePrefix("HEUR:").split("+")
+            parts.map { part ->
+                val key = if ("=" in part) part.substringBefore("=") else part
+                heuristicToReason(key)
+            }
+        }
+        cleaned.startsWith("HEBREW:") -> {
+            val reason = cleaned.removePrefix("HEBREW:")
+            listOf(
+                ReasonInfo(
+                    Icons.Default.TextFields, "Content analysis",
+                    formatHebrewReason(reason),
+                    Color(0xFF1E88E5)
+                )
+            )
+        }
+        cleaned.startsWith("SCORE_") -> listOf(
+            ReasonInfo(
+                Icons.Default.Psychology, "Spam detected",
+                "Our filters flagged this message as spam.",
+                Color(0xFF1E88E5)
+            )
+        )
+        else -> listOf(
+            ReasonInfo(
+                Icons.Default.Psychology, "Spam detected",
+                "Our filters flagged this message as spam.",
+                Color(0xFF1E88E5)
+            )
+        )
+    }
+}
+
+private fun heuristicToReason(key: String): ReasonInfo = when (key) {
+    "sender_unknown" -> ReasonInfo(
+        Icons.Default.Person, "Unknown sender",
+        "The sender is not in your contacts.",
+        Color(0xFFFF9800)
+    )
+    "contains_url" -> ReasonInfo(
+        Icons.Default.Link, "Contains a link",
+        "The message includes a URL, which is common in spam.",
+        Color(0xFFE53935)
+    )
+    "otp_verify" -> ReasonInfo(
+        Icons.Default.TextFields, "Fake verification code",
+        "The message looks like a fraudulent verification request.",
+        Color(0xFFE53935)
+    )
+    "high_special_chars" -> ReasonInfo(
+        Icons.Default.TextFields, "Unusual formatting",
+        "The message has an unusual amount of special characters.",
+        Color(0xFF7B1FA2)
+    )
+    "deterministic" -> ReasonInfo(
+        Icons.Default.Shield, "Known spam pattern",
+        "The message matches a known spam template.",
+        Color(0xFFFF9800)
+    )
+    else -> ReasonInfo(
+        Icons.Default.Shield, key.replace('_', ' ').replaceFirstChar { it.uppercase() },
+        "Flagged by our spam filters.",
+        Color(0xFF757575)
+    )
+}
+
+private fun formatDetReason(det: String): String = when (det) {
+    "SHORTENED_URL" -> "The message contains a shortened link that could hide a malicious destination."
+    "SUSPICIOUS_TLD" -> "The message links to a website with a suspicious domain."
+    "IP_URL" -> "The message contains a direct IP address link, often used in phishing."
+    "URGENT_KEYWORDS" -> "The message uses urgency tactics commonly found in scam messages."
+    "OTP_VERIFY_EN", "OTP_VERIFY_HE" -> "The message looks like a fraudulent verification request."
+    else -> "The message contains content commonly found in spam."
+}
+
+private fun formatScamCategory(category: String): String = when (category.uppercase()) {
+    "SUSPICIOUS_LINK" -> "The message contains a link that appears unsafe."
+    "OTP_FRAUD" -> "The message looks like a fake verification or login code."
+    "FINANCIAL_SCAM" -> "The message appears to be a financial scam."
+    "PHISHING" -> "The message is trying to steal personal information."
+    "UNKNOWN" -> "The message matches known scam patterns."
+    else -> category.replace('_', ' ').lowercase().replaceFirstChar { it.uppercase() } + " detected."
+}
+
+private fun formatHebrewReason(reason: String): String {
+    val readable = reason.replace('_', ' ').lowercase()
+    return readable.replaceFirstChar { it.uppercase() } + "."
+}
 
 /**
- * Extracts a 0–100 spam score stored in [matchedRuleType], e.g. `SPAM_FILTER:SCORE_72`,
- * `SPAM_FILTER:SHORTENED_URL|SCORE_72`, or `INBOX_SCAN:HEUR:…|SCORE_50`.
+ * Extracts a 0-100 spam score embedded in [matchedRuleType].
+ * Looks for `|SCORE_nn` suffix first, then any `SCORE_nn` token.
+ * Returns null when no score is stored (rule-based blocks).
  */
 fun parseSpamScoreFromMatchedRuleType(matchedRuleType: String): Int? {
     Regex("\\|SCORE_(\\d+)$").find(matchedRuleType)?.groupValues?.getOrNull(1)

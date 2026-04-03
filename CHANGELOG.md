@@ -3,6 +3,13 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.32.4] - 2026-04-03
+
+### Changed
+- Blocked / Spam "Why was this flagged?" sheet redesigned — spam score + progress bar only shown for AI-detected spam; hidden entirely for rule-based blocks (number, keyword, sender, etc.)
+- Renamed "Detection Signals" to "Reason" with clean, human-readable sentences instead of raw system identifiers
+- Each rule type now shows a friendly explanation (e.g. "This number is on your block list" instead of "Classification: NUMBER")
+
 ## [3.32.3] - 2026-04-03
 
 ### Fixed
