@@ -706,48 +706,49 @@ fun ChatScreen(
                             .lastOrNull { id -> id in uiState.scamWarnings && id !in uiState.dismissedScamWarnings }
                     }
                     CompositionLocalProvider(LocalTextScale provides textScale) {
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 14.dp)
-                            .pointerInput(Unit) {
-                                detectTransformGestures { _, _, zoom, _ ->
-                                    textScale = (textScale * zoom).coerceIn(0.8f, 2.5f)
+                        LazyColumn(
+                            state = listState,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 14.dp)
+                                .pointerInput(Unit) {
+                                    detectTransformGestures { _, _, zoom, _ ->
+                                        textScale = (textScale * zoom).coerceIn(0.8f, 2.5f)
+                                    }
+                                },
+                            verticalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
+                            items(
+                                count = chatItems.size,
+                                key = { index ->
+                                    when (val item = chatItems[index]) {
+                                        is ChatListItem.DateHeader -> "date_${item.label}"
+                                        is ChatListItem.MessageRow -> item.message.id
+                                    }
+                                },
+                                contentType = { index ->
+                                    when (chatItems[index]) {
+                                        is ChatListItem.DateHeader -> 0
+                                        is ChatListItem.MessageRow -> 1
+                                    }
                                 }
-                            },
-                        verticalArrangement = Arrangement.spacedBy(2.dp)
-                    ) {
-                        items(
-                            count = chatItems.size,
-                            key = { index ->
+                            ) { index ->
                                 when (val item = chatItems[index]) {
-                                    is ChatListItem.DateHeader -> "date_${item.label}"
-                                    is ChatListItem.MessageRow -> item.message.id
-                                }
-                            },
-                            contentType = { index ->
-                                when (chatItems[index]) {
-                                    is ChatListItem.DateHeader -> 0
-                                    is ChatListItem.MessageRow -> 1
-                                }
-                            }
-                        ) { index ->
-                            when (val item = chatItems[index]) {
-                                is ChatListItem.DateHeader -> {
-                                    DateSeparator(label = item.label)
-                                }
-                                is ChatListItem.MessageRow -> {
-                                    SwipeableMessageItem(
-                                        message = item.message,
-                                        uiState = uiState,
-                                        showScamBannerForThisMessage = item.message.id == lastScamWarningMessageId,
-                                        hapticFeedback = hapticFeedback,
-                                        clipboardManager = clipboardManager,
-                                        context = context,
-                                        viewModel = viewModel,
-                                        onPhoneNumberClick = { phoneNumberDialogTarget = it }
-                                    )
+                                    is ChatListItem.DateHeader -> {
+                                        DateSeparator(label = item.label)
+                                    }
+                                    is ChatListItem.MessageRow -> {
+                                        SwipeableMessageItem(
+                                            message = item.message,
+                                            uiState = uiState,
+                                            showScamBannerForThisMessage = item.message.id == lastScamWarningMessageId,
+                                            hapticFeedback = hapticFeedback,
+                                            clipboardManager = clipboardManager,
+                                            context = context,
+                                            viewModel = viewModel,
+                                            onPhoneNumberClick = { phoneNumberDialogTarget = it }
+                                        )
+                                    }
                                 }
                             }
                         }
