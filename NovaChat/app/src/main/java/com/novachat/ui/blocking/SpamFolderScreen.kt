@@ -56,12 +56,17 @@ private fun formatMatchedRuleType(ruleType: String): String = when {
         ruleType == "KEYWORD" -> "Blocked by keyword"
         ruleType == "LANGUAGE" -> "Blocked by language"
         ruleType == "INTERNATIONAL_FILTER" -> "International filter"
-        ruleType.startsWith("SPAM_FILTER:") -> formatSpamFilterReason(ruleType.removePrefix("SPAM_FILTER:"))
+        ruleType.startsWith("SPAM_FILTER:") ->
+            formatSpamFilterReason(ruleType.removePrefix("SPAM_FILTER:"))
+        ruleType.startsWith("INBOX_SCAN:") ->
+            formatSpamFilterReason(ruleType.removePrefix("INBOX_SCAN:"))
         else -> ruleType
     }
 
-    private fun formatSpamFilterReason(inner: String): String = when {
-        inner.startsWith("DET:") -> when (val det = inner.removePrefix("DET:")) {
+    private fun formatSpamFilterReason(inner: String): String {
+        val cleaned = inner.replace(Regex("\\|SCORE_\\d+$"), "")
+        return when {
+        cleaned.startsWith("DET:") -> when (val det = cleaned.removePrefix("DET:")) {
             "SHORTENED_URL" -> "Shortened link"
             "SUSPICIOUS_TLD" -> "Suspicious website"
             "IP_URL" -> "Suspicious link"
@@ -69,8 +74,8 @@ private fun formatMatchedRuleType(ruleType: String): String = when {
             "OTP_VERIFY_EN", "OTP_VERIFY_HE" -> "Possible OTP scam"
             else -> "Suspicious content"
         }
-        inner.startsWith("HEUR:") -> {
-            val heur = inner.removePrefix("HEUR:")
+        cleaned.startsWith("HEUR:") -> {
+            val heur = cleaned.removePrefix("HEUR:")
             when {
                 heur.contains("contains_url") -> "Suspicious link"
                 heur.contains("otp_verify") -> "Possible OTP scam"
@@ -79,8 +84,9 @@ private fun formatMatchedRuleType(ruleType: String): String = when {
                 else -> "Spam detected"
             }
         }
-        inner.startsWith("SCORE_") -> "Spam detected"
+        cleaned.startsWith("SCORE_") -> "Spam detected"
         else -> "Blocked as spam"
+    }
     }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -227,7 +233,7 @@ fun SpamFolderScreen(
             SpamDetailSheet(
                 address = spam.address,
                 body = spam.body,
-                score = 0,
+                score = parseSpamScoreFromMatchedRuleType(spam.matchedRuleType),
                 matchedRuleType = spam.matchedRuleType,
                 timestamp = spam.timestamp,
                 onDismiss = { detailMessage = null }

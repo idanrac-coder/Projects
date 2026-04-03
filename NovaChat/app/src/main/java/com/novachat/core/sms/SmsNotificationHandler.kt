@@ -170,6 +170,13 @@ class SmsNotificationHandler @Inject constructor(
             }
             if (spamClassificationResult?.classification == SpamFilter.SpamClassification.SPAM) {
                 if (BuildConfig.DEBUG) Log.d(TAG, "Spam filter: score=${spamClassificationResult.score} rule=${spamClassificationResult.matchedRuleType}, moving to Shadow Inbox")
+                val inner = spamClassificationResult.matchedRuleType
+                    ?: "SCORE_${spamClassificationResult.score}"
+                val spamPayload = if (spamClassificationResult.matchedRuleType != null) {
+                    "$inner|SCORE_${spamClassificationResult.score}"
+                } else {
+                    inner
+                }
                 spamMessageDao.insertSpamMessage(
                     SpamMessageEntity(
                         smsId = System.currentTimeMillis(),
@@ -177,7 +184,7 @@ class SmsNotificationHandler @Inject constructor(
                         body = body,
                         timestamp = timestamp,
                         matchedRuleId = -1,
-                        matchedRuleType = "SPAM_FILTER:${spamClassificationResult.matchedRuleType ?: "SCORE_${spamClassificationResult.score}"}"
+                        matchedRuleType = "SPAM_FILTER:$spamPayload"
                     )
                 )
                 spamFilter.reportSpam(address, body, ScamCategory.SUSPICIOUS_LINK)
@@ -343,6 +350,13 @@ class SmsNotificationHandler @Inject constructor(
         }
         if (spamClassificationResult?.classification == SpamFilter.SpamClassification.SPAM) {
             if (BuildConfig.DEBUG) Log.d(TAG, "Provider-inserted spam filter: score=${spamClassificationResult.score} rule=${spamClassificationResult.matchedRuleType}, moving to Shadow Inbox messageId=$messageId")
+            val inner = spamClassificationResult.matchedRuleType
+                ?: "SCORE_${spamClassificationResult.score}"
+            val spamPayload = if (spamClassificationResult.matchedRuleType != null) {
+                "$inner|SCORE_${spamClassificationResult.score}"
+            } else {
+                inner
+            }
             spamMessageDao.insertSpamMessage(
                 SpamMessageEntity(
                     smsId = System.currentTimeMillis(),
@@ -350,7 +364,7 @@ class SmsNotificationHandler @Inject constructor(
                     body = body,
                     timestamp = timestamp,
                     matchedRuleId = -1,
-                    matchedRuleType = "SPAM_FILTER:${spamClassificationResult.matchedRuleType ?: "SCORE_${spamClassificationResult.score}"}"
+                    matchedRuleType = "SPAM_FILTER:$spamPayload"
                 )
             )
             spamFilter.reportSpam(address, body, ScamCategory.SUSPICIOUS_LINK)

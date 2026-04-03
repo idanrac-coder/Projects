@@ -1,5 +1,3 @@
-Faster app startup and smoother screen transitions!
+Blocked / Spam folder: the "Why was this flagged?" sheet now shows the real spam score when we have one, and no longer shows a misleading zero for number or keyword blocks.
 
-- App opens noticeably faster — heavy background work is now deferred until needed
-- Opening a chat is snappier — messages appear instantly while spam checks run in the background
-- Reduced unnecessary work when switching between screens
+The score bar also reads left-to-right like the numbers, including in Hebrew.

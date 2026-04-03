@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.32.3] - 2026-04-03
+
+### Fixed
+- Blocked / Spam detail sheet showed a wrong spam score (always 0) and the progress bar could look reversed in RTL — score is now read from stored metadata, new spam rows keep the classifier score alongside rule names, and rule-only blocks show "Not available" instead of a fake zero
+
 ## [3.32.2] - 2026-04-03
 
 ### Fixed

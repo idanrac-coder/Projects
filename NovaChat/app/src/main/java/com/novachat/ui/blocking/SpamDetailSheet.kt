@@ -31,9 +31,12 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -49,7 +52,7 @@ import androidx.compose.ui.unit.dp
 fun SpamDetailSheet(
     address: String,
     body: String,
-    score: Int,
+    score: Int?,
     matchedRuleType: String,
     timestamp: Long,
     onDismiss: () -> Unit
@@ -93,30 +96,49 @@ fun SpamDetailSheet(
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Text(
-                        text = "$score / 100",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = when {
-                            score > 75 -> MaterialTheme.colorScheme.error
-                            score >= 55 -> Color(0xFFFF9800)
-                            else -> MaterialTheme.colorScheme.primary
-                        }
-                    )
+                    if (score != null) {
+                        Text(
+                            text = "$score / 100",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = when {
+                                score > 75 -> MaterialTheme.colorScheme.error
+                                score >= 55 -> Color(0xFFFF9800)
+                                else -> MaterialTheme.colorScheme.primary
+                            }
+                        )
+                    } else {
+                        Text(
+                            text = "Not available",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "No model score for this entry (blocked by number, keyword, or manual action).",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
-                LinearProgressIndicator(
-                    progress = { score / 100f },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(8.dp)
-                        .clip(RoundedCornerShape(4.dp)),
-                    color = when {
-                        score > 75 -> MaterialTheme.colorScheme.error
-                        score >= 55 -> Color(0xFFFF9800)
-                        else -> MaterialTheme.colorScheme.primary
-                    },
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                )
+                if (score != null) {
+                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                        LinearProgressIndicator(
+                            progress = { score / 100f },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(8.dp)
+                                .clip(RoundedCornerShape(4.dp)),
+                            color = when {
+                                score > 75 -> MaterialTheme.colorScheme.error
+                                score >= 55 -> Color(0xFFFF9800)
+                                else -> MaterialTheme.colorScheme.primary
+                            },
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -258,10 +280,20 @@ private fun parseMatchedRuleType(ruleType: String): List<DetectionSignal> {
             }
         }
         ruleType.startsWith("SPAM_FILTER:") -> {
+            val inner = ruleType.removePrefix("SPAM_FILTER:").replace(Regex("\\|SCORE_\\d+$"), "")
             signals.add(
                 DetectionSignal(
                     Icons.Default.Psychology, "AI Classification",
-                    ruleType.removePrefix("SPAM_FILTER:"), Color(0xFF1E88E5)
+                    inner, Color(0xFF1E88E5)
+                )
+            )
+        }
+        ruleType.startsWith("INBOX_SCAN:") -> {
+            val inner = ruleType.removePrefix("INBOX_SCAN:").replace(Regex("\\|SCORE_\\d+$"), "")
+            signals.add(
+                DetectionSignal(
+                    Icons.Default.Psychology, "Inbox scan",
+                    inner, Color(0xFF1E88E5)
                 )
             )
         }
@@ -283,3 +315,15 @@ private fun formatCategory(category: String): String = category
     .replace('_', ' ')
     .lowercase()
     .replaceFirstChar { it.uppercase() }
+
+/**
+ * Extracts a 0–100 spam score stored in [matchedRuleType], e.g. `SPAM_FILTER:SCORE_72`,
+ * `SPAM_FILTER:SHORTENED_URL|SCORE_72`, or `INBOX_SCAN:HEUR:…|SCORE_50`.
+ */
+fun parseSpamScoreFromMatchedRuleType(matchedRuleType: String): Int? {
+    Regex("\\|SCORE_(\\d+)$").find(matchedRuleType)?.groupValues?.getOrNull(1)
+        ?.toIntOrNull()
+        ?.let { return it.coerceIn(0, 100) }
+    val matches = Regex("SCORE_(\\d+)").findAll(matchedRuleType).map { it.groupValues[1] }.toList()
+    return matches.lastOrNull()?.toIntOrNull()?.coerceIn(0, 100)
+}

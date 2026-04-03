@@ -191,7 +191,15 @@ class InboxSpamScanViewModel @Inject constructor(
                             body = msg.body,
                             timestamp = msg.timestamp,
                             matchedRuleId = -1,
-                            matchedRuleType = "INBOX_SCAN:${msg.matchedRuleType ?: "SCORE_${msg.score}"}"
+                            matchedRuleType = run {
+                                val inner = msg.matchedRuleType ?: "SCORE_${msg.score}"
+                                val payload = if (msg.matchedRuleType != null) {
+                                    "$inner|SCORE_${msg.score}"
+                                } else {
+                                    inner
+                                }
+                                "INBOX_SCAN:$payload"
+                            }
                         )
                     )
                     smsProvider.deleteMessage(msg.smsId)
