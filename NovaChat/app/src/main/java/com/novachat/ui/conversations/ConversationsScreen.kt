@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -166,7 +167,8 @@ fun ConversationsScreen(
             ) {
                 BottomAppBar(
                     containerColor = MaterialTheme.colorScheme.inverseSurface,
-                    tonalElevation = 0.dp
+                    tonalElevation = 0.dp,
+                    modifier = Modifier.navigationBarsPadding()
                 ) {
                     IconButton(onClick = { viewModel.clearSelection() }) {
                         Icon(Icons.Default.Close, contentDescription = "Cancel", tint = MaterialTheme.colorScheme.inverseOnSurface)

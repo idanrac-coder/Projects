@@ -22,6 +22,7 @@ import com.novachat.core.datastore.UserPreferencesRepository
 import com.novachat.core.database.dao.SpamMessageDao
 import com.novachat.core.database.entity.SpamMessageEntity
 import com.novachat.core.sms.ml.PersonalSpamAdapter
+import com.novachat.core.voice.VoiceTranscriptionService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -63,7 +64,9 @@ data class ChatUiState(
     val senderBannerDismissed: Boolean = false,
     val editingMessage: Message? = null,
     val editHistoryEntries: List<MessageEdit> = emptyList(),
-    val showEditHistory: Boolean = false
+    val showEditHistory: Boolean = false,
+    val transcriptions: Map<Long, String> = emptyMap(),
+    val transcribingMessageIds: Set<Long> = emptySet()
 ) {
     val matchCount: Int get() = matchingMessageIds.size
     val activeMatchMessageId: Long? get() =
@@ -86,7 +89,8 @@ class ChatViewModel @Inject constructor(
     private val scamDetector: ScamDetector,
     private val spamFilter: SpamFilter,
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val personalSpamAdapter: PersonalSpamAdapter
+    private val personalSpamAdapter: PersonalSpamAdapter,
+    private val voiceTranscriptionService: VoiceTranscriptionService
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatUiState())
@@ -771,5 +775,22 @@ class ChatViewModel @Inject constructor(
 
     fun dismissEditHistory() {
         _uiState.value = _uiState.value.copy(showEditHistory = false, editHistoryEntries = emptyList())
+    }
+
+    fun transcribeVoiceMessage(messageId: Long, audioUri: String) {
+        if (_uiState.value.transcriptions.containsKey(messageId) ||
+            messageId in _uiState.value.transcribingMessageIds) return
+
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                transcribingMessageIds = _uiState.value.transcribingMessageIds + messageId
+            )
+            val result = voiceTranscriptionService.transcribe(messageId, audioUri)
+            val text = result.getOrNull() ?: "Transcription unavailable"
+            _uiState.value = _uiState.value.copy(
+                transcriptions = _uiState.value.transcriptions + (messageId to text),
+                transcribingMessageIds = _uiState.value.transcribingMessageIds - messageId
+            )
+        }
     }
 }

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.novachat.core.database.entity.ScanExcludedMessageEntity
 import com.novachat.core.database.entity.SenderAllowlistEntity
 import kotlinx.coroutines.flow.Flow
 import com.novachat.core.database.entity.SpamKeywordWeightEntity
@@ -60,4 +61,16 @@ interface SpamLearningDao {
 
     @Query("SELECT * FROM sender_allowlist ORDER BY createdAt DESC")
     fun observeAllowlist(): Flow<List<SenderAllowlistEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertScanExclusion(entity: ScanExcludedMessageEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertScanExclusions(entities: List<ScanExcludedMessageEntity>)
+
+    @Query("SELECT smsId FROM scan_excluded_messages")
+    suspend fun getExcludedSmsIds(): List<Long>
+
+    @Query("SELECT bodyHash FROM scan_excluded_messages")
+    suspend fun getExcludedBodyHashes(): List<Int>
 }

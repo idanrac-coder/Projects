@@ -3,6 +3,22 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.31.0] - 2026-04-03
+
+### Added
+- Smart link detection in message bubbles — tappable dates open Calendar, addresses open Maps (English and Hebrew patterns)
+- Pinch-to-zoom gesture on chat message list to scale text size (0.8x–2.5x)
+- Voice message transcription using Android SpeechRecognizer with cached results in Room
+- MMS message loading in chat threads — voice messages, images, and text parts now appear alongside SMS
+- "Not Spam" button on inbox scan results — flags false positives and excludes them from future scans
+- New `scan_excluded_messages` and `voice_transcriptions` Room tables with migrations (v15→v17)
+
+### Changed
+- Skip trusted senders (allowlisted + contacts) explicitly before calling classify() in inbox spam scan for better performance
+
+### Fixed
+- Bottom bar overlap with system gesture navigation on ConversationsScreen and InboxSpamScanScreen — add navigationBarsPadding()
+
 ## [3.30.0] - 2026-04-01
 
 ### Changed

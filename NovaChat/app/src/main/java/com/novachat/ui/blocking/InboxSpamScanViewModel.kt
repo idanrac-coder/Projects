@@ -3,9 +3,12 @@ package com.novachat.ui.blocking
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.novachat.core.database.dao.SpamLearningDao
 import com.novachat.core.database.dao.SpamMessageDao
+import com.novachat.core.database.entity.ScanExcludedMessageEntity
 import com.novachat.core.database.entity.SpamMessageEntity
 import com.novachat.core.sms.ContactResolver
+import com.novachat.core.sms.ScamDetector
 import com.novachat.core.sms.SmsProvider
 import com.novachat.core.sms.SpamFilter
 import com.novachat.domain.model.BlockRule
@@ -25,7 +28,7 @@ import javax.inject.Inject
 
 enum class ScanPhase { READY, SCANNING, REVIEW, PROCESSING, DONE }
 
-enum class ScanAction { MOVE_TO_SPAM, DELETE_PERMANENTLY }
+enum class ScanAction { MOVE_TO_SPAM, DELETE_PERMANENTLY, MARK_NOT_SPAM }
 
 data class ScannedSpamMessage(
     val smsId: Long,
@@ -55,7 +58,9 @@ class InboxSpamScanViewModel @Inject constructor(
     private val smsProvider: SmsProvider,
     private val spamFilter: SpamFilter,
     private val spamMessageDao: SpamMessageDao,
+    private val spamLearningDao: SpamLearningDao,
     private val contactResolver: ContactResolver,
+    private val scamDetector: ScamDetector,
     private val conversationRepository: ConversationRepository,
     private val blockRepository: BlockRepository
 ) : ViewModel() {
@@ -79,17 +84,27 @@ class InboxSpamScanViewModel @Inject constructor(
                 contactResolver.preloadContacts()
                 val inboxMessages = smsProvider.getInboxMessages()
                 val alreadyBlockedIds = spamMessageDao.getReportedSmsIds().toSet()
+                val excludedSmsIds = spamLearningDao.getExcludedSmsIds().toSet()
+                val excludedBodyHashes = spamLearningDao.getExcludedBodyHashes().toSet()
 
                 _uiState.update { it.copy(totalMessages = inboxMessages.size) }
 
                 val spamFound = mutableListOf<ScannedSpamMessage>()
                 for ((index, msg) in inboxMessages.withIndex()) {
-                    if (msg.smsId in alreadyBlockedIds) {
+                    if (msg.smsId in alreadyBlockedIds ||
+                        msg.smsId in excludedSmsIds ||
+                        msg.body.hashCode() in excludedBodyHashes
+                    ) {
                         if (index % 10 == 0) _uiState.update { it.copy(scannedCount = index + 1) }
                         continue
                     }
 
                     val isKnownContact = contactResolver.getContactName(msg.address) != null
+                    if (isKnownContact || scamDetector.isAllowlisted(msg.address)) {
+                        if (index % 10 == 0) _uiState.update { it.copy(scannedCount = index + 1) }
+                        continue
+                    }
+
                     val result = spamFilter.classify(msg.address, msg.body, isKnownContact)
 
                     if (result.classification == SpamFilter.SpamClassification.SPAM) {
@@ -220,6 +235,34 @@ class InboxSpamScanViewModel @Inject constructor(
                 conversationRepository.refreshAfterChange(threadId)
             }
             _uiState.update { it.copy(phase = ScanPhase.DONE, processedCount = count) }
+        }
+    }
+
+    fun markNotSpam() {
+        val selected = _uiState.value.spamResults.filter { it.selected }
+        if (selected.isEmpty()) return
+
+        viewModelScope.launch {
+            for (msg in selected) {
+                try {
+                    spamLearningDao.insertScanExclusion(
+                        ScanExcludedMessageEntity(
+                            smsId = msg.smsId,
+                            address = msg.address,
+                            bodyHash = msg.body.hashCode()
+                        )
+                    )
+                    spamFilter.reportNotSpam(msg.address, msg.body)
+                } catch (e: Exception) {
+                    Log.e("InboxSpamScanVM", "Failed to mark message ${msg.smsId} as not spam", e)
+                }
+            }
+            val selectedIds = selected.map { it.smsId }.toSet()
+            _uiState.update { state ->
+                state.copy(
+                    spamResults = state.spamResults.filter { it.smsId !in selectedIds }
+                )
+            }
         }
     }
 

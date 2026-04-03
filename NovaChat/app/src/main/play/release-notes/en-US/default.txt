@@ -1,8 +1,11 @@
-Performance improvements throughout the app!
+Smart links in messages! Tap dates to add to Calendar or addresses to open Maps.
 
-- Conversations and messages load faster with optimized database queries
-- Smoother scrolling in conversation list, chat, and search screens
-- Faster search with smart debounce — no more lag while typing
-- Reduced memory usage when viewing long conversations
-- Fixed background processing to prevent occasional UI freezes
-- Improved battery efficiency — flows stop collecting when app is in background
+Pinch to zoom on chat messages for easier reading.
+
+Voice message support — play audio messages and transcribe them to text.
+
+Spam scan improvements:
+- Mark false positives as "Not Spam" so they won't appear again
+- Trusted senders are now skipped automatically
+
+Fixed bottom bar overlapping with phone navigation buttons.

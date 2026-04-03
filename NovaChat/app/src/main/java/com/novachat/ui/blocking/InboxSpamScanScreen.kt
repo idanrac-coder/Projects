@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -78,7 +80,8 @@ fun InboxSpamScanScreen(
             onToggleMessage = viewModel::toggleMessage,
             onToggleSelectAll = viewModel::toggleSelectAll,
             onMoveToSpam = viewModel::moveToSpamFolder,
-            onDeletePermanently = viewModel::deletePermanently
+            onDeletePermanently = viewModel::deletePermanently,
+            onMarkNotSpam = viewModel::markNotSpam
         )
         ScanPhase.PROCESSING -> ProcessingPhase(uiState = uiState)
         ScanPhase.DONE -> DonePhase(
@@ -183,7 +186,8 @@ private fun ReviewPhase(
     onToggleMessage: (Long) -> Unit,
     onToggleSelectAll: () -> Unit,
     onMoveToSpam: () -> Unit,
-    onDeletePermanently: () -> Unit
+    onDeletePermanently: () -> Unit,
+    onMarkNotSpam: () -> Unit
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
 
@@ -251,48 +255,78 @@ private fun ReviewPhase(
                     shadowElevation = 8.dp,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Row(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            .navigationBarsPadding()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        FilledTonalButton(
-                            onClick = onMoveToSpam,
-                            enabled = uiState.selectedCount > 0,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Icon(
-                                Icons.Default.Folder,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text("Spam (${uiState.selectedCount})")
-                        }
-
                         OutlinedButton(
-                            onClick = { showDeleteDialog = true },
+                            onClick = onMarkNotSpam,
                             enabled = uiState.selectedCount > 0,
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = MaterialTheme.colorScheme.error
+                                contentColor = AuroraColors.Success
                             ),
                             border = BorderStroke(
                                 1.dp,
                                 if (uiState.selectedCount > 0)
-                                    MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
+                                    AuroraColors.Success.copy(alpha = 0.5f)
                                 else
                                     MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
                             )
                         ) {
                             Icon(
-                                Icons.Default.DeleteForever,
+                                Icons.Default.ThumbUp,
                                 contentDescription = null,
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Delete (${uiState.selectedCount})")
+                            Text("Not Spam (${uiState.selectedCount})")
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            FilledTonalButton(
+                                onClick = onMoveToSpam,
+                                enabled = uiState.selectedCount > 0,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(
+                                    Icons.Default.Folder,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Spam (${uiState.selectedCount})")
+                            }
+
+                            OutlinedButton(
+                                onClick = { showDeleteDialog = true },
+                                enabled = uiState.selectedCount > 0,
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = MaterialTheme.colorScheme.error
+                                ),
+                                border = BorderStroke(
+                                    1.dp,
+                                    if (uiState.selectedCount > 0)
+                                        MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
+                                    else
+                                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                                )
+                            ) {
+                                Icon(
+                                    Icons.Default.DeleteForever,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Delete (${uiState.selectedCount})")
+                            }
                         }
                     }
                 }
@@ -489,6 +523,7 @@ private fun ProcessingPhase(uiState: InboxSpamScanUiState) {
                 val actionText = when (uiState.lastAction) {
                     ScanAction.MOVE_TO_SPAM -> "Moving messages to spam..."
                     ScanAction.DELETE_PERMANENTLY -> "Deleting messages..."
+                    ScanAction.MARK_NOT_SPAM -> "Marking as not spam..."
                     null -> "Processing..."
                 }
                 Text(
@@ -550,6 +585,8 @@ private fun DonePhase(
                         "${uiState.processedCount} message${if (uiState.processedCount != 1) "s" else ""} moved to spam folder"
                     ScanAction.DELETE_PERMANENTLY ->
                         "${uiState.processedCount} message${if (uiState.processedCount != 1) "s" else ""} permanently deleted"
+                    ScanAction.MARK_NOT_SPAM ->
+                        "${uiState.processedCount} message${if (uiState.processedCount != 1) "s" else ""} marked as not spam"
                     null -> "Done"
                 }
                 Text(

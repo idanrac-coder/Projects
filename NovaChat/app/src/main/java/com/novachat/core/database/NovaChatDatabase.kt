@@ -16,6 +16,7 @@ import com.novachat.core.database.dao.SpamLearningDao
 import com.novachat.core.database.dao.SpamMessageDao
 import com.novachat.core.database.dao.MessageEditDao
 import com.novachat.core.database.dao.ThemeDao
+import com.novachat.core.database.dao.VoiceTranscriptionDao
 import com.novachat.core.database.entity.BlockRuleEntity
 import com.novachat.core.database.entity.ConversationMetaEntity
 import com.novachat.core.database.entity.CustomCategoryEntity
@@ -25,6 +26,7 @@ import com.novachat.core.database.entity.MessageReminderEntity
 import com.novachat.core.database.entity.NotificationProfileEntity
 import com.novachat.core.database.entity.PinnedMessageEntity
 import com.novachat.core.database.entity.ScheduledMessageEntity
+import com.novachat.core.database.entity.ScanExcludedMessageEntity
 import com.novachat.core.database.entity.SenderAllowlistEntity
 import com.novachat.core.database.entity.ShortCodeWhitelistEntity
 import com.novachat.core.database.entity.SpamKeywordWeightEntity
@@ -32,6 +34,7 @@ import com.novachat.core.database.entity.SpamLearningEntity
 import com.novachat.core.database.entity.SpamMessageEntity
 import com.novachat.core.database.entity.SpamSenderReputationEntity
 import com.novachat.core.database.entity.ThemeEntity
+import com.novachat.core.database.entity.VoiceTranscriptionEntity
 
 @Database(
     entities = [
@@ -50,9 +53,11 @@ import com.novachat.core.database.entity.ThemeEntity
         SpamKeywordWeightEntity::class,
         SenderAllowlistEntity::class,
         ShortCodeWhitelistEntity::class,
-        MessageEditEntity::class
+        MessageEditEntity::class,
+        ScanExcludedMessageEntity::class,
+        VoiceTranscriptionEntity::class
     ],
-    version = 15,
+    version = 17,
     exportSchema = true
 )
 abstract class NovaChatDatabase : RoomDatabase() {
@@ -69,4 +74,5 @@ abstract class NovaChatDatabase : RoomDatabase() {
     abstract fun notificationProfileDao(): NotificationProfileDao
     abstract fun shortCodeWhitelistDao(): ShortCodeWhitelistDao
     abstract fun messageEditDao(): MessageEditDao
+    abstract fun voiceTranscriptionDao(): VoiceTranscriptionDao
 }

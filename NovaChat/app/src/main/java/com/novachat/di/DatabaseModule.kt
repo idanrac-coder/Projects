@@ -18,12 +18,39 @@ import com.novachat.core.database.dao.ShortCodeWhitelistDao
 import com.novachat.core.database.dao.SpamMessageDao
 import com.novachat.core.database.dao.MessageEditDao
 import com.novachat.core.database.dao.ThemeDao
+import com.novachat.core.database.dao.VoiceTranscriptionDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+
+val MIGRATION_15_16 = object : Migration(15, 16) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS scan_excluded_messages (
+                smsId INTEGER PRIMARY KEY NOT NULL,
+                address TEXT NOT NULL,
+                bodyHash INTEGER NOT NULL,
+                createdAt INTEGER NOT NULL
+            )
+        """.trimIndent())
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_scan_excluded_messages_address ON scan_excluded_messages(address)")
+    }
+}
+
+val MIGRATION_16_17 = object : Migration(16, 17) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS voice_transcriptions (
+                messageId INTEGER PRIMARY KEY NOT NULL,
+                transcription TEXT NOT NULL,
+                createdAt INTEGER NOT NULL
+            )
+        """.trimIndent())
+    }
+}
 
 val MIGRATION_14_15 = object : Migration(14, 15) {
     override fun migrate(db: SupportSQLiteDatabase) {
@@ -275,7 +302,7 @@ object DatabaseModule {
             context,
             NovaChatDatabase::class.java,
             "novachat.db"
-        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15).build()
+        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17).build()
     }
 
     @Provides
@@ -316,4 +343,7 @@ object DatabaseModule {
 
     @Provides
     fun provideMessageEditDao(db: NovaChatDatabase): MessageEditDao = db.messageEditDao()
+
+    @Provides
+    fun provideVoiceTranscriptionDao(db: NovaChatDatabase): VoiceTranscriptionDao = db.voiceTranscriptionDao()
 }

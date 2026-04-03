@@ -149,8 +149,132 @@ class SmsProvider @Inject constructor(
                 messages.add(cursorToMessage(it))
             }
         }
+
+        try {
+            val mmsMessages = loadMmsForThread(threadId)
+            messages.addAll(mmsMessages)
+            messages.sortBy { it.timestamp }
+        } catch (e: Exception) {
+            Log.w("SmsProvider", "MMS loading failed, showing SMS only", e)
+        }
+
         if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "*** SmsProvider.getMessagesForThread($threadId) found ${messages.size} messages")
         messages
+    }
+
+    private fun loadMmsForThread(threadId: Long): List<Message> {
+        val messages = mutableListOf<Message>()
+        val mmsCursor = contentResolver.query(
+            Telephony.Mms.CONTENT_URI,
+            arrayOf(
+                Telephony.Mms._ID,
+                Telephony.Mms.THREAD_ID,
+                Telephony.Mms.DATE,
+                Telephony.Mms.MESSAGE_BOX,
+                Telephony.Mms.READ
+            ),
+            "${Telephony.Mms.THREAD_ID} = ?",
+            arrayOf(threadId.toString()),
+            "${Telephony.Mms.DATE} ASC"
+        )
+
+        mmsCursor?.use { cursor ->
+            while (cursor.moveToNext()) {
+                val mmsId = cursor.getLong(cursor.getColumnIndexOrThrow(Telephony.Mms._ID))
+                val dateSec = cursor.getLong(cursor.getColumnIndexOrThrow(Telephony.Mms.DATE))
+                val messageBox = cursor.getInt(cursor.getColumnIndexOrThrow(Telephony.Mms.MESSAGE_BOX))
+                val isRead = cursor.getInt(cursor.getColumnIndexOrThrow(Telephony.Mms.READ)) == 1
+
+                val type = when (messageBox) {
+                    Telephony.Mms.MESSAGE_BOX_INBOX -> MessageType.RECEIVED
+                    Telephony.Mms.MESSAGE_BOX_SENT -> MessageType.SENT
+                    Telephony.Mms.MESSAGE_BOX_DRAFTS -> MessageType.DRAFT
+                    Telephony.Mms.MESSAGE_BOX_OUTBOX -> MessageType.OUTBOX
+                    else -> MessageType.RECEIVED
+                }
+
+                val address = getMmsAddress(mmsId, type)
+                val parts = getMmsParts(mmsId)
+                val textBody = parts.firstOrNull { it.contentType?.startsWith("text/") == true }?.text ?: ""
+                val audioPart = parts.firstOrNull { it.contentType?.startsWith("audio/") == true }
+                val imagePart = parts.firstOrNull { it.contentType?.startsWith("image/") == true }
+                val attachmentPart = audioPart ?: imagePart
+
+                messages.add(
+                    Message(
+                        id = -mmsId,
+                        threadId = threadId,
+                        address = address,
+                        body = textBody.ifEmpty {
+                            when {
+                                audioPart != null -> "\uD83C\uDFA4 Voice message"
+                                imagePart != null -> "\uD83D\uDDBC\uFE0F Image"
+                                else -> "(MMS)"
+                            }
+                        },
+                        timestamp = dateSec * 1000,
+                        type = type,
+                        isRead = isRead,
+                        isMms = true,
+                        attachmentUri = attachmentPart?.uri,
+                        isVoiceMessage = audioPart != null
+                    )
+                )
+            }
+        }
+        return messages
+    }
+
+    private fun getMmsAddress(mmsId: Long, type: MessageType): String {
+        val addrUri = Uri.parse("content://mms/$mmsId/addr")
+        val addrType = if (type == MessageType.RECEIVED) 137 else 151 // PduHeaders.FROM / TO
+        val cursor = contentResolver.query(
+            addrUri,
+            arrayOf(Telephony.Mms.Addr.ADDRESS),
+            "${Telephony.Mms.Addr.TYPE} = ?",
+            arrayOf(addrType.toString()),
+            null
+        )
+        var address = ""
+        cursor?.use {
+            if (it.moveToFirst()) {
+                address = it.getString(0) ?: ""
+            }
+        }
+        if (address.isBlank() || address == "insert-address-token") {
+            val fallback = contentResolver.query(addrUri, arrayOf(Telephony.Mms.Addr.ADDRESS), null, null, null)
+            fallback?.use {
+                if (it.moveToFirst()) {
+                    val a = it.getString(0) ?: ""
+                    if (a != "insert-address-token") address = a
+                }
+            }
+        }
+        return address
+    }
+
+    data class MmsPart(val contentType: String?, val text: String?, val uri: String?)
+
+    private fun getMmsParts(mmsId: Long): List<MmsPart> {
+        val parts = mutableListOf<MmsPart>()
+        val partUri = Uri.parse("content://mms/$mmsId/part")
+        val cursor = contentResolver.query(
+            partUri,
+            arrayOf(Telephony.Mms.Part._ID, Telephony.Mms.Part.CONTENT_TYPE, Telephony.Mms.Part.TEXT),
+            null, null, null
+        )
+        cursor?.use {
+            while (it.moveToNext()) {
+                val partId = it.getLong(it.getColumnIndexOrThrow(Telephony.Mms.Part._ID))
+                val ct = it.getString(it.getColumnIndexOrThrow(Telephony.Mms.Part.CONTENT_TYPE))
+                val text = it.getString(it.getColumnIndexOrThrow(Telephony.Mms.Part.TEXT))
+                val dataUri = if (ct?.startsWith("text/") != true) {
+                    ContentUris.withAppendedId(partUri, partId).toString()
+                } else null
+                parts.add(MmsPart(ct, text, dataUri))
+            }
+        }
+        return parts
     }
 
     suspend fun searchMessages(query: String): List<Message> = withContext(Dispatchers.IO) {

@@ -27,6 +27,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -142,6 +143,7 @@ import com.novachat.domain.model.ReactionEmojis
 import com.novachat.domain.model.WallpaperType
 import com.novachat.ui.components.DisappearingMessagesDialog
 import com.novachat.ui.components.EmojiPicker
+import com.novachat.ui.components.LocalTextScale
 import com.novachat.ui.components.MessageBubble
 import com.novachat.ui.components.VoiceRecorderOverlay
 import java.text.SimpleDateFormat
@@ -196,6 +198,7 @@ fun ChatScreen(
     var isVoiceRecording by remember { mutableStateOf(false) }
     var voiceDurationMs by remember { mutableStateOf(0L) }
     var phoneNumberDialogTarget by remember { mutableStateOf<String?>(null) }
+    var textScale by remember { mutableFloatStateOf(1f) }
     val isEditing = uiState.editingMessage != null
 
     LaunchedEffect(uiState.editingMessage) {
@@ -702,11 +705,17 @@ fun ChatScreen(
                             .mapNotNull { (it as? ChatListItem.MessageRow)?.message?.id }
                             .lastOrNull { id -> id in uiState.scamWarnings && id !in uiState.dismissedScamWarnings }
                     }
+                    CompositionLocalProvider(LocalTextScale provides textScale) {
                     LazyColumn(
                         state = listState,
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(horizontal = 14.dp),
+                            .padding(horizontal = 14.dp)
+                            .pointerInput(Unit) {
+                                detectTransformGestures { _, _, zoom, _ ->
+                                    textScale = (textScale * zoom).coerceIn(0.8f, 2.5f)
+                                }
+                            },
                         verticalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
                         items(
@@ -1570,6 +1579,9 @@ private fun SwipeableMessageItem(
             highlightText = if (isMatch) uiState.searchQuery else null,
             isActiveMatch = message.id == uiState.activeMatchMessageId,
             scamAnalysis = scamWarning,
+            transcription = uiState.transcriptions[message.id],
+            isTranscribing = message.id in uiState.transcribingMessageIds,
+            onTranscribe = { msgId, uri -> viewModel.transcribeVoiceMessage(msgId, uri) },
             onLongClick = {
                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                 viewModel.showReactionPicker(message.id)

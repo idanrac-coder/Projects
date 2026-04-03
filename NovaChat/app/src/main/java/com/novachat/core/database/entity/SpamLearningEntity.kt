@@ -45,3 +45,15 @@ data class SenderAllowlistEntity(
     val address: String,
     val createdAt: Long = System.currentTimeMillis()
 )
+
+@Entity(
+    tableName = "scan_excluded_messages",
+    indices = [Index(value = ["address"])]
+)
+data class ScanExcludedMessageEntity(
+    @PrimaryKey
+    val smsId: Long,
+    val address: String,
+    val bodyHash: Int,
+    val createdAt: Long = System.currentTimeMillis()
+)

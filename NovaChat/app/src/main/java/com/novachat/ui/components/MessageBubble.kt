@@ -1,5 +1,8 @@
 package com.novachat.ui.components
 
+import android.content.Intent
+import android.net.Uri
+import android.provider.CalendarContract
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -28,6 +31,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -59,6 +63,8 @@ import com.novachat.domain.model.MessageType
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
+val LocalTextScale = compositionLocalOf { 1f }
 
 private val emojiRegex = Regex("^[\\p{So}\\p{Cn}\\p{Cs}\\s\\uFE0F\\u200D\\u20E3\\u2600-\\u27BF\\U0001F000-\\U0001FFFF]{1,10}$")
 
@@ -92,6 +98,9 @@ fun MessageBubble(
     isActiveMatch: Boolean = false,
     replyToBody: String? = null,
     scamAnalysis: ScamAnalysis? = null,
+    transcription: String? = null,
+    isTranscribing: Boolean = false,
+    onTranscribe: ((Long, String) -> Unit)? = null,
     onLongClick: () -> Unit = {},
     onReactionClick: (String) -> Unit = {},
     onCodeCopy: (String) -> Unit = {},
@@ -176,12 +185,30 @@ fun MessageBubble(
                     )
                 }
 
+                if (message.isVoiceMessage && message.attachmentUri != null) {
+                    VoiceMessageContent(
+                        messageId = message.id,
+                        attachmentUri = message.attachmentUri,
+                        textColor = textColor,
+                        isSent = isSent,
+                        transcription = transcription,
+                        isTranscribing = isTranscribing,
+                        onTranscribe = onTranscribe
+                    )
+                    if (message.body.isNotBlank() &&
+                        message.body != "\uD83C\uDFA4 Voice message"
+                    ) {
+                        Spacer(modifier = Modifier.height(6.dp))
+                    }
+                }
+
+                val textScale = LocalTextScale.current
                 SelectionContainer {
                     if (emojiOnly) {
                         Text(
                             text = message.body.trim(),
-                            fontSize = 42.sp,
-                            lineHeight = 50.sp,
+                            fontSize = 42.sp * textScale,
+                            lineHeight = 50.sp * textScale,
                             modifier = Modifier.padding(vertical = 2.dp)
                         )
                     } else if (!highlightText.isNullOrBlank()) {
@@ -195,8 +222,10 @@ fun MessageBubble(
                         Text(
                             text = highlighted,
                             color = textColor,
-                            style = MaterialTheme.typography.bodyLarge,
-                            lineHeight = 22.sp
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontSize = MaterialTheme.typography.bodyLarge.fontSize * textScale
+                            ),
+                            lineHeight = 22.sp * textScale
                         )
                     } else {
                         val uriHandler = LocalUriHandler.current
@@ -208,7 +237,8 @@ fun MessageBubble(
                             text = formatted,
                             style = MaterialTheme.typography.bodyLarge.copy(
                                 color = textColor,
-                                lineHeight = 22.sp
+                                fontSize = MaterialTheme.typography.bodyLarge.fontSize * textScale,
+                                lineHeight = 22.sp * textScale
                             ),
                             onTextLayout = { layoutResult.value = it },
                             modifier = Modifier.pointerInput(formatted, isSuspicious) {
@@ -233,6 +263,25 @@ fun MessageBubble(
                                                 } else {
                                                     uriHandler.openUri(urlAnnotation.item)
                                                 }
+                                                return@detectTapGestures
+                                            }
+                                        formatted.getStringAnnotations("SMART_DATE", offset, offset)
+                                            .firstOrNull()
+                                            ?.let { dateAnnotation ->
+                                                val intent = Intent(Intent.ACTION_INSERT).apply {
+                                                    data = CalendarContract.Events.CONTENT_URI
+                                                    putExtra(CalendarContract.Events.TITLE, dateAnnotation.item)
+                                                }
+                                                try { context.startActivity(intent) } catch (_: Exception) {}
+                                                return@detectTapGestures
+                                            }
+                                        formatted.getStringAnnotations("SMART_ADDRESS", offset, offset)
+                                            .firstOrNull()
+                                            ?.let { addrAnnotation ->
+                                                val geoUri = Uri.parse("geo:0,0?q=${Uri.encode(addrAnnotation.item)}")
+                                                val intent = Intent(Intent.ACTION_VIEW, geoUri)
+                                                try { context.startActivity(intent) } catch (_: Exception) {}
+                                                return@detectTapGestures
                                             }
                                     }
                                 }
@@ -494,6 +543,7 @@ fun parseFormattedText(text: String): AnnotatedString {
         )
     }
 
+    val phoneRanges = mutableListOf<IntRange>()
     val phoneRegex = PHONE_REGEX
     phoneRegex.findAll(resultText).forEach { matchResult ->
         val start = matchResult.range.first
@@ -504,6 +554,7 @@ fun parseFormattedText(text: String): AnnotatedString {
         val normalized = normalizePhoneNumber(matchResult.value)
         if (normalized.length < 7) return@forEach
 
+        phoneRanges += start until end
         builder.addStyle(
             style = SpanStyle(
                 color = Color(0xFF81C784),
@@ -517,6 +568,30 @@ fun parseFormattedText(text: String): AnnotatedString {
             annotation = normalized,
             start = start,
             end = end
+        )
+    }
+
+    val allExcluded = urlRanges + phoneRanges +
+        shortCodeRegex.findAll(resultText).map { it.range.first until (it.range.last + 1) }
+    val smartLinks = SmartLinkDetector.detect(resultText, allExcluded)
+    for (link in smartLinks) {
+        val tag = when (link.type) {
+            SmartLinkType.DATE_TIME -> "SMART_DATE"
+            SmartLinkType.ADDRESS -> "SMART_ADDRESS"
+        }
+        builder.addStyle(
+            style = SpanStyle(
+                color = Color(0xFF90CAF9),
+                textDecoration = TextDecoration.Underline
+            ),
+            start = link.start,
+            end = link.end
+        )
+        builder.addStringAnnotation(
+            tag = tag,
+            annotation = link.actionData,
+            start = link.start,
+            end = link.end
         )
     }
 
@@ -567,4 +642,114 @@ private fun normalizePhoneNumber(raw: String): String {
     val leadingPlus = trimmed.startsWith("+")
     val digitsOnly = trimmed.filter { it.isDigit() }
     return if (leadingPlus) "+$digitsOnly" else digitsOnly
+}
+
+@Composable
+fun VoiceMessageContent(
+    messageId: Long,
+    attachmentUri: String,
+    textColor: Color,
+    isSent: Boolean,
+    transcription: String? = null,
+    isTranscribing: Boolean = false,
+    onTranscribe: ((Long, String) -> Unit)? = null
+) {
+    var isPlaying by remember { mutableStateOf(false) }
+    var showTranscription by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    Column {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Surface(
+                shape = CircleShape,
+                color = textColor.copy(alpha = 0.15f),
+                onClick = {
+                    isPlaying = !isPlaying
+                    if (isPlaying) {
+                        try {
+                            val player = android.media.MediaPlayer()
+                            player.setDataSource(context, android.net.Uri.parse(attachmentUri))
+                            player.prepare()
+                            player.start()
+                            player.setOnCompletionListener {
+                                isPlaying = false
+                                player.release()
+                            }
+                        } catch (_: Exception) {
+                            isPlaying = false
+                        }
+                    }
+                },
+                modifier = Modifier.size(40.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        text = if (isPlaying) "\u23F8" else "\u25B6",
+                        fontSize = 18.sp,
+                        color = textColor
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Voice message",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = textColor
+                )
+            }
+        }
+
+        if (onTranscribe != null) {
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = textColor.copy(alpha = 0.1f),
+                    onClick = {
+                        if (transcription != null) {
+                            showTranscription = !showTranscription
+                        } else if (!isTranscribing) {
+                            showTranscription = true
+                            onTranscribe(messageId, attachmentUri)
+                        }
+                    }
+                ) {
+                    Text(
+                        text = when {
+                            isTranscribing -> "Transcribing..."
+                            showTranscription && transcription != null -> "Hide transcript"
+                            transcription != null -> "Show transcript"
+                            else -> "Transcribe"
+                        },
+                        style = MaterialTheme.typography.labelSmall,
+                        color = textColor.copy(alpha = 0.7f),
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                    )
+                }
+            }
+
+            if (showTranscription && transcription != null) {
+                Spacer(modifier = Modifier.height(6.dp))
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = textColor.copy(alpha = 0.06f)
+                ) {
+                    Text(
+                        text = transcription,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = textColor.copy(alpha = 0.8f),
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+            }
+        }
+    }
 }
