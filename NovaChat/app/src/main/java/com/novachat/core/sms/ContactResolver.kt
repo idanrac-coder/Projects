@@ -13,7 +13,7 @@ import javax.inject.Singleton
 class ContactResolver @Inject constructor(
     private val contentResolver: ContentResolver
 ) {
-    private val nameCache = java.util.concurrent.ConcurrentHashMap<String, String?>()
+    private val nameCache = java.util.concurrent.ConcurrentHashMap<String, String>()
     @Volatile
     private var contactsPreloaded = false
     private val miniMatchMap = java.util.concurrent.ConcurrentHashMap<String, String>()
@@ -53,13 +53,14 @@ class ContactResolver @Inject constructor(
     }
 
     fun getContactName(phoneNumber: String): String? {
-        nameCache[phoneNumber]?.let { return it }
-        if (nameCache.containsKey(phoneNumber)) return null
+        nameCache[phoneNumber]?.let { cached ->
+            return cached.takeIf { it.isNotEmpty() }
+        }
 
         if (contactsPreloaded) {
             val key = miniMatch(phoneNumber)
             val name = if (key.isNotEmpty()) miniMatchMap[key] else null
-            nameCache[phoneNumber] = name
+            nameCache[phoneNumber] = name ?: ""
             return name
         }
 
@@ -77,7 +78,7 @@ class ContactResolver @Inject constructor(
                 it.getString(it.getColumnIndexOrThrow(ContactsContract.PhoneLookup.DISPLAY_NAME))
             } else null
         }
-        nameCache[phoneNumber] = name
+        nameCache[phoneNumber] = name ?: ""
         return name
     }
 

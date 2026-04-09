@@ -3,6 +3,11 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [4.0.1] - 2026-04-09
+
+### Fixed
+- Bottom navigation bar not showing on release builds due to R8 obfuscating route class names
+
 ## [4.0.0] - 2026-04-09
 
 ### Added
