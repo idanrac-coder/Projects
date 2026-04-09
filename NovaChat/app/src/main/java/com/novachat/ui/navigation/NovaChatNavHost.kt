@@ -20,7 +20,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.hasRoute
 import androidx.navigation.toRoute
 import com.novachat.ui.archived.ArchivedConversationsScreen
 import com.novachat.ui.backup.BackupRestoreScreen
@@ -61,12 +60,14 @@ fun NovaChatNavHost(
     modifier: Modifier = Modifier
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
-    val showBottomBar = navBackStackEntry?.destination?.let { dest ->
-        dest.hasRoute<ConversationsRoute>() ||
-                dest.hasRoute<FinancialDashboardRoute>() ||
-                dest.hasRoute<SettingsRoute>()
-    } ?: false
+    val topLevelRoutes = setOf(
+        ConversationsRoute::class.qualifiedName,
+        FinancialDashboardRoute::class.qualifiedName,
+        SettingsRoute::class.qualifiedName
+    )
+    val showBottomBar = currentRoute in topLevelRoutes
 
     Scaffold(
         bottomBar = {
@@ -79,7 +80,7 @@ fun NovaChatNavHost(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer
                 ) {
                     TopLevelDestination.entries.forEach { dest ->
-                        val selected = navBackStackEntry?.destination?.hasRoute(dest.route::class) == true
+                        val selected = currentRoute == dest.route::class.qualifiedName
                         NavigationBarItem(
                             selected = selected,
                             onClick = {

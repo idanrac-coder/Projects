@@ -18,6 +18,9 @@
 -dontnote kotlinx.serialization.AnnotationsKt
 -keepclassmembers class kotlinx.serialization.json.** { *** Companion; }
 
+# Navigation type-safe routes — keep class names so qualifiedName matches at runtime
+-keepnames class com.novachat.ui.navigation.*Route
+
 # LiteRT / TensorFlow Lite — keep Interpreter and JNI-loaded classes
 -keep class org.tensorflow.lite.** { *; }
 -dontwarn org.tensorflow.lite.**
