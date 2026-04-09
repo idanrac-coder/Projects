@@ -34,4 +34,8 @@ object PreferencesKeys {
     val REVIEW_SHOWN = booleanPreferencesKey("review_shown")
     val SMART_LINKS_CALENDAR_ENABLED = booleanPreferencesKey("smart_links_calendar_enabled")
     val SMART_LINKS_MAPS_ENABLED = booleanPreferencesKey("smart_links_maps_enabled")
+    val FINANCIAL_INTELLIGENCE_ENABLED = booleanPreferencesKey("financial_intelligence_enabled")
+    val FINANCIAL_LAST_PARSED_SMS_ID = longPreferencesKey("financial_last_parsed_sms_id")
+    val FINANCIAL_PRIMARY_CURRENCY = stringPreferencesKey("financial_primary_currency")
+    val FINANCIAL_ONBOARDING_COMPLETE = booleanPreferencesKey("financial_onboarding_complete")
 }

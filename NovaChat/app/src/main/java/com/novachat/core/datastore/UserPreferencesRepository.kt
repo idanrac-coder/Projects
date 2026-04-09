@@ -179,4 +179,36 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun setSmartLinksMapsEnabled(enabled: Boolean) {
         dataStore.edit { it[PreferencesKeys.SMART_LINKS_MAPS_ENABLED] = enabled }
     }
+
+    val financialIntelligenceEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[PreferencesKeys.FINANCIAL_INTELLIGENCE_ENABLED] ?: false
+    }
+
+    suspend fun setFinancialIntelligenceEnabled(enabled: Boolean) {
+        dataStore.edit { it[PreferencesKeys.FINANCIAL_INTELLIGENCE_ENABLED] = enabled }
+    }
+
+    val financialLastParsedSmsId: Flow<Long> = dataStore.data.map { prefs ->
+        prefs[PreferencesKeys.FINANCIAL_LAST_PARSED_SMS_ID] ?: 0L
+    }
+
+    suspend fun setFinancialLastParsedSmsId(id: Long) {
+        dataStore.edit { it[PreferencesKeys.FINANCIAL_LAST_PARSED_SMS_ID] = id }
+    }
+
+    val financialPrimaryCurrency: Flow<String> = dataStore.data.map { prefs ->
+        prefs[PreferencesKeys.FINANCIAL_PRIMARY_CURRENCY] ?: "ILS"
+    }
+
+    suspend fun setFinancialPrimaryCurrency(currency: String) {
+        dataStore.edit { it[PreferencesKeys.FINANCIAL_PRIMARY_CURRENCY] = currency }
+    }
+
+    val financialOnboardingComplete: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[PreferencesKeys.FINANCIAL_ONBOARDING_COMPLETE] ?: false
+    }
+
+    suspend fun setFinancialOnboardingComplete(complete: Boolean) {
+        dataStore.edit { it[PreferencesKeys.FINANCIAL_ONBOARDING_COMPLETE] = complete }
+    }
 }

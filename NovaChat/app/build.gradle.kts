@@ -15,8 +15,8 @@ android {
         applicationId = "com.novachat"
         minSdk = 31
         targetSdk = 35
-        versionCode = 138
-        versionName = "3.32.5"
+        versionCode = 139
+        versionName = "4.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -118,6 +118,10 @@ dependencies {
 
     // LiteRT (TensorFlow Lite successor – 16 KB page-size aligned)
     implementation(libs.litert)
+
+    // SQLCipher – encrypted financial database
+    implementation(libs.sqlcipher)
+    implementation(libs.androidx.sqlite.ktx)
 
     // ML Kit Language ID
     implementation(libs.mlkit.language.id)

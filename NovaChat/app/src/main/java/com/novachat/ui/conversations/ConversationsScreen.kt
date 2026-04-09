@@ -109,7 +109,6 @@ fun ConversationsScreen(
     onConversationClick: (threadId: Long, address: String, contactName: String?) -> Unit,
     onComposeClick: () -> Unit,
     onSearchClick: () -> Unit,
-    onSettingsClick: () -> Unit,
     onNavigateToPremium: () -> Unit = {},
     viewModel: ConversationsViewModel = hiltViewModel()
 ) {
@@ -231,23 +230,6 @@ fun ConversationsScreen(
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.weight(1f)
                 )
-                Surface(
-                    onClick = onSettingsClick,
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.surfaceVariant
-                ) {
-                    Box(
-                        modifier = Modifier.size(40.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            Icons.Default.Settings,
-                            contentDescription = "Settings",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
             }
 
             // Search bar

@@ -21,3 +21,8 @@
 # LiteRT / TensorFlow Lite — keep Interpreter and JNI-loaded classes
 -keep class org.tensorflow.lite.** { *; }
 -dontwarn org.tensorflow.lite.**
+
+# SQLCipher – encrypted financial database
+-keep class net.sqlcipher.** { *; }
+-keep class net.sqlcipher.database.** { *; }
+-dontwarn net.sqlcipher.**

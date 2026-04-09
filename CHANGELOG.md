@@ -3,6 +3,30 @@
 All notable changes to Aura are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [4.0.0] - 2026-04-09
+
+### Added
+- Financial Intelligence Inbox — premium feature for on-device financial tracking from SMS
+- Encrypted SQLCipher database for secure financial data storage
+- SMS parsing engine with regex + ML Kit Entity Extraction for amount, currency, merchant, card detection
+- Israeli and international bank SMS format support (Leumi, Hapoalim, Isracard, MAX, Cal, Chase, etc.)
+- Category classifier (Bill, Subscription, Payment, Expense) with recurrence detection
+- Subscription tracking with price increase detection and alerts
+- Anomaly detection engine (unusual charges, duplicate charges, new merchant high amounts)
+- Multi-card family support with nicknames, per-card filtering, and card hide/show
+- Sender management with per-sender monitor and alert toggles
+- Financial Dashboard with monthly summary, category breakdown, spending chart, and transaction list
+- Subscription List screen with price change badges and swipe-to-dismiss
+- Dedicated Alerts screen with colored severity borders and dismiss/view actions
+- Card Manager screen with colored digit badges, nickname editing, and monitor toggles
+- Financial Settings screen with 7 sections (General, Cards, Senders, Privacy, Parsing, Categories, Setup)
+- Multi-step onboarding with provider SMS activation links for Israeli and US financial institutions
+- Material 3 Bottom Navigation Bar with Messages, Financial, and Settings tabs
+- Financial notification channel for independent alert control
+- Background worker for historical SMS backfill (6-hour periodic, battery-aware)
+- Android Keystore encryption for database passphrase
+- Premium gating, onboarding gate, and feature toggle for three-layer access control
+
 ## [3.32.5] - 2026-04-03
 
 ### Fixed

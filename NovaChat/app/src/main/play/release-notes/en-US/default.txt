@@ -1,1 +1,9 @@
-Bug fixes and performance improvements.
+Introducing Financial Intelligence! Track spending, subscriptions, and unusual charges — all from your SMS.
+
+- Smart dashboard with monthly summaries and category breakdowns
+- Subscription tracking with price increase alerts
+- Multi-card family support with nicknames and filtering
+- Bank & credit card SMS detection (Israel & US)
+- Fully encrypted, on-device only — no cloud
+
+Premium feature. Tap the Financial tab to get started!

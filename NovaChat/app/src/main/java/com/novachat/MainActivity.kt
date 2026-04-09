@@ -42,6 +42,8 @@ import com.novachat.core.billing.LicenseManager
 import com.novachat.core.datastore.UserPreferencesRepository
 import com.novachat.core.sms.BubbleNotificationHelper
 import com.novachat.core.theme.NovaChatMaterialTheme
+import com.novachat.core.notification.FinancialNotificationHelper
+import com.novachat.core.worker.FinancialParsingWorker
 import com.novachat.core.worker.ScheduledMessageWorker
 import com.novachat.core.worker.SpamLearningDecayWorker
 import com.novachat.domain.model.BubbleShape
@@ -144,10 +146,20 @@ class MainActivity : ComponentActivity() {
 
         handleNotificationIntent(intent)
         bubbleNotificationHelper.createBubbleChannel()
+        FinancialNotificationHelper.createChannel(this)
         val activity = this
         window.decorView.post {
             ScheduledMessageWorker.enqueue(activity)
             SpamLearningDecayWorker.enqueue(activity)
+            lifecycleScope.launch {
+                val isPrem = userPreferencesRepository.isPremium.first()
+                val finEnabled = userPreferencesRepository.financialIntelligenceEnabled.first()
+                if (isPrem && finEnabled) {
+                    FinancialParsingWorker.enqueue(activity)
+                } else {
+                    FinancialParsingWorker.cancel(activity)
+                }
+            }
         }
 
         setContent {
@@ -247,7 +259,16 @@ class MainActivity : ComponentActivity() {
                             }
                         }
 
-                        NovaChatNavHost(navController = navController)
+                        val isPremiumState by licenseManager.isPremium
+                            .collectAsStateWithLifecycle(initialValue = false)
+                        val financialOnboardingComplete by userPreferencesRepository.financialOnboardingComplete
+                            .collectAsStateWithLifecycle(initialValue = false)
+
+                        NovaChatNavHost(
+                            navController = navController,
+                            isPremium = isPremiumState,
+                            financialOnboardingComplete = financialOnboardingComplete
+                        )
                     }
                 }
             }

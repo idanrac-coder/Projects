@@ -73,3 +73,21 @@ object InboxSpamScanRoute
 
 @Serializable
 object MessagingSettingsRoute
+
+@Serializable
+object FinancialDashboardRoute
+
+@Serializable
+object SubscriptionListRoute
+
+@Serializable
+object AlertsRoute
+
+@Serializable
+object FinancialSettingsRoute
+
+@Serializable
+object FinancialOnboardingRoute
+
+@Serializable
+object CardManagerRoute

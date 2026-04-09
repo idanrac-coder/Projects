@@ -31,7 +31,8 @@ class SmsNotificationHandler @Inject constructor(
     private val conversationRepository: ConversationRepository,
     private val spamFilter: SpamFilter,
     private val scamDetector: ScamDetector,
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val financialSmsParser: com.novachat.core.sms.financial.FinancialSmsParser
 ) {
 
     companion object {
@@ -209,15 +210,18 @@ class SmsNotificationHandler @Inject constructor(
         }
 
         var threadId = 0L
+        var smsId = 0L
         if (isDefaultApp) {
             if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== Handler: inserting SMS (we are default app)")
             val result = smsProvider.insertIncomingSms(address, body, timestamp)
             threadId = result.threadId
+            result.uri?.let { smsId = android.content.ContentUris.parseId(it) }
             if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== Handler: insert result uri=${result.uri} threadId=$threadId")
             if (result.uri == null) {
                 if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== Handler: insert returned null, retrying after 300ms")
                 kotlinx.coroutines.delay(300)
                 val retry = smsProvider.insertIncomingSms(address, body, timestamp)
+                retry.uri?.let { smsId = android.content.ContentUris.parseId(it) }
                 if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== Handler: retry result uri=${retry.uri}")
             }
         } else {
@@ -270,6 +274,15 @@ class SmsNotificationHandler @Inject constructor(
         val effectiveThreadId = if (threadId != 0L) threadId else -1L
         if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== Handler: refreshAfterChange($effectiveThreadId)")
         conversationRepository.refreshAfterChange(effectiveThreadId)
+
+        if (smsId > 0) {
+            try {
+                financialSmsParser.parseIfEnabled(smsId = smsId, address = address, body = body, timestamp = timestamp)
+            } catch (e: Exception) {
+                if (BuildConfig.DEBUG) Log.e(TAG, "Financial parsing failed", e)
+            }
+        }
+
         if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== handleIncomingSms END ===")
     }
 

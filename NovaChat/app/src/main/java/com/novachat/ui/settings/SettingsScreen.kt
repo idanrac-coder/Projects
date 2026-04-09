@@ -29,6 +29,8 @@ import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.RateReview
 import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Verified
@@ -79,6 +81,7 @@ fun SettingsScreen(
     onNotificationProfilesClick: () -> Unit = {},
     onSmartSecureClick: () -> Unit = {},
     onMessagingSettingsClick: () -> Unit = {},
+    onFinancialIntelligenceClick: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val isPremium by viewModel.isPremium.collectAsStateWithLifecycle()
@@ -205,6 +208,23 @@ fun SettingsScreen(
                     title = "Smart & Secure",
                     subtitle = "AI spam detection, protection stats",
                     onClick = onSmartSecureClick
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Surface(
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                SettingsItem(
+                    icon = Icons.Default.BarChart,
+                    title = "Financial Intelligence",
+                    subtitle = if (isPremium) "Track spending & subscriptions" else "Premium feature",
+                    onClick = onFinancialIntelligenceClick,
+                    trailing = if (!isPremium) {
+                        { Icon(Icons.Default.Lock, contentDescription = "Premium", modifier = Modifier.size(16.dp), tint = AuroraColors.warning) }
+                    } else null
                 )
             }
 
@@ -377,7 +397,8 @@ private fun SettingsItem(
     icon: ImageVector,
     title: String,
     subtitle: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    trailing: @Composable (() -> Unit)? = null
 ) {
     Row(
         modifier = Modifier
@@ -412,6 +433,10 @@ private fun SettingsItem(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+        }
+        if (trailing != null) {
+            trailing()
+            Spacer(modifier = Modifier.width(4.dp))
         }
         Icon(
             imageVector = Icons.Default.ChevronRight,
