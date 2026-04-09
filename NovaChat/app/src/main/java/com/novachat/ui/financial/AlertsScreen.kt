@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -159,7 +160,7 @@ private fun AlertCard(
             Box(
                 modifier = Modifier
                     .width(4.dp)
-                    .matchParentSize()
+                    .fillMaxHeight()
                     .background(borderColor, RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp))
             )
             Column(

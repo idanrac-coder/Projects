@@ -223,7 +223,7 @@ fun SettingsScreen(
                     subtitle = if (isPremium) "Track spending & subscriptions" else "Premium feature",
                     onClick = onFinancialIntelligenceClick,
                     trailing = if (!isPremium) {
-                        { Icon(Icons.Default.Lock, contentDescription = "Premium", modifier = Modifier.size(16.dp), tint = AuroraColors.warning) }
+                        { Icon(Icons.Default.Lock, contentDescription = "Premium", modifier = Modifier.size(16.dp), tint = AuroraColors.Warning) }
                     } else null
                 )
             }

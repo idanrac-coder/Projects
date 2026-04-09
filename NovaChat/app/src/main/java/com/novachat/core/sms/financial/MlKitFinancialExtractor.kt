@@ -38,8 +38,10 @@ class MlKitFinancialExtractor @Inject constructor() {
                         Entity.TYPE_MONEY -> {
                             val money = entity as MoneyEntity
                             if (amount == null) {
-                                amount = money.unnormalizedCurrency.toDoubleOrNull()
-                                currency = money.normalizedCurrency
+                                val intPart = money.integerPart
+                                val fracPart = money.fractionalPart
+                                amount = intPart.toDouble() + fracPart.toDouble() / 100.0
+                                currency = money.unnormalizedCurrency
                             }
                         }
                         Entity.TYPE_DATE_TIME -> {

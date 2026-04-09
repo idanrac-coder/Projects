@@ -54,20 +54,20 @@ class FinancialDashboardViewModel @Inject constructor(
                 repository.getCategoryBreakdown(year, month, card),
                 repository.getDailySpending(year, month, card),
                 repository.getRecentTransactions(20, card),
-                repository.getActiveAlerts(),
-                repository.getAllCards()
-            ) { summary, breakdown, daily, transactions, alerts, cards ->
+                repository.getActiveAlerts()
+            ) { summary, breakdown, daily, transactions, alerts ->
                 DashboardUiState(
                     monthlySummary = summary,
                     categoryBreakdown = breakdown,
                     dailySpending = daily,
                     recentTransactions = transactions,
                     alerts = alerts,
-                    cards = cards,
                     selectedCardLast4 = card,
                     currentMonth = month,
                     currentYear = year
                 )
+            }.combine(repository.getAllCards()) { state, cards ->
+                state.copy(cards = cards)
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), DashboardUiState())
