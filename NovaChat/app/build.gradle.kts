@@ -15,8 +15,8 @@ android {
         applicationId = "com.novachat"
         minSdk = 31
         targetSdk = 35
-        versionCode = 141
-        versionName = "4.0.2"
+        versionCode = 142
+        versionName = "4.0.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -35,6 +35,7 @@ android {
             )
             ndk {
                 debugSymbolLevel = "FULL"
+                abiFilters += listOf("arm64-v8a", "armeabi-v7a")
             }
         }
     }
