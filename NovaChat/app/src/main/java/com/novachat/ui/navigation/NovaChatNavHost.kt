@@ -1,8 +1,11 @@
 package com.novachat.ui.navigation
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -13,8 +16,16 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -67,14 +78,42 @@ fun NovaChatNavHost(
         FinancialDashboardRoute::class.qualifiedName,
         SettingsRoute::class.qualifiedName
     )
-    val showBottomBar = currentRoute in topLevelRoutes
+    val isTopLevelRoute = currentRoute in topLevelRoutes
+
+    // Restore bar whenever we land on a top-level screen
+    var bottomBarScrollVisible by remember { mutableStateOf(true) }
+    LaunchedEffect(currentRoute) {
+        if (isTopLevelRoute) bottomBarScrollVisible = true
+    }
+
+    // Hide on scroll-down, show on scroll-up; threshold avoids jitter on micro-movements
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                when {
+                    available.y < -8f -> bottomBarScrollVisible = false
+                    available.y > 8f  -> bottomBarScrollVisible = true
+                }
+                return Offset.Zero // observe only — never consume
+            }
+        }
+    }
+
+    val showBottomBar = isTopLevelRoute && bottomBarScrollVisible
 
     Scaffold(
+        modifier = Modifier.nestedScroll(nestedScrollConnection),
         bottomBar = {
             AnimatedVisibility(
                 visible = showBottomBar,
-                enter = slideInVertically(initialOffsetY = { it }),
-                exit = slideOutVertically(targetOffsetY = { it })
+                enter = slideInVertically(
+                    animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing),
+                    initialOffsetY = { it }
+                ),
+                exit = slideOutVertically(
+                    animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing),
+                    targetOffsetY = { it }
+                )
             ) {
                 NavigationBar(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer
@@ -125,6 +164,7 @@ fun NovaChatNavHost(
             modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
         ) {
             composable<ConversationsRoute> {
                 ConversationsScreen(
