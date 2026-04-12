@@ -107,6 +107,7 @@ fun NovaChatNavHost(
 
     Scaffold(
         modifier = Modifier.nestedScroll(nestedScrollConnection),
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         bottomBar = {
             AnimatedVisibility(
                 visible = showBottomBar,
