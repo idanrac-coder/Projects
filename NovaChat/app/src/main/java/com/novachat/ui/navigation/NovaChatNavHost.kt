@@ -20,6 +20,9 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -107,7 +110,6 @@ fun NovaChatNavHost(
 
     Scaffold(
         modifier = Modifier.nestedScroll(nestedScrollConnection),
-        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         bottomBar = {
             AnimatedVisibility(
                 visible = showBottomBar,
@@ -160,12 +162,21 @@ fun NovaChatNavHost(
             }
         }
     ) { innerPadding ->
+        val density = LocalDensity.current
         NavHost(
             navController = navController,
             startDestination = ConversationsRoute,
             modifier = modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(
+                    start  = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                    top    = innerPadding.calculateTopPadding(),
+                    end    = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
+                    bottom = with(density) {
+                        (innerPadding.calculateBottomPadding().toPx() - bottomBarOffsetPx)
+                            .coerceAtLeast(0f).toDp()
+                    }
+                )
                 .consumeWindowInsets(innerPadding)
         ) {
             composable<ConversationsRoute> {
