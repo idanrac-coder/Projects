@@ -1,10 +1,8 @@
 package com.novachat.ui.navigation
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,14 +16,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.onGloballyPositioned
+import kotlin.math.roundToInt
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -80,43 +79,43 @@ fun NovaChatNavHost(
     )
     val isTopLevelRoute = currentRoute in topLevelRoutes
 
-    // Restore bar whenever we land on a top-level screen
-    var bottomBarScrollVisible by remember { mutableStateOf(true) }
+    // Capture bar height once measured; used to clamp the scroll offset
+    var bottomBarHeightPx by remember { mutableFloatStateOf(0f) }
+
+    // Proportional offset: 0f = fully visible, bottomBarHeightPx = fully hidden below screen
+    var bottomBarOffsetPx by remember { mutableFloatStateOf(0f) }
+
+    // Reset to fully visible whenever we arrive on a top-level screen
     LaunchedEffect(currentRoute) {
-        if (isTopLevelRoute) bottomBarScrollVisible = true
+        if (isTopLevelRoute) bottomBarOffsetPx = 0f
     }
 
-    // Hide on scroll-down, show on scroll-up; threshold avoids jitter on micro-movements
+    // Proportional real-time tracking — bar slides with the finger, no threshold snap
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                when {
-                    available.y < -8f -> bottomBarScrollVisible = false
-                    available.y > 8f  -> bottomBarScrollVisible = true
-                }
+                val delta = -available.y // positive when scrolling down
+                bottomBarOffsetPx = (bottomBarOffsetPx + delta).coerceIn(0f, bottomBarHeightPx)
                 return Offset.Zero // observe only — never consume
             }
         }
     }
 
-    val showBottomBar = isTopLevelRoute && bottomBarScrollVisible
+    val showBottomBar = isTopLevelRoute // scroll hiding handled by graphicsLayer, not visibility
 
     Scaffold(
         modifier = Modifier.nestedScroll(nestedScrollConnection),
         bottomBar = {
             AnimatedVisibility(
                 visible = showBottomBar,
-                enter = slideInVertically(
-                    animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing),
-                    initialOffsetY = { it }
-                ),
-                exit = slideOutVertically(
-                    animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing),
-                    targetOffsetY = { it }
-                )
+                enter = EnterTransition.None,  // route transitions cover this visually
+                exit = ExitTransition.None
             ) {
                 NavigationBar(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    modifier = Modifier
+                        .onGloballyPositioned { bottomBarHeightPx = it.size.height.toFloat() }
+                        .graphicsLayer { translationY = bottomBarOffsetPx }
                 ) {
                     TopLevelDestination.entries.forEach { dest ->
                         val selected = currentRoute == dest.route::class.qualifiedName
