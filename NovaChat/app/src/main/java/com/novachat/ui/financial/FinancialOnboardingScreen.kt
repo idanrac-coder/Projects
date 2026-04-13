@@ -51,6 +51,7 @@ fun FinancialOnboardingScreen(
     viewModel: FinancialOnboardingViewModel = hiltViewModel()
 ) {
     val currentStep by viewModel.currentStep.collectAsStateWithLifecycle()
+    val selectedProviders by viewModel.selectedProviders.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier
@@ -98,12 +99,24 @@ fun FinancialOnboardingScreen(
 
         // Step content
         Box(modifier = Modifier.weight(1f)) {
+            val locale = java.util.Locale.getDefault()
+            val isIsrael = locale.language in listOf("he", "iw") || locale.country == "IL"
+            val isUS = locale.country == "US"
+            val providers = when {
+                isIsrael -> FinancialProviders.israeliProviders
+                isUS -> FinancialProviders.usProviders
+                else -> emptyList()
+            }
+
             when (currentStep) {
                 0 -> Step1FeatureIntro()
-                1 -> Step2ProviderLinks()
+                1 -> Step2ProviderLinks(
+                    selectedProviders = selectedProviders,
+                    onToggleProvider = viewModel::toggleProvider
+                )
                 2 -> Step3ConfirmEnable(
                     onComplete = {
-                        viewModel.completeOnboarding()
+                        viewModel.completeOnboarding(providers)
                         onComplete()
                     }
                 )
@@ -183,7 +196,10 @@ private fun Step1FeatureIntro() {
 }
 
 @Composable
-private fun Step2ProviderLinks() {
+private fun Step2ProviderLinks(
+    selectedProviders: Set<String>,
+    onToggleProvider: (String) -> Unit
+) {
     val context = LocalContext.current
     val locale = Locale.getDefault()
     val isIsrael = locale.language in listOf("he", "iw") || locale.country == "IL"
@@ -205,7 +221,7 @@ private fun Step2ProviderLinks() {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "For Financial Intelligence to work, your bank and credit card companies must send you transaction SMS messages. Activate alerts from your providers below.",
+            text = "Check the providers you have enabled SMS alerts for. Only checked providers will be monitored.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -221,6 +237,8 @@ private fun Step2ProviderLinks() {
                 items(providers) { provider ->
                     ProviderRow(
                         provider = provider,
+                        isSelected = provider.smsAddress in selectedProviders,
+                        onToggle = { onToggleProvider(provider.smsAddress) },
                         onOpenSetup = {
                             context.startActivity(
                                 Intent(Intent.ACTION_VIEW, Uri.parse(provider.url))
@@ -256,11 +274,14 @@ private fun Step2ProviderLinks() {
 @Composable
 private fun ProviderRow(
     provider: FinancialProvider,
+    isSelected: Boolean,
+    onToggle: () -> Unit,
     onOpenSetup: () -> Unit
 ) {
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        onClick = onToggle
     ) {
         Row(
             modifier = Modifier
@@ -269,6 +290,10 @@ private fun ProviderRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            Checkbox(
+                checked = isSelected,
+                onCheckedChange = { onToggle() }
+            )
             Box(
                 modifier = Modifier
                     .size(40.dp)

@@ -6,7 +6,6 @@ import com.novachat.core.database.financial.dao.FinancialSenderDao
 import com.novachat.core.database.financial.dao.FinancialTransactionDao
 import com.novachat.core.database.financial.dao.MerchantDao
 import com.novachat.core.database.financial.entity.CardEntity
-import com.novachat.core.database.financial.entity.FinancialSenderEntity
 import com.novachat.core.database.financial.entity.FinancialTransactionEntity
 import com.novachat.core.database.financial.entity.MerchantEntity
 import com.novachat.core.datastore.UserPreferencesRepository
@@ -42,22 +41,12 @@ class FinancialSmsParser @Inject constructor(
         // Step 3: Body pre-filter
         if (!regexEngine.isFinancialSms(body)) return
 
-        // Step 4: Sender auto-registration
-        if (existingSender == null) {
-            senderDao.insert(
-                FinancialSenderEntity(
-                    address = address,
-                    source = "AUTO",
-                    createdAt = timestamp,
-                    lastSeenTimestamp = timestamp
-                )
-            )
-        } else {
-            senderDao.update(existingSender.copy(
-                lastSeenTimestamp = timestamp,
-                transactionCount = existingSender.transactionCount + 1
-            ))
-        }
+        // Step 4: Known-sender check — only process opt-in senders (no auto-registration)
+        if (existingSender == null) return
+        senderDao.update(existingSender.copy(
+            lastSeenTimestamp = timestamp,
+            transactionCount = existingSender.transactionCount + 1
+        ))
 
         // Step 5: Extract data
         val regexData = regexEngine.parse(body, address)
