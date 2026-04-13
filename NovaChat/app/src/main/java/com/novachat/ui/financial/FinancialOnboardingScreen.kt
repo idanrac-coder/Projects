@@ -1,7 +1,9 @@
 package com.novachat.ui.financial
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.telephony.TelephonyManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -99,14 +101,7 @@ fun FinancialOnboardingScreen(
 
         // Step content
         Box(modifier = Modifier.weight(1f)) {
-            val locale = java.util.Locale.getDefault()
-            val isIsrael = locale.language in listOf("he", "iw") || locale.country == "IL"
-            val isUS = locale.country == "US"
-            val providers = when {
-                isIsrael -> FinancialProviders.israeliProviders
-                isUS -> FinancialProviders.usProviders
-                else -> emptyList()
-            }
+            val providers = detectCountryProviders()
 
             when (currentStep) {
                 0 -> Step1FeatureIntro()
@@ -196,20 +191,31 @@ private fun Step1FeatureIntro() {
 }
 
 @Composable
+private fun detectCountryProviders(): List<FinancialProvider> {
+    val context = LocalContext.current
+    val tm = context.getSystemService(Context.TELEPHONY_SERVICE) as? TelephonyManager
+    val simCountry = tm?.simCountryIso?.uppercase()
+    val locale = Locale.getDefault()
+
+    val isIsrael = simCountry == "IL"
+            || locale.language in listOf("he", "iw")
+            || locale.country == "IL"
+    val isUS = !isIsrael && (simCountry == "US" || locale.country == "US")
+
+    return when {
+        isIsrael -> FinancialProviders.israeliProviders
+        isUS -> FinancialProviders.usProviders
+        else -> emptyList()
+    }
+}
+
+@Composable
 private fun Step2ProviderLinks(
     selectedProviders: Set<String>,
     onToggleProvider: (String) -> Unit
 ) {
     val context = LocalContext.current
-    val locale = Locale.getDefault()
-    val isIsrael = locale.language in listOf("he", "iw") || locale.country == "IL"
-    val isUS = locale.country == "US"
-
-    val providers = when {
-        isIsrael -> FinancialProviders.israeliProviders
-        isUS -> FinancialProviders.usProviders
-        else -> emptyList()
-    }
+    val providers = detectCountryProviders()
 
     Column(modifier = Modifier.fillMaxSize()) {
         Text(

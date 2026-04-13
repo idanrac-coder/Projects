@@ -5,8 +5,10 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -165,6 +167,7 @@ fun NovaChatNavHost(
         }
     ) { innerPadding ->
         val density = LocalDensity.current
+        val systemNavBottom = WindowInsets.navigationBars.getBottom(density)
         NavHost(
             navController = navController,
             startDestination = ConversationsRoute,
@@ -176,7 +179,7 @@ fun NovaChatNavHost(
                     end    = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
                     bottom = with(density) {
                         (innerPadding.calculateBottomPadding().toPx() - bottomBarOffsetPx)
-                            .coerceAtLeast(0f).toDp()
+                            .coerceAtLeast(systemNavBottom.toFloat()).toDp()
                     }
                 )
                 .consumeWindowInsets(innerPadding)
