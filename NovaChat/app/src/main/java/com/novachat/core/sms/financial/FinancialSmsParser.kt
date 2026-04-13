@@ -34,6 +34,9 @@ class FinancialSmsParser @Inject constructor(
     }
 
     suspend fun parse(smsId: Long, address: String, body: String, timestamp: Long) {
+        // Step 1: Duplicate check — skip if already processed
+        if (transactionDao.existsBySmsId(smsId)) return
+
         // Step 2: Sender disable check
         val existingSender = senderDao.getByAddress(address)
         if (existingSender != null && !existingSender.isEnabled) return

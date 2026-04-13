@@ -13,7 +13,7 @@ data class FinancialProvider(
 object FinancialProviders {
     val israeliProviders = listOf(
         FinancialProvider("American Express Israel", "AE", "https://he.americanexpress.co.il/products-services-lobby/sms/", Color(0xFF2196F3), "AMEX"),
-        FinancialProvider("Isracard (Mastercard)", "IC", "https://business.isracard.co.il/digital_services/information_sms/", Color(0xFF4CAF50), "ISRACARD"),
+        FinancialProvider("Isracard (Mastercard)", "IC", "https://business.isracard.co.il/digital_services/information_sms/", Color(0xFF4CAF50), "Isracard"),
         FinancialProvider("MAX", "MX", "https://www.max.co.il/cards/pages/sms", Color(0xFFFF9800), "MAX"),
         FinancialProvider("Cal", "CL", "https://www.cal-online.co.il/service-and-support/push-notifications", Color(0xFF9C27B0), "CAL"),
         FinancialProvider("Bank Discount", "BD", "https://www.discountbank.co.il/private/communication-channels/online-banking/discount-by-sms/", Color(0xFF009688), "DISCOUNT"),

@@ -20,6 +20,9 @@ interface FinancialTransactionDao {
     @Query("SELECT * FROM financial_transactions WHERE id = :id")
     suspend fun getById(id: Long): FinancialTransactionEntity?
 
+    @Query("SELECT COUNT(*) > 0 FROM financial_transactions WHERE smsId = :smsId")
+    suspend fun existsBySmsId(smsId: Long): Boolean
+
     @Query("SELECT * FROM financial_transactions WHERE isConversion = 0 AND timestamp BETWEEN :startMs AND :endMs AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4) AND sender NOT IN (SELECT address FROM financial_senders WHERE isEnabled = 0) ORDER BY timestamp DESC")
     fun getTransactionsInRange(startMs: Long, endMs: Long, cardLast4: String?): Flow<List<FinancialTransactionEntity>>
 
