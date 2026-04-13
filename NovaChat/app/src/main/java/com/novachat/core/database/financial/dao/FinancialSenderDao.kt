@@ -17,6 +17,9 @@ interface FinancialSenderDao {
     @Update
     suspend fun update(sender: FinancialSenderEntity)
 
+    @Query("SELECT * FROM financial_senders WHERE id = :id LIMIT 1")
+    suspend fun getById(id: Long): FinancialSenderEntity?
+
     @Query("SELECT * FROM financial_senders WHERE address = :address LIMIT 1")
     suspend fun getByAddress(address: String): FinancialSenderEntity?
 

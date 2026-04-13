@@ -159,7 +159,11 @@ class FinancialRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun removeSender(id: Long) = senderDao.delete(id)
+    override suspend fun removeSender(id: Long) {
+        val sender = senderDao.getById(id) ?: return
+        transactionDao.deleteBySender(sender.address)
+        senderDao.delete(id)
+    }
 
     override suspend fun clearAllFinancialData() {
         transactionDao.deleteAll()

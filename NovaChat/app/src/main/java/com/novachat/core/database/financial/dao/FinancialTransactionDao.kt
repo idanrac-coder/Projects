@@ -20,22 +20,22 @@ interface FinancialTransactionDao {
     @Query("SELECT * FROM financial_transactions WHERE id = :id")
     suspend fun getById(id: Long): FinancialTransactionEntity?
 
-    @Query("SELECT * FROM financial_transactions WHERE isConversion = 0 AND timestamp BETWEEN :startMs AND :endMs AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4) ORDER BY timestamp DESC")
+    @Query("SELECT * FROM financial_transactions WHERE isConversion = 0 AND timestamp BETWEEN :startMs AND :endMs AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4) AND sender NOT IN (SELECT address FROM financial_senders WHERE isEnabled = 0) ORDER BY timestamp DESC")
     fun getTransactionsInRange(startMs: Long, endMs: Long, cardLast4: String?): Flow<List<FinancialTransactionEntity>>
 
-    @Query("SELECT * FROM financial_transactions WHERE isConversion = 0 AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4) ORDER BY timestamp DESC LIMIT :limit")
+    @Query("SELECT * FROM financial_transactions WHERE isConversion = 0 AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4) AND sender NOT IN (SELECT address FROM financial_senders WHERE isEnabled = 0) ORDER BY timestamp DESC LIMIT :limit")
     fun getRecentTransactions(limit: Int, cardLast4: String?): Flow<List<FinancialTransactionEntity>>
 
-    @Query("SELECT COALESCE(SUM(amount), 0.0) FROM financial_transactions WHERE isConversion = 0 AND timestamp BETWEEN :startMs AND :endMs AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4)")
+    @Query("SELECT COALESCE(SUM(amount), 0.0) FROM financial_transactions WHERE isConversion = 0 AND timestamp BETWEEN :startMs AND :endMs AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4) AND sender NOT IN (SELECT address FROM financial_senders WHERE isEnabled = 0)")
     fun getTotalInRange(startMs: Long, endMs: Long, cardLast4: String?): Flow<Double>
 
-    @Query("SELECT COUNT(*) FROM financial_transactions WHERE isConversion = 0 AND timestamp BETWEEN :startMs AND :endMs AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4)")
+    @Query("SELECT COUNT(*) FROM financial_transactions WHERE isConversion = 0 AND timestamp BETWEEN :startMs AND :endMs AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4) AND sender NOT IN (SELECT address FROM financial_senders WHERE isEnabled = 0)")
     fun getCountInRange(startMs: Long, endMs: Long, cardLast4: String?): Flow<Int>
 
-    @Query("SELECT category, COALESCE(SUM(amount), 0.0) as total, COUNT(*) as count FROM financial_transactions WHERE isConversion = 0 AND timestamp BETWEEN :startMs AND :endMs AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4) GROUP BY category")
+    @Query("SELECT category, COALESCE(SUM(amount), 0.0) as total, COUNT(*) as count FROM financial_transactions WHERE isConversion = 0 AND timestamp BETWEEN :startMs AND :endMs AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4) AND sender NOT IN (SELECT address FROM financial_senders WHERE isEnabled = 0) GROUP BY category")
     fun getCategoryBreakdown(startMs: Long, endMs: Long, cardLast4: String?): Flow<List<CategoryTotal>>
 
-    @Query("SELECT CAST(strftime('%d', timestamp / 1000, 'unixepoch', 'localtime') AS INTEGER) as dayOfMonth, COALESCE(SUM(amount), 0.0) as total FROM financial_transactions WHERE isConversion = 0 AND timestamp BETWEEN :startMs AND :endMs AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4) GROUP BY dayOfMonth ORDER BY dayOfMonth")
+    @Query("SELECT CAST(strftime('%d', timestamp / 1000, 'unixepoch', 'localtime') AS INTEGER) as dayOfMonth, COALESCE(SUM(amount), 0.0) as total FROM financial_transactions WHERE isConversion = 0 AND timestamp BETWEEN :startMs AND :endMs AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4) AND sender NOT IN (SELECT address FROM financial_senders WHERE isEnabled = 0) GROUP BY dayOfMonth ORDER BY dayOfMonth")
     fun getDailySpending(startMs: Long, endMs: Long, cardLast4: String?): Flow<List<DailyTotal>>
 
     @Query("SELECT * FROM financial_transactions WHERE merchantName = :merchantName AND timestamp > :since ORDER BY timestamp DESC")
@@ -52,6 +52,9 @@ interface FinancialTransactionDao {
 
     @Query("UPDATE financial_transactions SET isRecurring = 1 WHERE id = :id")
     suspend fun markRecurring(id: Long)
+
+    @Query("DELETE FROM financial_transactions WHERE sender = :senderAddress")
+    suspend fun deleteBySender(senderAddress: String)
 
     @Query("DELETE FROM financial_transactions")
     suspend fun deleteAll()

@@ -63,6 +63,10 @@ class FinancialSettingsViewModel @Inject constructor(
         viewModelScope.launch { repository.addSender(address, displayName) }
     }
 
+    fun removeSender(id: Long) {
+        viewModelScope.launch { repository.removeSender(id) }
+    }
+
     fun clearData() {
         viewModelScope.launch { repository.clearAllFinancialData() }
     }

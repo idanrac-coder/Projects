@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.novachat.core.sms.financial.FinancialCategory
+import com.novachat.domain.model.SenderInfo
 import com.novachat.ui.financial.components.CATEGORY_COLORS
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,6 +61,7 @@ fun FinancialSettingsScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var showClearDialog by remember { mutableStateOf(false) }
     var showAddSenderDialog by remember { mutableStateOf(false) }
+    var senderToRemove by remember { mutableStateOf<SenderInfo?>(null) }
 
     Scaffold(
         topBar = {
@@ -140,7 +142,8 @@ fun FinancialSettingsScreen(
                     monitorEnabled = sender.isEnabled,
                     alertsEnabled = sender.alertsEnabled,
                     onMonitorToggle = { viewModel.setSenderEnabled(sender.id, it) },
-                    onAlertsToggle = { viewModel.setSenderAlertsEnabled(sender.id, it) }
+                    onAlertsToggle = { viewModel.setSenderAlertsEnabled(sender.id, it) },
+                    onRemove = { senderToRemove = sender }
                 )
             }
 
@@ -252,6 +255,23 @@ fun FinancialSettingsScreen(
         )
     }
 
+    senderToRemove?.let { sender ->
+        AlertDialog(
+            onDismissRequest = { senderToRemove = null },
+            title = { Text("Remove Sender") },
+            text = { Text("Remove \"${sender.displayName ?: sender.address}\"? All ${sender.transactionCount} transactions from this sender will be permanently deleted.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.removeSender(sender.id)
+                    senderToRemove = null
+                }) { Text("Remove", color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = {
+                TextButton(onClick = { senderToRemove = null }) { Text("Cancel") }
+            }
+        )
+    }
+
     if (showAddSenderDialog) {
         var address by remember { mutableStateOf("") }
         var displayName by remember { mutableStateOf("") }
@@ -342,7 +362,8 @@ private fun SenderRow(
     monitorEnabled: Boolean,
     alertsEnabled: Boolean,
     onMonitorToggle: (Boolean) -> Unit,
-    onAlertsToggle: (Boolean) -> Unit
+    onAlertsToggle: (Boolean) -> Unit,
+    onRemove: () -> Unit
 ) {
     Surface(
         shape = RoundedCornerShape(12.dp),
@@ -351,7 +372,7 @@ private fun SenderRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
@@ -371,6 +392,13 @@ private fun SenderRow(
                     checked = alertsEnabled,
                     onCheckedChange = onAlertsToggle,
                     enabled = monitorEnabled
+                )
+            }
+            IconButton(onClick = onRemove) {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = "Remove sender",
+                    tint = MaterialTheme.colorScheme.error
                 )
             }
         }
