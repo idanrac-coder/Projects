@@ -16,6 +16,7 @@ import com.novachat.domain.model.DailySpending
 import com.novachat.domain.model.MonthlySummary
 import com.novachat.domain.model.SenderInfo
 import com.novachat.domain.model.SubscriptionInfo
+import com.novachat.domain.model.TopMerchant
 import com.novachat.domain.model.TransactionInfo
 import com.novachat.domain.repository.FinancialRepository
 import kotlinx.coroutines.flow.Flow
@@ -45,6 +46,9 @@ class FinancialRepositoryImpl @Inject constructor(
     override fun getDailySpending(year: Int, month: Int, cardLast4: String?): Flow<List<DailySpending>> =
         spendingAnalyzer.getDailySpending(year, month, cardLast4)
 
+    override fun getTopMerchants(year: Int, month: Int, cardLast4: String?, limit: Int): Flow<List<TopMerchant>> =
+        spendingAnalyzer.getTopMerchants(year, month, cardLast4, limit)
+
     override fun getRecentTransactionsForMonth(year: Int, month: Int, limit: Int, cardLast4: String?): Flow<List<TransactionInfo>> {
         val cal = Calendar.getInstance()
         cal.set(year, month - 1, 1, 0, 0, 0)
@@ -71,7 +75,8 @@ class FinancialRepositoryImpl @Inject constructor(
                     timestamp = tx.timestamp,
                     cardLast4 = tx.cardLast4,
                     cardNickname = tx.cardLast4?.let { cardMap[it] },
-                    isRecurring = tx.isRecurring
+                    isRecurring = tx.isRecurring,
+                    senderAddress = tx.sender
                 )
             }
         }
@@ -93,7 +98,8 @@ class FinancialRepositoryImpl @Inject constructor(
                     timestamp = tx.timestamp,
                     cardLast4 = tx.cardLast4,
                     cardNickname = tx.cardLast4?.let { cardMap[it] },
-                    isRecurring = tx.isRecurring
+                    isRecurring = tx.isRecurring,
+                    senderAddress = tx.sender
                 )
             }
         }
@@ -221,4 +227,9 @@ class FinancialRepositoryImpl @Inject constructor(
                 FinancialCategory.EXPENSE.name to expenses
             )
         }
+
+    override suspend fun updateMerchantCategory(merchantName: String, category: String) {
+        merchantDao.updateCategory(merchantName, category)
+        transactionDao.updateCategoryByMerchant(merchantName, category)
+    }
 }

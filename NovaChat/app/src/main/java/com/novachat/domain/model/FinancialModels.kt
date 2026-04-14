@@ -73,5 +73,29 @@ data class TransactionInfo(
     val timestamp: Long,
     val cardLast4: String?,
     val cardNickname: String?,
-    val isRecurring: Boolean
+    val isRecurring: Boolean,
+    val senderAddress: String? = null
+)
+
+data class TopMerchant(
+    val merchantName: String,
+    val totalSpent: Double,
+    val transactionCount: Int
+)
+
+data class MonthComparison(
+    val currentTotal: Double,
+    val previousTotal: Double,
+    val percentageChange: Double,
+    val currency: String,
+    val currentMonth: Int,
+    val currentYear: Int
+)
+
+data class SpendingVelocity(
+    val dailyRate: Double,
+    val projectedMonthTotal: Double,
+    val daysElapsed: Int,
+    val daysInMonth: Int,
+    val currency: String
 )

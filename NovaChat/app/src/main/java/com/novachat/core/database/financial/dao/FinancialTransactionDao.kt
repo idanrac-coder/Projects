@@ -59,8 +59,14 @@ interface FinancialTransactionDao {
     @Query("UPDATE financial_transactions SET isRecurring = 1 WHERE id = :id")
     suspend fun markRecurring(id: Long)
 
+    @Query("UPDATE financial_transactions SET category = :category WHERE merchantName = :merchantName")
+    suspend fun updateCategoryByMerchant(merchantName: String, category: String)
+
     @Query("DELETE FROM financial_transactions WHERE sender = :senderAddress")
     suspend fun deleteBySender(senderAddress: String)
+
+    @Query("SELECT merchantName, COALESCE(SUM(amount), 0.0) as totalSpent, COUNT(*) as txCount FROM financial_transactions WHERE isConversion = 0 AND timestamp BETWEEN :startMs AND :endMs AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4) AND sender NOT IN (SELECT address FROM financial_senders WHERE isEnabled = 0) AND merchantName IS NOT NULL GROUP BY merchantName ORDER BY totalSpent DESC LIMIT :limit")
+    fun getTopMerchants(startMs: Long, endMs: Long, cardLast4: String?, limit: Int): Flow<List<MerchantTotal>>
 
     @Query("DELETE FROM financial_transactions")
     suspend fun deleteAll()
@@ -68,3 +74,4 @@ interface FinancialTransactionDao {
 
 data class CategoryTotal(val category: String, val total: Double, val count: Int)
 data class DailyTotal(val dayOfMonth: Int, val total: Double)
+data class MerchantTotal(val merchantName: String, val totalSpent: Double, val txCount: Int)

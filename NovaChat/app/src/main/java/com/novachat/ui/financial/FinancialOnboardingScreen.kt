@@ -110,8 +110,8 @@ fun FinancialOnboardingScreen(
                     onToggleProvider = viewModel::toggleProvider
                 )
                 2 -> Step3ConfirmEnable(
-                    onComplete = {
-                        viewModel.completeOnboarding(providers)
+                    onComplete = { scanInbox ->
+                        viewModel.completeOnboarding(providers, scanInbox)
                         onComplete()
                     }
                 )
@@ -327,10 +327,11 @@ private fun ProviderRow(
 
 @Composable
 private fun Step3ConfirmEnable(
-    onComplete: () -> Unit
+    onComplete: (scanInbox: Boolean) -> Unit
 ) {
     var smsEnabled by remember { mutableStateOf(false) }
     var featureEnabled by remember { mutableStateOf(true) }
+    var scanInbox by remember { mutableStateOf(true) }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -360,6 +361,29 @@ private fun Step3ConfirmEnable(
             )
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            verticalAlignment = Alignment.Top,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Checkbox(
+                checked = scanInbox,
+                onCheckedChange = { scanInbox = it }
+            )
+            Column {
+                Text(
+                    text = "Scan existing SMS inbox for past transactions",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = "Finds transactions from previous months",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(
@@ -381,7 +405,7 @@ private fun Step3ConfirmEnable(
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
-            onClick = onComplete,
+            onClick = { onComplete(scanInbox) },
             enabled = smsEnabled && featureEnabled,
             modifier = Modifier
                 .fillMaxWidth()

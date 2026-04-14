@@ -7,6 +7,7 @@ import com.novachat.domain.model.DailySpending
 import com.novachat.domain.model.MonthlySummary
 import com.novachat.domain.model.SenderInfo
 import com.novachat.domain.model.SubscriptionInfo
+import com.novachat.domain.model.TopMerchant
 import com.novachat.domain.model.TransactionInfo
 import kotlinx.coroutines.flow.Flow
 
@@ -14,6 +15,7 @@ interface FinancialRepository {
     fun getMonthlySummary(year: Int, month: Int, cardLast4: String?): Flow<MonthlySummary>
     fun getCategoryBreakdown(year: Int, month: Int, cardLast4: String?): Flow<List<CategoryBreakdown>>
     fun getDailySpending(year: Int, month: Int, cardLast4: String?): Flow<List<DailySpending>>
+    fun getTopMerchants(year: Int, month: Int, cardLast4: String?, limit: Int = 5): Flow<List<TopMerchant>>
     fun getRecentTransactions(limit: Int, cardLast4: String?): Flow<List<TransactionInfo>>
     fun getRecentTransactionsForMonth(year: Int, month: Int, limit: Int, cardLast4: String?): Flow<List<TransactionInfo>>
 
@@ -38,4 +40,6 @@ interface FinancialRepository {
 
     suspend fun clearAllFinancialData()
     fun getCategoryCounts(): Flow<Map<String, Int>>
+
+    suspend fun updateMerchantCategory(merchantName: String, category: String)
 }

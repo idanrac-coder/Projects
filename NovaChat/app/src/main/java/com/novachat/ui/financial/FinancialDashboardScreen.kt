@@ -32,8 +32,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.novachat.ui.financial.components.AlertsBanner
 import com.novachat.ui.financial.components.CategoryBreakdownBar
+import com.novachat.ui.financial.components.MonthComparisonCard
 import com.novachat.ui.financial.components.MonthlySummaryCard
 import com.novachat.ui.financial.components.SpendingChart
+import com.novachat.ui.financial.components.SpendingVelocityCard
+import com.novachat.ui.financial.components.TopMerchantsCard
 import com.novachat.ui.financial.components.TransactionItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,6 +45,7 @@ fun FinancialDashboardScreen(
     onNavigateToSettings: () -> Unit,
     onNavigateToSubscriptions: () -> Unit,
     onNavigateToAlerts: () -> Unit,
+    onNavigateToConversation: (Long, String, String?) -> Unit = { _, _, _ -> },
     viewModel: FinancialDashboardViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -123,6 +127,37 @@ fun FinancialDashboardScreen(
                 }
             }
 
+            // Month-over-Month Comparison
+            state.monthComparison?.let { comparison ->
+                item {
+                    MonthComparisonCard(
+                        comparison = comparison,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
+            }
+
+            // Spending Velocity (current month only)
+            state.spendingVelocity?.let { velocity ->
+                item {
+                    SpendingVelocityCard(
+                        velocity = velocity,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
+            }
+
+            // Top Merchants
+            if (state.topMerchants.isNotEmpty()) {
+                item {
+                    TopMerchantsCard(
+                        merchants = state.topMerchants,
+                        currency = state.monthlySummary.currency,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
+            }
+
             // Spending Chart
             item {
                 SpendingChart(
@@ -148,7 +183,17 @@ fun FinancialDashboardScreen(
                 else
                     state.recentTransactions.take(5)
                 items(visibleTransactions, key = { it.id }) { transaction ->
-                    TransactionItem(transaction = transaction)
+                    TransactionItem(
+                        transaction = transaction,
+                        onCategoryChange = { merchantName, category ->
+                            viewModel.updateTransactionCategory(merchantName, category.name)
+                        },
+                        onViewInConversation = { address ->
+                            viewModel.resolveAndNavigateToConversation(address) { threadId ->
+                                onNavigateToConversation(threadId, address, null)
+                            }
+                        }
+                    )
                 }
                 if (state.recentTransactions.size > 5) {
                     item {

@@ -385,7 +385,10 @@ fun NovaChatNavHost(
                 FinancialDashboardScreen(
                     onNavigateToSettings = { navController.navigate(FinancialSettingsRoute) },
                     onNavigateToSubscriptions = { navController.navigate(SubscriptionListRoute) },
-                    onNavigateToAlerts = { navController.navigate(AlertsRoute) }
+                    onNavigateToAlerts = { navController.navigate(AlertsRoute) },
+                    onNavigateToConversation = { threadId, address, contactName ->
+                        navController.navigate(ChatRoute(threadId, address, contactName))
+                    }
                 )
             }
 

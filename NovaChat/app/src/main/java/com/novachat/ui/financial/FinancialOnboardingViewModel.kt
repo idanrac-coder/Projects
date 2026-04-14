@@ -41,7 +41,7 @@ class FinancialOnboardingViewModel @Inject constructor(
         }
     }
 
-    fun completeOnboarding(providers: List<FinancialProvider>) {
+    fun completeOnboarding(providers: List<FinancialProvider>, scanInbox: Boolean = false) {
         viewModelScope.launch {
             _selectedProviders.value.forEach { addr ->
                 val provider = providers.firstOrNull { it.smsAddress == addr }
@@ -50,6 +50,9 @@ class FinancialOnboardingViewModel @Inject constructor(
             userPreferencesRepository.setFinancialIntelligenceEnabled(true)
             userPreferencesRepository.setFinancialOnboardingComplete(true)
             FinancialParsingWorker.enqueue(context)
+            if (scanInbox) {
+                FinancialParsingWorker.enqueueScan(context)
+            }
         }
     }
 }

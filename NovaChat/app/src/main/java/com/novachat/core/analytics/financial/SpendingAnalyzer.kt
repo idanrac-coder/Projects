@@ -8,6 +8,7 @@ import com.novachat.core.sms.financial.FinancialCategory
 import com.novachat.domain.model.CategoryBreakdown
 import com.novachat.domain.model.DailySpending
 import com.novachat.domain.model.MonthlySummary
+import com.novachat.domain.model.TopMerchant
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -56,6 +57,13 @@ class SpendingAnalyzer @Inject constructor(
         val (start, end) = getMonthRange(year, month)
         return transactionDao.getDailySpending(start, end, cardLast4).map { dailies ->
             dailies.map { DailySpending(dayOfMonth = it.dayOfMonth, total = it.total) }
+        }
+    }
+
+    fun getTopMerchants(year: Int, month: Int, cardLast4: String?, limit: Int = 5): Flow<List<TopMerchant>> {
+        val (start, end) = getMonthRange(year, month)
+        return transactionDao.getTopMerchants(start, end, cardLast4, limit).map { list ->
+            list.map { TopMerchant(merchantName = it.merchantName, totalSpent = it.totalSpent, transactionCount = it.txCount) }
         }
     }
 
