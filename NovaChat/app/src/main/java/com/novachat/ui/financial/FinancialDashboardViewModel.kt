@@ -53,7 +53,7 @@ class FinancialDashboardViewModel @Inject constructor(
                 repository.getMonthlySummary(year, month, card),
                 repository.getCategoryBreakdown(year, month, card),
                 repository.getDailySpending(year, month, card),
-                repository.getRecentTransactions(20, card),
+                repository.getRecentTransactionsForMonth(year, month, 10, card),
                 repository.getActiveAlerts()
             ) { summary, breakdown, daily, transactions, alerts ->
                 DashboardUiState(

@@ -19,8 +19,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -41,6 +45,7 @@ fun FinancialDashboardScreen(
     viewModel: FinancialDashboardViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    var transactionsExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -138,8 +143,22 @@ fun FinancialDashboardScreen(
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
                 }
-                items(state.recentTransactions, key = { it.id }) { transaction ->
+                val visibleTransactions = if (transactionsExpanded)
+                    state.recentTransactions
+                else
+                    state.recentTransactions.take(5)
+                items(visibleTransactions, key = { it.id }) { transaction ->
                     TransactionItem(transaction = transaction)
+                }
+                if (state.recentTransactions.size > 5) {
+                    item {
+                        TextButton(
+                            onClick = { transactionsExpanded = !transactionsExpanded },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(if (transactionsExpanded) "Show less" else "Show ${state.recentTransactions.size - 5} more")
+                        }
+                    }
                 }
             }
         }

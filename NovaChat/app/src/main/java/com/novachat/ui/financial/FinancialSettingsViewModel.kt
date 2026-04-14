@@ -1,11 +1,14 @@
 package com.novachat.ui.financial
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.novachat.core.datastore.UserPreferencesRepository
+import com.novachat.core.worker.FinancialParsingWorker
 import com.novachat.domain.model.SenderInfo
 import com.novachat.domain.repository.FinancialRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -24,7 +27,8 @@ data class FinancialSettingsUiState(
 @HiltViewModel
 class FinancialSettingsViewModel @Inject constructor(
     private val repository: FinancialRepository,
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val userPreferencesRepository: UserPreferencesRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     val uiState: StateFlow<FinancialSettingsUiState> = combine(
@@ -65,6 +69,10 @@ class FinancialSettingsViewModel @Inject constructor(
 
     fun removeSender(id: Long) {
         viewModelScope.launch { repository.removeSender(id) }
+    }
+
+    fun scanInbox() {
+        FinancialParsingWorker.enqueueScan(context)
     }
 
     fun clearData() {

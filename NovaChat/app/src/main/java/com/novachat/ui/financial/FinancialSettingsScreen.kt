@@ -20,6 +20,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -100,6 +101,14 @@ fun FinancialSettingsScreen(
                     title = "Primary Currency",
                     subtitle = "${state.primaryCurrency} (${currencySymbolFromCode(state.primaryCurrency)})",
                     trailing = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null) }
+                )
+            }
+            item {
+                SettingsRow(
+                    title = "Scan Inbox",
+                    subtitle = "Re-scan all SMS for transactions from your senders",
+                    leading = { Icon(Icons.Default.MailOutline, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp)) },
+                    onClick = { viewModel.scanInbox() }
                 )
             }
 

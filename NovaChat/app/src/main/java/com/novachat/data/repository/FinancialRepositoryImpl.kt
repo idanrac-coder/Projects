@@ -21,6 +21,7 @@ import com.novachat.domain.repository.FinancialRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import java.util.Calendar
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -43,6 +44,38 @@ class FinancialRepositoryImpl @Inject constructor(
 
     override fun getDailySpending(year: Int, month: Int, cardLast4: String?): Flow<List<DailySpending>> =
         spendingAnalyzer.getDailySpending(year, month, cardLast4)
+
+    override fun getRecentTransactionsForMonth(year: Int, month: Int, limit: Int, cardLast4: String?): Flow<List<TransactionInfo>> {
+        val cal = Calendar.getInstance()
+        cal.set(year, month - 1, 1, 0, 0, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+        val startMs = cal.timeInMillis
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH))
+        cal.set(Calendar.HOUR_OF_DAY, 23)
+        cal.set(Calendar.MINUTE, 59)
+        cal.set(Calendar.SECOND, 59)
+        cal.set(Calendar.MILLISECOND, 999)
+        val endMs = cal.timeInMillis
+        return combine(
+            transactionDao.getRecentTransactionsInRange(startMs, endMs, limit, cardLast4),
+            cardDao.getAllCards()
+        ) { transactions, cards ->
+            val cardMap = cards.associate { it.last4 to it.nickname }
+            transactions.map { tx ->
+                TransactionInfo(
+                    id = tx.id,
+                    merchantName = tx.merchantName,
+                    amount = tx.amount,
+                    currency = tx.currency,
+                    category = tx.category,
+                    timestamp = tx.timestamp,
+                    cardLast4 = tx.cardLast4,
+                    cardNickname = tx.cardLast4?.let { cardMap[it] },
+                    isRecurring = tx.isRecurring
+                )
+            }
+        }
+    }
 
     override fun getRecentTransactions(limit: Int, cardLast4: String?): Flow<List<TransactionInfo>> =
         combine(

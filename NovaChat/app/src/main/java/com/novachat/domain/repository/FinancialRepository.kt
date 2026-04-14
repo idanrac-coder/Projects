@@ -15,6 +15,7 @@ interface FinancialRepository {
     fun getCategoryBreakdown(year: Int, month: Int, cardLast4: String?): Flow<List<CategoryBreakdown>>
     fun getDailySpending(year: Int, month: Int, cardLast4: String?): Flow<List<DailySpending>>
     fun getRecentTransactions(limit: Int, cardLast4: String?): Flow<List<TransactionInfo>>
+    fun getRecentTransactionsForMonth(year: Int, month: Int, limit: Int, cardLast4: String?): Flow<List<TransactionInfo>>
 
     fun getActiveSubscriptions(cardLast4: String?): Flow<List<SubscriptionInfo>>
     fun getSubscriptionTotal(cardLast4: String?): Flow<Double>

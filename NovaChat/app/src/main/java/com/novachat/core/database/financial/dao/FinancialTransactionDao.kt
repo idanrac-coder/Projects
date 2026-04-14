@@ -29,6 +29,9 @@ interface FinancialTransactionDao {
     @Query("SELECT * FROM financial_transactions WHERE isConversion = 0 AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4) AND sender NOT IN (SELECT address FROM financial_senders WHERE isEnabled = 0) ORDER BY timestamp DESC LIMIT :limit")
     fun getRecentTransactions(limit: Int, cardLast4: String?): Flow<List<FinancialTransactionEntity>>
 
+    @Query("SELECT * FROM financial_transactions WHERE isConversion = 0 AND timestamp BETWEEN :startMs AND :endMs AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4) AND sender NOT IN (SELECT address FROM financial_senders WHERE isEnabled = 0) ORDER BY timestamp DESC LIMIT :limit")
+    fun getRecentTransactionsInRange(startMs: Long, endMs: Long, limit: Int, cardLast4: String?): Flow<List<FinancialTransactionEntity>>
+
     @Query("SELECT COALESCE(SUM(amount), 0.0) FROM financial_transactions WHERE isConversion = 0 AND timestamp BETWEEN :startMs AND :endMs AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4) AND sender NOT IN (SELECT address FROM financial_senders WHERE isEnabled = 0)")
     fun getTotalInRange(startMs: Long, endMs: Long, cardLast4: String?): Flow<Double>
 
