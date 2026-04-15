@@ -18,6 +18,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import net.zetetic.database.sqlcipher.SQLiteConnection
+import net.zetetic.database.sqlcipher.SQLiteDatabaseHook
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 import javax.inject.Singleton
 
@@ -32,7 +34,14 @@ object FinancialDatabaseModule {
         keyManager: FinancialKeyManager
     ): FinancialDatabase {
         val passphrase = keyManager.getPassphrase()
-        val factory = SupportOpenHelperFactory(passphrase)
+        val dbFile = context.getDatabasePath("financial.db")
+        val hook: SQLiteDatabaseHook? = if (dbFile.exists()) object : SQLiteDatabaseHook {
+            override fun preKey(connection: SQLiteConnection) {}
+            override fun postKey(connection: SQLiteConnection) {
+                connection.execute("PRAGMA cipher_page_size = 4096;", arrayOf(), null)
+            }
+        } else null
+        val factory = SupportOpenHelperFactory(passphrase, hook, false)
         return Room.databaseBuilder(
             context,
             FinancialDatabase::class.java,
