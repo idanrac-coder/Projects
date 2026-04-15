@@ -50,6 +50,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
+import com.novachat.R
 import com.novachat.core.theme.AuroraColors
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,10 +70,10 @@ fun SmartSecureScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("Smart & Secure", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.smart_and_secure), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -111,7 +113,7 @@ fun SmartSecureScreen(
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "Spam Protection",
+                        text = stringResource(R.string.spam_protection),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -139,7 +141,7 @@ fun SmartSecureScreen(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text(
-                                text = "Suspected scam detected",
+                                text = stringResource(R.string.suspected_scam_detected),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onErrorContainer
@@ -169,7 +171,7 @@ fun SmartSecureScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "${uiState.spamCount} spam blocked this month",
+                        text = stringResource(R.string.spam_blocked_fmt, uiState.spamCount),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.SemiBold,
                         color = AuroraColors.Success,
@@ -206,12 +208,12 @@ fun SmartSecureScreen(
                     Spacer(modifier = Modifier.width(10.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "AI Scam Detection",
+                            text = stringResource(R.string.ai_scam_detection),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Medium
                         )
                         Text(
-                            text = "Automatically filter malicious messages",
+                            text = stringResource(R.string.ai_scam_detection_subtitle),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -250,12 +252,12 @@ fun SmartSecureScreen(
                     Spacer(modifier = Modifier.width(10.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Filter international senders",
+                            text = stringResource(R.string.filter_international_senders),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Medium
                         )
                         Text(
-                            text = "Hide messages from numbers outside your country",
+                            text = stringResource(R.string.filter_international_subtitle),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -284,8 +286,8 @@ fun SmartSecureScreen(
                 Column {
                     NavItem(
                         icon = Icons.Default.Block,
-                        title = "Blocking",
-                        subtitle = "Number, keywords & sender rules",
+                        title = stringResource(R.string.blocking),
+                        subtitle = stringResource(R.string.blocking_subtitle),
                         onClick = onBlockingClick
                     )
                     Box(
@@ -297,8 +299,8 @@ fun SmartSecureScreen(
                     )
                     NavItem(
                         icon = Icons.Default.Folder,
-                        title = "Spam Folder",
-                        subtitle = "View filtered messages",
+                        title = stringResource(R.string.spam_folder),
+                        subtitle = stringResource(R.string.spam_folder_subtitle),
                         onClick = onSpamFolderClick
                     )
                     Box(
@@ -310,8 +312,8 @@ fun SmartSecureScreen(
                     )
                     NavItem(
                         icon = Icons.Default.VerifiedUser,
-                        title = "Trusted Senders",
-                        subtitle = "Senders that skip spam checks",
+                        title = stringResource(R.string.trusted_senders),
+                        subtitle = stringResource(R.string.trusted_senders_subtitle),
                         onClick = onTrustedSendersClick
                     )
                     Box(
@@ -323,8 +325,8 @@ fun SmartSecureScreen(
                     )
                     NavItem(
                         icon = Icons.Default.ManageSearch,
-                        title = "Scan Inbox",
-                        subtitle = "Find old spam in your inbox",
+                        title = stringResource(R.string.scan_inbox),
+                        subtitle = stringResource(R.string.scan_inbox_subtitle),
                         onClick = onScanInboxClick
                     )
                 }

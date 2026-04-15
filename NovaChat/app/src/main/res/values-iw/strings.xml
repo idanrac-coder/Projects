@@ -1,0 +1,746 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Aura</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_messages">הודעות</string>
+    <string name="nav_financial">פיננסי</string>
+    <string name="nav_settings">הגדרות</string>
+
+    <!-- Conversations Screen -->
+    <string name="aura_messaging">Aura הודעות</string>
+    <string name="search_conversations">חיפוש שיחות…</string>
+    <string name="conversations">שיחות</string>
+    <string name="search">חיפוש</string>
+    <string name="new_message">הודעה חדשה</string>
+    <string name="no_messages">אין הודעות עדיין</string>
+    <string name="no_messages_subtitle">התחל שיחה על ידי לחיצה על כפתור כתיבה</string>
+    <string name="archived">ארכיון</string>
+    <string name="edit">ערוך</string>
+    <string name="delete">מחק</string>
+    <string name="cancel">ביטול</string>
+    <string name="back">חזור</string>
+    <string name="clear">נקה</string>
+    <string name="archive">ארכיון</string>
+    <string name="category">קטגוריה</string>
+    <string name="rename">שנה שם</string>
+    <string name="add_new_category">הוסף קטגוריה חדשה</string>
+    <string name="category_name">שם קטגוריה</string>
+    <string name="rename_category">שנה שם קטגוריה</string>
+    <string name="no_custom_categories">אין קטגוריות מותאמות אישית עדיין.</string>
+    <string name="no_custom_categories_create_hint">אין קטגוריות מותאמות אישית עדיין. צור אחת מכפתור ערוך בסרגל הקטגוריות.</string>
+    <string name="choose_category_hint">בחר קטגוריה לשיחות הנבחרות</string>
+    <string name="remove_from_category">הסר מקטגוריה</string>
+    <string name="block_contact_title">חסום %s</string>
+    <string name="block_choose_how">בחר כיצד לחסום את איש הקשר הזה. הודעות חסומות יועברו לתיקיית הספאם.</string>
+    <string name="block_by_number">חסום לפי מספר</string>
+    <string name="block_by_sender">חסום לפי שולח</string>
+    <string name="block_by_words">חסום לפי מילים</string>
+    <string name="block_by_language">חסום לפי שפה</string>
+    <string name="block_enter_words">הזן מילים לחסימה (מופרדות בפסיק)</string>
+    <string name="block_enter_language">הזן קוד שפה (למשל, en, es, fr)</string>
+    <string name="unable_sms_settings">לא ניתן לפתוח הגדרות SMS. אנא הגדר את Aura כברירת מחדל דרך הגדרות המכשיר > אפליקציות > אפליקציות ברירת מחדל.</string>
+    <string name="delete_conversation">למחוק את השיחה?</string>
+    <string name="delete_n_conversations">למחוק %d שיחות?</string>
+    <string name="delete_conversation_text">שיחה זו תימחק לצמיתות. לא ניתן לבטל פעולה זו.</string>
+    <string name="delete_n_conversations_text">%d שיחות אלה יימחקו לצמיתות. לא ניתן לבטל פעולה זו.</string>
+    <string name="default_messaging_app_required">נדרשת אפליקציית ברירת מחדל להודעות</string>
+    <string name="default_sms_required_text">למחיקת שיחות, Aura צריכה להיות מוגדרת כאפליקציית ברירת המחדל שלך להודעות. זה מאפשר ל-Aura לנהל את ההודעות שלך.</string>
+    <string name="set_as_default">הגדר כברירת מחדל</string>
+    <string name="not_now">לא עכשיו</string>
+    <string name="set_as_default_title">הגדר כאפליקציית הודעות ברירת מחדל</string>
+    <string name="set_as_default_text">לחוויה הטובה ביותר, הגדר את Aura כאפליקציית ברירת המחדל שלך להודעות. זה מאפשר ניהול הודעות מלא.</string>
+    <string name="assign_category">שיוך קטגוריה</string>
+    <string name="manage_categories">ניהול קטגוריות</string>
+    <string name="new_category">קטגוריה חדשה</string>
+
+    <!-- Chat Screen -->
+    <string name="type_message">כתוב הודעה…</string>
+    <string name="send">שלח</string>
+    <string name="search_in_conversation">חיפוש בשיחה…</string>
+    <string name="pinned_messages">הודעות מוצמדות</string>
+    <string name="media_gallery">גלריית מדיה</string>
+    <string name="disappearing_messages">הודעות נעלמות</string>
+    <string name="reply">השב</string>
+    <string name="copy">העתק</string>
+    <string name="forward">העבר</string>
+    <string name="remind">תזכורת</string>
+    <string name="share">שתף</string>
+    <string name="view_details">פרטים</string>
+    <string name="send_message_action">שלח הודעה</string>
+    <string name="add_to_contacts">הוסף לאנשי קשר</string>
+    <string name="call">התקשר</string>
+    <string name="copy_number">העתק מספר</string>
+    <string name="unknown_sender">שולח לא מוכר</string>
+    <string name="trust">אמון</string>
+    <string name="block">חסום</string>
+    <string name="reported_as_spam">דווח כספאם</string>
+    <string name="more">עוד</string>
+
+    <!-- Settings Screen -->
+    <string name="settings">הגדרות</string>
+    <string name="premium_account">חשבון פרימיום</string>
+    <string name="upgrade_to_premium">שדרג לפרימיום</string>
+    <string name="all_features_unlocked">כל התכונות פתוחות</string>
+    <string name="unlock_all_features">פתח את כל הנושאים, התכונות ועוד</string>
+    <string name="section_appearance">מראה</string>
+    <string name="themes">ערכות נושא</string>
+    <string name="themes_subtitle">צבעים, בועות וטפטים</string>
+    <string name="swipe_actions">פעולות החלקה</string>
+    <string name="swipe_actions_subtitle">הגדר מחוות החלקה</string>
+    <string name="app_language">שפת האפליקציה</string>
+    <string name="language_hebrew">עברית</string>
+    <string name="language_english">אנגלית</string>
+    <string name="language_system_default">ברירת מחדל של המערכת</string>
+    <string name="section_protection">הגנה</string>
+    <string name="smart_and_secure">חכם ומאובטח</string>
+    <string name="smart_and_secure_subtitle">זיהוי ספאם בינה מלאכותית, סטטיסטיקות הגנה</string>
+    <string name="financial_intelligence">מודיעין פיננסי</string>
+    <string name="financial_intelligence_subtitle">מעקב הוצאות ומנויים</string>
+    <string name="premium_feature">תכונת פרימיום</string>
+    <string name="section_messages">הודעות</string>
+    <string name="messaging_settings">הגדרות הודעות</string>
+    <string name="messaging_settings_subtitle">ביטול שליחה, קישורים חכמים והעברה</string>
+    <string name="notifications">התראות</string>
+    <string name="notifications_subtitle">צלילים, רטט ואל תפריע</string>
+    <string name="notification_profiles">פרופילי התראות</string>
+    <string name="notification_profiles_subtitle">מצבי עבודה, שינה ואישי</string>
+    <string name="scheduled_messages">הודעות מתוזמנות</string>
+    <string name="scheduled_messages_subtitle">ניהול הודעות ממתינות</string>
+    <string name="archived_subtitle">הצג שיחות בארכיון</string>
+    <string name="section_data_privacy">נתונים ופרטיות</string>
+    <string name="backup_and_restore">גיבוי ושחזור</string>
+    <string name="backup_subtitle">גבה ל-Google Drive</string>
+    <string name="qr_contact_sharing">שיתוף איש קשר QR</string>
+    <string name="qr_contact_sharing_subtitle">שתף את פרטי הקשר שלך באמצעות QR</string>
+    <string name="privacy_policy">מדיניות פרטיות</string>
+    <string name="privacy_policy_subtitle">כיצד הנתונים שלך מטופלים</string>
+    <string name="section_support">תמיכה</string>
+    <string name="send_feedback">שלח משוב</string>
+    <string name="send_feedback_subtitle">דווח על באגים או הצע תכונות</string>
+    <string name="rate_us">דרג אותנו</string>
+    <string name="rate_us_subtitle">השאר ביקורת ב-Google Play</string>
+    <string name="apply">החל</string>
+    <string name="language_hebrew_native">עברית (Hebrew)</string>
+
+    <!-- Spam-related strings -->
+    <string name="report_spam">דווח כספאם</string>
+    <string name="not_spam">לא ספאם</string>
+    <string name="suspicious_message">הודעה חשודה</string>
+    <string name="trust_sender">אשר שולח</string>
+    <string name="block_contact">חסום איש קשר</string>
+    <string name="blocked_spam">חסום / ספאם</string>
+    <string name="suspicious_link_hint">קישור חשוד – פתיחה רק לאחר סימון כלא ספאם</string>
+
+    <!-- Smart &amp; Secure -->
+    <string name="spam_protection">הגנת ספאם</string>
+    <string name="suspected_scam_detected">זוהה הונאה חשודה</string>
+    <string name="spam_blocked_fmt">%d ספאמים נחסמו החודש</string>
+    <string name="ai_scam_detection">זיהוי הונאות בינה מלאכותית</string>
+    <string name="ai_scam_detection_subtitle">סינון אוטומטי של הודעות זדוניות</string>
+    <string name="filter_international_senders">סנן שולחים בינלאומיים</string>
+    <string name="filter_international_subtitle">הסתר הודעות ממספרים מחוץ למדינתך</string>
+    <string name="spam_folder">תיקיית ספאם</string>
+    <string name="spam_folder_subtitle">הצג הודעות מסוננות</string>
+    <string name="trusted_senders">שולחים מהימנים</string>
+    <string name="trusted_senders_subtitle">שולחים שמדלגים על בדיקות ספאם</string>
+    <string name="scan_inbox">סרוק תיבת דואר</string>
+    <string name="scan_inbox_subtitle">מצא ספאם ישן בתיבת הדואר שלך</string>
+    <string name="blocking_subtitle">מספר, מילות מפתח וכללי שולח</string>
+
+    <!-- Trusted Senders -->
+    <string name="no_trusted_senders">אין שולחים מהימנים עדיין</string>
+    <string name="no_trusted_senders_hint">הקש + להוסיף שולח, או סמן הודעה כ"לא ספאם"</string>
+    <string name="trusted_senders_description">הודעות משולחים אלה מדלגות על בדיקות ספאם.</string>
+    <string name="add_trusted_sender">הוסף שולח מהימן</string>
+    <string name="add_trusted_sender_text">הכנס מספר טלפון או שם שולח לסמן כמהימן. הודעות משולח זה ידלגו על בדיקות ספאם.</string>
+    <string name="phone_or_sender_name">מספר טלפון או שם שולח</string>
+
+    <!-- Blocking -->
+    <string name="blocking">חסימה</string>
+    <string name="by_number">לפי מספר</string>
+    <string name="by_words">לפי מילים</string>
+    <string name="by_sender">לפי שולח</string>
+    <string name="by_language">לפי שפה</string>
+    <string name="tap_to_add_rule">הקש + להוסיף כלל</string>
+    <string name="regex_pattern">תבנית Regex</string>
+    <string name="use_regex_pattern">השתמש בתבנית Regex</string>
+    <string name="block_number">חסום מספר</string>
+    <string name="block_keyword">חסום מילת מפתח</string>
+    <string name="block_sender_rule">חסום שולח</string>
+    <string name="block_language">חסום שפה</string>
+    <string name="wildcard_note">השתמש ב-* כתו כללי (למשל, +972* חוסם כל המספרים המתחילים ב-+972)</string>
+    <string name="free_plan_rules_fmt">תוכנית חינמית: %1$d/%2$d כללי חסימה בשימוש. שדרג לפרימיום לכללים ללא הגבלה.</string>
+    <string name="no_rules_yet_fmt">אין כללי %s עדיין</string>
+    <string name="phone_number_example">מספר טלפון (למשל, +972*)</string>
+    <string name="keyword_or_phrase">מילת מפתח או ביטוי</string>
+    <string name="sender_name_label">שם שולח</string>
+    <string name="language_code_example">קוד שפה (למשל he, en, es)</string>
+    <string name="add">הוסף</string>
+
+    <!-- Inbox Spam Scan -->
+    <string name="scanning_inbox">סורק את תיבת הדואר…</string>
+    <string name="may_take_a_moment">זה עשוי לקחת רגע</string>
+    <string name="scan_results">תוצאות סריקה</string>
+    <string name="permanently_delete">למחוק לצמיתות?</string>
+    <string name="your_inbox_is_clean">תיבת הדואר שלך נקייה!</string>
+    <string name="no_spam_detected">לא זוהה ספאם.</string>
+    <string name="done">סיום</string>
+    <string name="deselect_all">בטל בחירת הכל</string>
+    <string name="select_all">בחר הכל</string>
+    <string name="view_spam_folder">הצג תיקיית ספאם</string>
+    <string name="moving_to_spam">מעביר הודעות לספאם…</string>
+    <string name="deleting_messages">מוחק הודעות…</string>
+    <string name="marking_not_spam">מסמן כלא ספאם…</string>
+    <string name="processing">מעבד…</string>
+    <string name="scan_progress_fmt">%1$d מתוך %2$d הודעות נבדקו</string>
+    <string name="spam_found_so_far_fmt">%d ספאמים נמצאו עד כה</string>
+    <string name="delete_confirm_singular">הודעה אחת תימחק לצמיתות. לא ניתן לבטל פעולה זו.</string>
+    <string name="delete_confirm_plural_fmt">%d הודעות יימחקו לצמיתות. לא ניתן לבטל פעולה זו.</string>
+    <string name="not_spam_count_fmt">לא ספאם (%d)</string>
+    <string name="spam_count_fmt">ספאם (%d)</string>
+    <string name="delete_count_fmt">מחק (%d)</string>
+    <string name="spam_found_singular">נמצאה הודעת ספאם חשודה אחת</string>
+    <string name="spam_found_plural_fmt">נמצאו %d הודעות ספאם חשודות</string>
+    <string name="selected_count_fmt">%d נבחרו</string>
+    <string name="processed_count_fmt">%1$d מתוך %2$d עובדו</string>
+    <string name="result_moved_spam_singular">הודעה אחת הועברה לתיקיית ספאם</string>
+    <string name="result_moved_spam_plural_fmt">%d הודעות הועברו לתיקיית ספאם</string>
+    <string name="result_deleted_singular">הודעה אחת נמחקה לצמיתות</string>
+    <string name="result_deleted_plural_fmt">%d הודעות נמחקו לצמיתות</string>
+    <string name="result_not_spam_singular">הודעה אחת סומנה כלא ספאם</string>
+    <string name="result_not_spam_plural_fmt">%d הודעות סומנו כלא ספאם</string>
+    <string name="spam_reason_hebrew">ספאם בעברית</string>
+    <string name="spam_reason_suspicious_pattern">דפוס חשוד</string>
+    <string name="spam_reason_shortened_link">קישור מקוצר</string>
+    <string name="spam_reason_suspicious_website">אתר חשוד</string>
+    <string name="spam_reason_suspicious_link">קישור חשוד</string>
+    <string name="spam_reason_urgency">טקטיקות דחיפות</string>
+    <string name="spam_reason_suspicious_content">תוכן חשוד</string>
+    <string name="spam_reason_detected">ספאם זוהה</string>
+
+    <!-- Swipe Actions -->
+    <string name="preview">תצוגה מקדימה</string>
+    <string name="swipe_right_label">החלקה ימינה</string>
+    <string name="swipe_right_subtitle">החלק משמאל לימין</string>
+    <string name="swipe_left_label">החלקה שמאלה</string>
+    <string name="swipe_left_subtitle">החלק מימין לשמאל</string>
+    <string name="swipe_info">החלק על כל שיחה ברשימה הראשית לביצוע הפעולה המוגדרת במהירות.</string>
+    <string name="swipe_action_archive">ארכיון</string>
+    <string name="swipe_action_delete">מחק</string>
+    <string name="swipe_action_pin">הצמד</string>
+    <string name="swipe_action_read_unread">קרא/לא נקרא</string>
+    <string name="swipe_action_mute">השתק</string>
+    <string name="swipe_action_block">חסום</string>
+    <string name="swipe_action_off">כבוי</string>
+    <string name="sample_conversation">שיחה לדוגמה</string>
+    <string name="last_message_preview">תצוגה מקדימה של הודעה אחרונה…</string>
+
+    <!-- Themes -->
+    <string name="theme_mode">מצב ערכת נושא</string>
+    <string name="theme_mode_subtitle">כיצד האפליקציה בוחרת מראה בהיר או כהה</string>
+    <string name="theme_mode_system">מערכת</string>
+    <string name="theme_mode_custom">ערכת נושא מותאמת</string>
+    <string name="conversation_backgrounds">רקעי שיחה</string>
+    <string name="backgrounds_subtitle">שמיים, אוקיינוס, אורורה ועוד</string>
+    <string name="bubble_style">סגנון בועה</string>
+    <string name="create_theme">צור ערכת נושא</string>
+
+    <!-- Notifications -->
+    <string name="notifications_enable_subtitle">הפעל או השבת את כל ההתראות</string>
+    <string name="vibration">רטט</string>
+    <string name="vibration_subtitle">רטט בהודעות חדשות</string>
+    <string name="quick_reply">תגובה מהירה</string>
+    <string name="quick_reply_subtitle">אפשר תגובה ישירה מהתראות</string>
+    <string name="popup_style">סגנון קופץ</string>
+    <string name="notification_grouping">קיבוץ התראות</string>
+    <string name="scheduled_dnd">אל תפריע מתוזמן</string>
+    <string name="scheduled_dnd_subtitle">השתק התראות בשעות שקטות</string>
+    <string name="dnd_start">התחלה</string>
+    <string name="dnd_end">סיום</string>
+    <string name="dnd_format_hint">השתמש בפורמט 24 שעות (למשל, 22:00 - 07:00)</string>
+    <string name="per_conversation_hint">להגדרת העדפות התראות לשיחה, לחץ לחיצה ארוכה על שיחה ברשימה הראשית.</string>
+    <string name="popup_heads_up">מוצגת בראש</string>
+    <string name="popup_banner">באנר</string>
+    <string name="popup_silent">שקט</string>
+    <string name="grouping_by_contact">לפי איש קשר</string>
+    <string name="grouping_bundle_all">חבילה הכל</string>
+    <string name="grouping_individual">אישי</string>
+
+    <!-- Notification Profiles -->
+    <string name="no_notification_profiles">אין פרופילי התראות</string>
+    <string name="no_notification_profiles_hint">צור פרופילים כמו עבודה, שינה, או\nאישי עם הגדרות התראות מותאמות</string>
+    <string name="default_profile">ברירת מחדל</string>
+    <string name="standard_notifications">התראות רגילות</string>
+    <string name="vibrate_on_notifications">רטט בהתראות</string>
+    <string name="popup_notifications">התראות קופצות</string>
+    <string name="show_heads_up">הצג התראות בראש המסך</string>
+    <string name="priority">עדיפות</string>
+    <string name="schedule_label">לוח זמנים</string>
+    <string name="schedule_subtitle">הפעל אוטומטית בשעות מסוימות</string>
+    <string name="edit_profile">ערוך פרופיל</string>
+    <string name="new_profile">פרופיל חדש</string>
+    <string name="profile_name">שם פרופיל</string>
+    <string name="profile_name_hint">למשל, עבודה, שינה, אישי</string>
+    <string name="update">עדכן</string>
+    <string name="create">צור</string>
+    <string name="silent_label">שקט</string>
+
+    <!-- Messaging Settings -->
+    <string name="section_sending">שליחה</string>
+    <string name="undo_send">ביטול שליחה</string>
+    <string name="undo_send_subtitle">אפשר ביטול הודעה שנשלחה לכמה שניות</string>
+    <string name="forward_sms_whatsapp">העבר SMS ל-WhatsApp</string>
+    <string name="forward_sms_whatsapp_subtitle">העבר אוטומטית SMS של אנשי קשר ל-WhatsApp</string>
+    <string name="smart_links">קישורים חכמים</string>
+    <string name="calendar_links">קישורי לוח שנה</string>
+    <string name="calendar_links_subtitle">הקש על תאריכים בהודעות להוסיף ללוח השנה</string>
+    <string name="maps_links">קישורי מפות</string>
+    <string name="maps_links_subtitle">הקש על כתובות בהודעות לפתוח במפות</string>
+
+    <!-- Backup &amp; Restore -->
+    <string name="backup_restore">גיבוי ושחזור</string>
+    <string name="cloud_backup">גיבוי ענן</string>
+    <string name="never">אף פעם</string>
+    <string name="backup_label">גיבוי</string>
+    <string name="backup_now">גבה עכשיו</string>
+    <string name="backing_up">מגבה הודעות…</string>
+    <string name="restore_label">שחזור</string>
+    <string name="restore_from_google_drive">שחזר מ-Google Drive</string>
+    <string name="restore_from_local_file">שחזר מקובץ מקומי</string>
+    <string name="restoring">משחזר גיבוי…</string>
+    <string name="auto_backup">גיבוי אוטומטי</string>
+    <string name="auto_backup_subtitle">גבה אוטומטית לפי לוח זמנים</string>
+    <string name="backup_frequency">תדירות גיבוי</string>
+    <string name="freq_daily">יומי</string>
+    <string name="freq_weekly">שבועי</string>
+    <string name="freq_monthly">חודשי</string>
+    <string name="backup_note">גיבויים כוללים הודעות, ערכות נושא והגדרות. קבצי מדיה מגובים בנפרד.</string>
+    <string name="restore_backup_title">שחזר גיבוי</string>
+    <string name="restore_backup_text">זה יחליף את כל ההודעות והנתונים הנוכחיים בגיבוי. האפליקציה תופעל מחדש לאחר השחזור. לא ניתן לבטל פעולה זו.</string>
+    <string name="backup_saved_successfully">הגיבוי נשמר בהצלחה</string>
+    <string name="backup_failed">הגיבוי נכשל. נסה שוב.</string>
+    <string name="restore_successful">השחזור הצליח. מפעיל מחדש…</string>
+    <string name="restore_failed">השחזור נכשל. קובץ הגיבוי עשוי להיות לא תקין.</string>
+    <string name="backup_settings">הגדרות</string>
+    <string name="last_backup_label">גיבוי אחרון: %s</string>
+
+    <!-- Scheduled Messages -->
+    <string name="to_display_fmt">אל: %s</string>
+    <string name="no_scheduled_messages">אין הודעות מתוזמנות</string>
+    <string name="no_scheduled_messages_hint">תזמן הודעה מכל שיחה\nבאמצעות כפתור התזמון</string>
+    <string name="cancel_scheduled_message">ביטול הודעה מתוזמנת</string>
+    <string name="cancel_scheduled_message_text">הודעה זו לא תישלח. האם אתה בטוח?</string>
+    <string name="cancel_message">בטל הודעה</string>
+    <string name="keep">השאר</string>
+
+    <!-- Financial Dashboard -->
+    <string name="all_cards">כל הכרטיסים</string>
+    <string name="recent_transactions">עסקאות אחרונות</string>
+    <string name="show_less">הצג פחות</string>
+    <string name="show_more_fmt">הצג %d נוספים</string>
+    <string name="card_number_fmt">כרטיס *%s</string>
+    <string name="cards_detected_fmt">%d כרטיסים זוהו</string>
+    <string name="remove_sender_confirm">הסר את "%1$s"? כל %2$d עסקאות מהשולח הזה יימחקו לצמיתות.</string>
+
+    <!-- Financial Settings -->
+    <string name="financial_settings">הגדרות פיננסיות</string>
+    <string name="general">כללי</string>
+    <string name="primary_currency">מטבע ראשי</string>
+    <string name="scan_inbox_financial_subtitle">סרוק מחדש את כל ה-SMS עבור עסקאות מהשולחים שלך</string>
+    <string name="card_management">ניהול כרטיסים</string>
+    <string name="manage_cards">נהל כרטיסים</string>
+    <string name="sender_management">ניהול שולחים</string>
+    <string name="add_sender">הוסף שולח</string>
+    <string name="privacy_and_security">פרטיות ואבטחה</string>
+    <string name="database_encryption">הצפנת מסד נתונים</string>
+    <string name="database_encryption_subtitle">הנתונים הפיננסיים מוצפנים עם SQLCipher</string>
+    <string name="on_device_only">במכשיר בלבד</string>
+    <string name="on_device_only_subtitle">אין נתונים שיוצאים מהמכשיר שלך</string>
+    <string name="clear_financial_data">מחק נתונים פיננסיים</string>
+    <string name="clear_financial_data_subtitle">מחק את כל העסקאות והמנויים המעוקבים</string>
+    <string name="categories">קטגוריות</string>
+    <string name="category_bills">חשבונות</string>
+    <string name="category_subscriptions">מנויים</string>
+    <string name="category_payments">תשלומים</string>
+    <string name="category_expenses">הוצאות</string>
+    <string name="setup">הגדרה</string>
+    <string name="setup_guide">מדריך הגדרה</string>
+    <string name="setup_guide_subtitle">פתח מחדש קישורי הפעלת SMS של הספק</string>
+    <string name="clear_financial_data_dialog_text">זה ימחק לצמיתות את כל העסקאות, המנויים, נתוני הסוחרים והתראות המעוקבים. לא ניתן לבטל פעולה זו.</string>
+    <string name="delete_all">מחק הכל</string>
+    <string name="remove_sender">הסר שולח</string>
+    <string name="remove">הסר</string>
+    <string name="sender_address">כתובת שולח</string>
+    <string name="sender_address_hint">למשל, MAX, לאומי</string>
+    <string name="display_name_optional">שם תצוגה (אופציונלי)</string>
+    <string name="monitor">מעקב</string>
+    <string name="alerts">התראות</string>
+
+    <!-- Permission -->
+    <string name="permission_required">נדרשת הרשאה</string>
+    <string name="sms_permission_rationale">Aura צריכה הרשאות SMS לקריאה ושליחת הודעות.</string>
+    <string name="grant_permission">הענק הרשאה</string>
+    <string name="lifetime_license">רישיון לכל החיים</string>
+    <string name="restore_purchase">שחזר רכישה</string>
+
+    <!-- Chat Screen additional -->
+    <string name="message_copied">הודעה הועתקה</string>
+    <string name="number_copied">מספר הועתק</string>
+    <string name="pin">הצמד</string>
+    <string name="unpin">בטל הצמדה</string>
+    <string name="replying_to">בתגובה ל</string>
+    <string name="editing_message">עריכת הודעה</string>
+    <string name="sending_via_whatsapp">שליחה דרך WhatsApp</string>
+    <string name="voice_mms_unavailable">הודעות קוליות יהיו זמינות עם תמיכת MMS</string>
+    <string name="sending">שולח…</string>
+    <string name="whatsapp_message">הודעת WhatsApp</string>
+    <string name="message_placeholder">הודעה</string>
+    <string name="schedule_message">תזמן הודעה</string>
+    <string name="will_send_whatsapp">תישלח דרך WhatsApp</string>
+    <string name="choose_when_to_send">בחר מתי לשלוח הודעה זו</string>
+    <string name="schedule_in_1h">בעוד שעה</string>
+    <string name="schedule_in_3h">בעוד 3 שעות</string>
+    <string name="schedule_tomorrow_morning">מחר בבוקר (9:00)</string>
+    <string name="schedule_tomorrow_evening">מחר בערב (18:00)</string>
+    <string name="remind_me">תזכר לי</string>
+    <string name="when_to_remind">מתי להזכיר לך?</string>
+    <string name="remind_in_30min">בעוד 30 דקות</string>
+    <string name="remind_in_1h">בעוד שעה</string>
+    <string name="remind_in_3h">בעוד 3 שעות</string>
+    <string name="remind_tomorrow_morning">מחר בבוקר (9:00)</string>
+    <string name="code_copied">קוד הועתק ללוח</string>
+    <string name="code_name_copied">קוד &#8220;%s&#8221; הועתק</string>
+    <string name="today">היום</string>
+    <string name="yesterday">אתמול</string>
+    <string name="now_label">עכשיו</string>
+    <string name="forward_message">העבר הודעה</string>
+    <string name="share_message">שתף</string>
+
+    <!-- Archived Conversations -->
+    <string name="no_archived_conversations">אין שיחות בארכיון</string>
+    <string name="no_archived_conversations_hint">שיחות בארכיון יופיעו כאן.\nהחלק שמאלה או השתמש בתפריט כדי לארכב.</string>
+    <string name="restore_to_inbox">שחזר לדואר נכנס</string>
+    <string name="restore_to_inbox_subtitle">העבר שיחה זו חזרה לרשימה הראשית</string>
+    <string name="delete_conversation_action">מחק שיחה</string>
+    <string name="delete_conversation_subtitle">הסר שיחה זו לצמיתות</string>
+
+    <!-- Spam Folder -->
+    <string name="no_spam_messages">אין הודעות ספאם</string>
+    <string name="spam_filter_shortened_link">קישור מקוצר</string>
+    <string name="spam_filter_suspicious_tld">אתר חשוד</string>
+    <string name="spam_filter_ip_url">קישור חשוד</string>
+    <string name="spam_filter_urgent_keywords">טקטיקות דחיפות</string>
+    <string name="spam_filter_otp_verify">הונאת OTP אפשרית</string>
+    <string name="spam_filter_suspicious_content">תוכן חשוד</string>
+    <string name="spam_filter_unknown_sender">שולח לא ידוע</string>
+    <string name="spam_filter_spam_detected">ספאם זוהה</string>
+    <string name="spam_filter_blocked_as_spam">נחסם כספאם</string>
+
+    <!-- Spam Detail Sheet -->
+    <string name="spam_detail_title">מדוע סומן?</string>
+    <string name="spam_detail_from_prefix">מאת: </string>
+    <string name="spam_detail_score_label">ציון ספאם</string>
+    <string name="spam_detail_score_suffix">/ 100</string>
+    <string name="spam_detail_reason_label">סיבה</string>
+    <string name="spam_detail_preview_label">תצוגה מקדימה</string>
+    <string name="spam_detail_number_blocked_label">מספר חסום</string>
+    <string name="spam_detail_number_blocked_description">מספר זה נמצא ברשימת החסימה שלך.</string>
+    <string name="spam_detail_sender_blocked_label">שולח חסום</string>
+    <string name="spam_detail_sender_blocked_description">שם שולח זה נמצא ברשימת החסימה שלך.</string>
+    <string name="spam_detail_keyword_match_label">התאמת מילת מפתח</string>
+    <string name="spam_detail_keyword_match_description">ההודעה מכילה מילה או ביטוי שחסמת.</string>
+    <string name="spam_detail_language_filtered_label">שפה מסוננת</string>
+    <string name="spam_detail_language_filtered_description">ההודעה נכתבה בשפה שבחרת לחסום.</string>
+    <string name="spam_detail_international_filter_label">מספר בינלאומי</string>
+    <string name="spam_detail_international_filter_description">הודעה זו הגיעה ממספר זר ומסנן הבינלאומי שלך פעיל.</string>
+    <string name="spam_detail_scam_report_label">דווח כספאם</string>
+    <string name="spam_detail_scam_report_description">אתה או משתמשים אחרים דיווחו על מספר זה כספאם.</string>
+    <string name="spam_detail_scam_detected_label">הונאה זוהתה</string>
+    <string name="spam_detail_ai_flagged_label">סומן על ידי AI</string>
+    <string name="spam_detail_suspicious_content_label">תוכן חשוד</string>
+    <string name="spam_detail_shortened_url_description">ההודעה מכילה קישור מקוצר שעלול להסתיר יעד זדוני.</string>
+    <string name="spam_detail_suspicious_tld_description">ההודעה מקשרת לאתר עם דומיין חשוד.</string>
+    <string name="spam_detail_ip_url_description">ההודעה מכילה קישור לכתובת IP ישירה, שמשמשת לעתים קרובות בפישינג.</string>
+    <string name="spam_detail_urgent_keywords_description">ההודעה משתמשת בטקטיקות דחיפות הנפוצות בהודעות הונאה.</string>
+    <string name="spam_detail_otp_verify_description">ההודעה נראית כבקשת אימות מזויפת.</string>
+    <string name="spam_detail_general_spam_description">ההודעה מכילה תוכן הנפוץ בספאם.</string>
+    <string name="spam_detail_suspicious_link_description">ההודעה מכילה קישור שנראה לא בטוח.</string>
+    <string name="spam_detail_otp_fraud_description">ההודעה נראית כקוד אימות או כניסה מזויף.</string>
+    <string name="spam_detail_financial_scam_description">ההודעה נראית כהונאה פיננסית.</string>
+    <string name="spam_detail_phishing_description">ההודעה מנסה לגנוב מידע אישי.</string>
+    <string name="spam_detail_unknown_scam_description">ההודעה מתאימה לדפוסי הונאה ידועים.</string>
+    <string name="spam_reason_unknown_sender_label">שולח לא ידוע</string>
+    <string name="spam_reason_unknown_sender_description">השולח אינו נמצא באנשי הקשר שלך.</string>
+    <string name="spam_reason_contains_url_label">מכיל קישור</string>
+    <string name="spam_reason_contains_url_description">ההודעה כוללת URL, שנפוץ בספאם.</string>
+    <string name="spam_reason_otp_verify_label">קוד אימות מזויף</string>
+    <string name="spam_reason_otp_verify_description">ההודעה נראית כבקשת אימות מזויפת.</string>
+    <string name="spam_reason_high_special_chars_label">עיצוב חריג</string>
+    <string name="spam_reason_high_special_chars_description">ההודעה מכילה כמות חריגה של תווים מיוחדים.</string>
+    <string name="spam_reason_deterministic_label">דפוס ספאם ידוע</string>
+    <string name="spam_reason_deterministic_description">ההודעה תואמת תבנית ספאם ידועה.</string>
+    <string name="spam_reason_default_description">סומן על ידי מסנני הספאם שלנו.</string>
+
+    <!-- Block Rule Limit Dialog -->
+    <string name="block_rule_limit_title">הגעת למגבלת כללי החסימה</string>
+    <string name="block_rule_limit_message">השתמשת בכל %d כללי החסימה החינמיים. שדרג לפרימיום לכללים בלתי מוגבלים.</string>
+
+    <!-- Compose Message Screen -->
+    <string name="compose_to_label">אל</string>
+    <string name="compose_recipient_placeholder">מספר טלפון או שם איש קשר</string>
+    <string name="compose_message_placeholder">הקלד הודעה…</string>
+
+    <!-- Pinned Messages -->
+    <string name="no_pinned_messages">אין הודעות מוצמדות</string>
+    <string name="no_pinned_messages_hint">לחץ לחיצה ארוכה על הודעה בשיחה כדי להצמיד אותה</string>
+    <string name="pinned_message_sender_you">אתה</string>
+
+    <!-- Media Gallery -->
+    <string name="media_gallery_title">מדיה</string>
+    <string name="photos">תמונות</string>
+    <string name="videos">סרטונים</string>
+    <string name="links">קישורים</string>
+    <string name="files">קבצים</string>
+    <string name="no_photos_shared">לא שותפו תמונות עדיין</string>
+    <string name="no_videos_shared">לא שותפו סרטונים עדיין</string>
+    <string name="no_links_shared">לא שותפו קישורים עדיין</string>
+    <string name="no_files_shared">לא שותפו קבצים עדיין</string>
+
+    <!-- QR Contact Screen -->
+    <string name="share_contact">שתף איש קשר</string>
+    <string name="scan_to_start_conversation">סרוק קוד זה כדי להתחיל שיחה</string>
+    <string name="scan_qr_code">סרוק קוד QR</string>
+    <string name="share_qr_image">שתף תמונת QR</string>
+    <string name="qr_library_error">יצירת QR דורשת\nספריית ZXing</string>
+
+    <!-- Search Screen -->
+    <string name="search_placeholder">חפש הודעות…</string>
+    <string name="no_results_found">לא נמצאו תוצאות</string>
+
+    <!-- Card Manager -->
+    <string name="card_manager_footer">כרטיסים מזוהים אוטומטית מה-SMS. כבה את הניטור כדי להפסיק לעקוב אחר כרטיס.</string>
+    <string name="edit_nickname">ערוך כינוי</string>
+    <string name="auto_detected">זוהה אוטומטית</string>
+    <string name="transactions_suffix">עסקאות</string>
+    <string name="monitor_label">ניטור</string>
+    <string name="card_nickname_title">כינוי כרטיס</string>
+    <string name="nickname_label">כינוי</string>
+    <string name="card_nickname_placeholder">לדוגמה, ויזה של אמא</string>
+    <string name="save">שמור</string>
+
+    <!-- Alerts Banner -->
+    <string name="view_all">צפה בהכל</string>
+    <string name="no_spending_data">אין נתוני הוצאות עדיין</string>
+
+    <!-- Alerts Screen -->
+    <string name="no_active_alerts">אין התראות פעילות</string>
+    <string name="alert_unusual_charge">חיוב חריג זוהה</string>
+    <string name="alert_duplicate_charge">חיוב כפול</string>
+    <string name="alert_new_merchant_high">סוחר חדש - סכום גבוה</string>
+    <string name="alert_subscription_price_increase">העלאת מחיר מנוי</string>
+    <string name="alert_financial_default">התראה פיננסית</string>
+    <string name="dismiss">סגור</string>
+    <string name="view_transaction">צפה בעסקה</string>
+    <string name="alerts_privacy_footer">התראות נוצרות אוטומטית על בסיס דפוסי ההוצאות שלך. כל הנתונים נשמרים במכשיר שלך.</string>
+
+    <!-- Subscriptions Screen -->
+    <string name="subscriptions">מנויים</string>
+    <string name="subscriptions_total_label">סה"כ מנויים חודשיים:</string>
+    <string name="subscriptions_active_suffix">מנויים פעילים</string>
+    <string name="subscriptions_footer_hint">החלק שמאלה לסימון כלא פעיל</string>
+
+    <!-- Financial Onboarding -->
+    <string name="financial_onboarding_badge">תכונת פרימיום</string>
+    <string name="financial_onboarding_description">עקוב אחר ההוצאות שלך, נטר מנויים וקבל התראות על חיובים חריגים — הכל אוטומטית מהודעות ה-SMS שלך.</string>
+    <string name="financial_onboarding_privacy_note">כל הנתונים נשמרים במכשיר שלך. שום דבר לא נשלח לענן.</string>
+    <string name="financial_onboarding_step2_title">אפשר התראות SMS מהספקים שלך</string>
+    <string name="financial_onboarding_step2_description">סמן את הספקים שהפעלת עבורם התראות SMS. רק ספקים מסומנים יישמרו.</string>
+    <string name="financial_onboarding_no_providers_message">צור קשר עם הבנק או חברת כרטיס האשראי שלך להפעלת התראות SMS על עסקאות.</string>
+    <string name="financial_onboarding_manual_add_hint">לא רואה את הספק שלך? תוכל להוסיף שולחים ידנית בהגדרות.</string>
+    <string name="open_setup">פתח הגדרה</string>
+    <string name="youre_all_set">הכל מוכן!</string>
+    <string name="financial_confirm_sms">הפעלתי התראות SMS מלפחות ספק אחד</string>
+    <string name="financial_confirm_scan_inbox">סרוק תיבת ה-SMS הקיימת לעסקאות עבר</string>
+    <string name="financial_confirm_scan_description">מוצא עסקאות מחודשים קודמים</string>
+    <string name="enable_financial_intelligence">הפעל אינטליגנציה פיננסית</string>
+    <string name="get_started">בואו נתחיל</string>
+    <string name="next">הבא</string>
+
+    <!-- Backgrounds Screen -->
+    <string name="conversation_backgrounds_title">רקעי שיחה</string>
+    <string name="backgrounds_premium_message">רקעי שיחה הם תכונת פרימיום</string>
+    <string name="preview_prefix">תצוגה מקדימה: </string>
+
+    <!-- Theme Editor -->
+    <string name="theme_editor">עורך ערכת נושא</string>
+    <string name="live_preview">תצוגה מקדימה חיה</string>
+    <string name="theme_name_label">שם ערכת נושא</string>
+    <string name="primary_color_label">צבע ראשי</string>
+    <string name="secondary_color_label">צבע משני</string>
+    <string name="background_label">רקע</string>
+    <string name="surface_label">משטח</string>
+    <string name="sent_bubble_label">בועה נשלחה</string>
+    <string name="received_bubble_label">בועה התקבלה</string>
+    <string name="sent_text_label">טקסט נשלח</string>
+    <string name="received_text_label">טקסט שהתקבל</string>
+
+    <!-- License / Premium Screen -->
+    <string name="premium">פרימיום</string>
+    <string name="youre_premium">אתה פרימיום!</string>
+    <string name="premium_trial">ניסיון פרימיום</string>
+    <string name="trial_days_remaining_fmt">%d יום נותר</string>
+    <string name="trial_days_remaining_plural_fmt">%d ימים נותרו</string>
+    <string name="trial_ended">הניסיון הסתיים</string>
+    <string name="trial_ended_description">רכוש כדי לפתוח את כל תכונות הפרימיום</string>
+    <string name="aura_premium">Aura פרימיום</string>
+    <string name="one_time_purchase">רכישה חד פעמית, גישה לכל החיים</string>
+    <string name="whats_included">מה כלול</string>
+    <string name="feature_unlimited_themes">ערכות נושא ללא הגבלה</string>
+    <string name="feature_unlimited_themes_desc">גש לכל 18 ערכות הנושא המובנות וצור ערכות נושא מותאמות אישית ללא הגבלה</string>
+    <string name="feature_unlimited_block_rules">כללי חסימה ללא הגבלה</string>
+    <string name="feature_unlimited_block_rules_desc">צור כמה כללי חסימה שתרצה (מגבלה חינמית: 15)</string>
+    <string name="feature_advanced_notifications">התראות מתקדמות</string>
+    <string name="feature_advanced_notifications_desc">צלילים מותאמים אישית לאיש קשר, צבעי LED והעדפות בועות</string>
+    <string name="feature_priority_support">תמיכה בעדיפות</string>
+    <string name="feature_priority_support_desc">קבל תגובות מהירות יותר ובקשות לתכונות בעדיפות</string>
+    <string name="discount_badge">67% הנחה</string>
+    <string name="license_original_price">$15.00</string>
+    <string name="no_subscriptions_note">תשלום חד פעמי • אין מנויים</string>
+    <string name="purchase_to_keep_premium">רכוש כדי לשמור פרימיום</string>
+    <string name="purchase_lifetime_license">רכוש רישיון לכל החיים</string>
+    <string name="terms_and_conditions">תנאים והגבלות</string>
+    <string name="collapse">כווץ</string>
+    <string name="expand">הרחב</string>
+    <string name="refund_policy">מדיניות החזרים</string>
+    <string name="refund_policy_body">החזרים זמינים תוך 30 יום מהרכישה. לאחר תקופה זו, כל המכירות סופיות. ניתן להגיש בקשות להחזר דרך Google Play.</string>
+    <string name="lifetime_license_terms_title">רישיון לכל החיים</string>
+    <string name="lifetime_license_terms_body">\"לכל החיים\" מתייחס לאורך חיי האפליקציה Aura. אם האפליקציה תופסק או תוסר מ-Google Play, הרישיון יפוג ללא חובה נוספת למפתח.</string>
+    <string name="whats_included_terms_title">מה כלול</string>
+    <string name="whats_included_terms_body">הרישיון שלך כולל את כל תכונות הפרימיום הנוכחיות ועדכונים עתידיים כל עוד האפליקציה מתוחזקת באופן פעיל.</string>
+    <string name="non_transferable_title">אינו ניתן להעברה</string>
+    <string name="non_transferable_body">רישיון זה קשור לחשבון Google שלך ואינו ניתן להעברה, שיתוף או מכירה חוזרת.</string>
+    <string name="google_play_title">Google Play</string>
+    <string name="google_play_body">רכישה זו כפופה לתנאי השירות של Google Play.</string>
+    <string name="payment_disclaimer">התשלום מעובד דרך Google Play.\nהרכישה שלך קשורה לחשבון Google שלך.</string>
+    <string name="reset_license_dev">אפס רישיון (מפתח)</string>
+
+    <!-- Trial Offer Dialog -->
+    <string name="try_premium_free">נסה פרימיום בחינם</string>
+    <string name="trial_duration">21 יום בחינם</string>
+    <string name="trial_offer_description">פתח את כל תכונות הפרימיום — ערכות נושא, כללי חסימה ללא הגבלה, לוח פיננסי ועוד — בחינם לחלוטין למשך 21 יום.</string>
+    <string name="no_payment_required">אין צורך בתשלום. אין כרטיס אשראי.</string>
+    <string name="start_free_trial">התחל ניסיון חינמי</string>
+    <string name="view_plans">צפה בתוכניות</string>
+
+    <!-- Conversation Item Component -->
+    <string name="category_contacts">אנשי קשר</string>
+
+    <!-- Message Bubble Component -->
+    <string name="message_edited">נערך</string>
+    <string name="message_status_read">נקרא</string>
+    <string name="message_status_sent">נשלח</string>
+    <string name="voice_message">הודעה קולית</string>
+    <string name="suspicious_link_warning">קישור חשוד – פתח רק לאחר סימון כ"לא ספאם"</string>
+    <string name="confidence_suffix_fmt">%d%% ביטחון</string>
+    <string name="transcribing">מתמלל...</string>
+    <string name="hide_transcript">הסתר תמלול</string>
+    <string name="show_transcript">הצג תמלול</string>
+    <string name="transcribe">תמלל</string>
+
+    <!-- AI Compose Sheet -->
+    <string name="ai_compose_title">עוזר כתיבה AI</string>
+    <string name="ai_compose_subtitle">שנה את ההודעה שלך עם AI</string>
+    <string name="ai_compose_your_message">ההודעה שלך</string>
+    <string name="ai_compose_change_tone">שנה טון</string>
+    <string name="ai_tone_formal">רשמי</string>
+    <string name="ai_tone_formal_desc">מקצועי ומלוטש</string>
+    <string name="ai_tone_casual">סתמי</string>
+    <string name="ai_tone_casual_desc">מרגוע וידידותי</string>
+    <string name="ai_tone_funny">מצחיק</string>
+    <string name="ai_tone_funny_desc">הומוריסטי וחכם</string>
+    <string name="ai_tone_translate">תרגם</string>
+    <string name="ai_tone_translate_desc">תרגם לשפה אחרת</string>
+    <string name="ai_compose_custom_prompt_label">או תאר מה אתה רוצה לומר</string>
+    <string name="ai_compose_placeholder">לדוגמה, כתוב ברכת יום הולדת לחבר שלי</string>
+    <string name="ai_compose_suggestion_label">הצעה (הקש לשימוש)</string>
+    <string name="ai_compose_disclaimer">תכונות AI דורשות חיבור לאינטרנט. הצעות נוצרות מקומית כשאפשר.</string>
+
+    <!-- Conversation Context Menu -->
+    <string name="context_menu_unmute">בטל השתקת התראות</string>
+    <string name="context_menu_mute">השתק התראות</string>
+    <string name="context_menu_unpin">בטל הצמדת שיחה</string>
+    <string name="context_menu_pin">הצמד שיחה</string>
+    <string name="context_menu_remove_favorite">הסר מהמועדפים</string>
+    <string name="context_menu_add_favorite">הוסף למועדפים</string>
+    <string name="context_menu_mark_as_read">סמן כנקרא</string>
+    <string name="context_menu_select">בחר</string>
+
+    <!-- Disappearing Messages Dialog -->
+    <string name="disappearing_messages_description">הודעות יימחקו אוטומטית לאחר הזמן שנבחר.</string>
+    <string name="disappearing_off">כבוי</string>
+    <string name="disappearing_5_seconds">5 שניות</string>
+    <string name="disappearing_1_minute">דקה אחת</string>
+    <string name="disappearing_1_hour">שעה אחת</string>
+    <string name="disappearing_24_hours">24 שעות</string>
+    <string name="disappearing_7_days">7 ימים</string>
+    <string name="disappearing_30_days">30 ימים</string>
+    <string name="disappearing_90_days">90 ימים</string>
+
+    <!-- Mute Duration Picker -->
+    <string name="mute_notifications">השתק התראות</string>
+    <string name="mute_for_how_long">לכמה זמן?</string>
+    <string name="mute_1_hour">שעה אחת</string>
+    <string name="mute_8_hours">8 שעות</string>
+    <string name="mute_1_week">שבוע אחד</string>
+    <string name="mute_forever">לתמיד</string>
+    <string name="mute">השתק</string>
+
+    <!-- Voice Recorder -->
+    <string name="cancel_recording">בטל הקלטה</string>
+    <string name="send_voice">שלח קול</string>
+
+    <!-- Transaction Item -->
+    <string name="unknown_merchant">סוחר לא ידוע</string>
+    <string name="change_category">שנה קטגוריה</string>
+    <string name="view_in_conversation">צפה בשיחה</string>
+
+    <!-- Monthly Summary Card -->
+    <string name="previous_month">חודש קודם</string>
+    <string name="next_month">חודש הבא</string>
+
+    <!-- Month Comparison Card -->
+    <string name="month_vs_last_month">חודש לעומת החודש הקודם</string>
+    <string name="comparison_new_label">חדש</string>
+
+    <!-- Top Merchants Card -->
+    <string name="top_merchants">סוחרים מובילים</string>
+    <string name="transaction_singular">עסקה</string>
+    <string name="transactions_plural">עסקאות</string>
+
+    <!-- Spending Velocity Card -->
+    <string name="spending_pace">קצב הוצאות</string>
+    <string name="daily_rate_label">שיעור יומי</string>
+    <string name="projected_total">סה"כ צפוי</string>
+    <string name="day_remaining_singular">יום נותר</string>
+    <string name="days_remaining_plural_fmt">%d ימים נותרו</string>
+
+    <!-- Category Picker Dialog -->
+    <string name="change_category_title">שנה קטגוריה</string>
+    <string name="change_category_description">זה יעדכן את כל העסקאות מסוחר זה.</string>
+
+    <!-- Subscription Item -->
+    <string name="last_charged_prefix">חויב לאחרונה: </string>
+
+    <!-- Edit History Sheet -->
+    <string name="edit_history_title">היסטוריית עריכת הודעה</string>
+    <string name="edit_history_current">גרסה נוכחית</string>
+    <string name="edit_history_original">הודעה מקורית</string>
+    <string name="edit_history_previous">גרסה קודמת</string>
+
+    <!-- Restore Onboarding Screen -->
+    <string name="welcome_to_novachat">ברוך הבא ל-NovaChat</string>
+    <string name="restore_onboarding_question">האם יש לך גיבוי קודם לשחזור?</string>
+    <string name="restore_in_progress">משחזר את הנתונים שלך...</string>
+    <string name="start_fresh">התחל מחדש</string>
+</resources>

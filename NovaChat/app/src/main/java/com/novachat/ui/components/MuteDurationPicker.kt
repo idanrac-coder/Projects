@@ -19,16 +19,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-
-private val MUTE_OPTIONS = listOf(
-    "1 hour" to (60L * 60 * 1000),
-    "8 hours" to (8L * 60 * 60 * 1000),
-    "1 week" to (7L * 24 * 60 * 60 * 1000),
-    "Forever" to Long.MAX_VALUE
-)
+import com.novachat.R
 
 @Composable
 fun MuteDurationPicker(
@@ -37,20 +32,27 @@ fun MuteDurationPicker(
 ) {
     var selectedIndex by remember { mutableStateOf(0) }
 
+    val muteOptions = listOf(
+        stringResource(R.string.mute_1_hour) to (60L * 60 * 1000),
+        stringResource(R.string.mute_8_hours) to (8L * 60 * 60 * 1000),
+        stringResource(R.string.mute_1_week) to (7L * 24 * 60 * 60 * 1000),
+        stringResource(R.string.mute_forever) to Long.MAX_VALUE
+    )
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text("Mute notifications", fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.mute_notifications), fontWeight = FontWeight.SemiBold)
         },
         text = {
             Column {
                 Text(
-                    "For how long?",
+                    stringResource(R.string.mute_for_how_long),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-                MUTE_OPTIONS.forEachIndexed { index, (label, _) ->
+                muteOptions.forEachIndexed { index, (label, _) ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -78,18 +80,18 @@ fun MuteDurationPicker(
         confirmButton = {
             TextButton(
                 onClick = {
-                    val durationMs = MUTE_OPTIONS[selectedIndex].second
+                    val durationMs = muteOptions[selectedIndex].second
                     val muteUntil = if (durationMs == Long.MAX_VALUE) Long.MAX_VALUE
                     else System.currentTimeMillis() + durationMs
                     onConfirm(muteUntil)
                 }
             ) {
-                Text("Mute", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.mute), fontWeight = FontWeight.SemiBold)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )

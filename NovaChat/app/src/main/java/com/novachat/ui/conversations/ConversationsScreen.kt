@@ -101,6 +101,8 @@ import com.novachat.domain.model.MessageCategory
 import com.novachat.domain.model.SwipeAction
 import androidx.compose.material3.HorizontalDivider
 import com.novachat.domain.model.Conversation
+import androidx.compose.ui.res.stringResource
+import com.novachat.R
 import com.novachat.ui.components.ConversationContextMenu
 import com.novachat.ui.components.ConversationItem
 import com.novachat.ui.components.SwipeableRow
@@ -174,7 +176,7 @@ fun ConversationsScreen(
                     modifier = Modifier.navigationBarsPadding()
                 ) {
                     IconButton(onClick = { viewModel.clearSelection() }) {
-                        Icon(Icons.Default.Close, contentDescription = "Cancel", tint = MaterialTheme.colorScheme.inverseOnSurface)
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cancel), tint = MaterialTheme.colorScheme.inverseOnSurface)
                     }
                     Text(
                         text = "${uiState.selectedThreadIds.size}",
@@ -184,16 +186,16 @@ fun ConversationsScreen(
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     IconButton(onClick = { viewModel.showCategoryAssignDialog() }) {
-                        Icon(Icons.AutoMirrored.Filled.Label, contentDescription = "Category", tint = MaterialTheme.colorScheme.inverseOnSurface)
+                        Icon(Icons.AutoMirrored.Filled.Label, contentDescription = stringResource(R.string.category), tint = MaterialTheme.colorScheme.inverseOnSurface)
                     }
                     IconButton(onClick = { viewModel.showBlockDialogForSelected() }) {
-                        Icon(Icons.Default.Block, contentDescription = "Block", tint = MaterialTheme.colorScheme.inverseOnSurface)
+                        Icon(Icons.Default.Block, contentDescription = stringResource(R.string.block), tint = MaterialTheme.colorScheme.inverseOnSurface)
                     }
                     IconButton(onClick = { viewModel.archiveSelected() }) {
-                        Icon(Icons.Default.Archive, contentDescription = "Archive", tint = MaterialTheme.colorScheme.inverseOnSurface)
+                        Icon(Icons.Default.Archive, contentDescription = stringResource(R.string.archive), tint = MaterialTheme.colorScheme.inverseOnSurface)
                     }
                     IconButton(onClick = { viewModel.deleteSelected() }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = AuroraColors.Error)
+                        Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete), tint = AuroraColors.Error)
                     }
                 }
             }
@@ -210,7 +212,7 @@ fun ConversationsScreen(
                     contentColor = Color.White,
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Icon(Icons.Default.Edit, contentDescription = "New message")
+                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.new_message))
                 }
             }
         }
@@ -228,7 +230,7 @@ fun ConversationsScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Aura Messaging",
+                    text = stringResource(R.string.aura_messaging),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
@@ -251,7 +253,7 @@ fun ConversationsScreen(
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text(
-                            "Search conversations...",
+                            stringResource(R.string.search_conversations),
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             style = MaterialTheme.typography.bodyMedium
                         )
@@ -259,7 +261,7 @@ fun ConversationsScreen(
                     leadingIcon = {
                         Icon(
                             Icons.Default.Search,
-                            contentDescription = "Search",
+                            contentDescription = stringResource(R.string.search),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                             modifier = Modifier.size(20.dp)
                         )
@@ -269,7 +271,7 @@ fun ConversationsScreen(
                             IconButton(onClick = { viewModel.updateSearchQuery("") }) {
                                 Icon(
                                     Icons.Default.Close,
-                                    contentDescription = "Clear",
+                                    contentDescription = stringResource(R.string.clear),
                                     modifier = Modifier.size(18.dp)
                                 )
                             }
@@ -347,13 +349,13 @@ fun ConversationsScreen(
                         ) {
                             Icon(
                                 Icons.Default.Archive,
-                                contentDescription = "Archived",
+                                contentDescription = stringResource(R.string.archived),
                                 modifier = Modifier.size(14.dp),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "Archived",
+                                text = stringResource(R.string.archived),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 style = MaterialTheme.typography.labelLarge,
                                 fontWeight = FontWeight.Medium
@@ -375,13 +377,13 @@ fun ConversationsScreen(
                         ) {
                             Icon(
                                 Icons.Default.Edit,
-                                contentDescription = "Manage categories",
+                                contentDescription = stringResource(R.string.manage_categories),
                                 modifier = Modifier.size(14.dp),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "Edit",
+                                text = stringResource(R.string.edit),
                                 color = MaterialTheme.colorScheme.primary,
                                 style = MaterialTheme.typography.labelLarge,
                                 fontWeight = FontWeight.Medium
@@ -433,13 +435,13 @@ fun ConversationsScreen(
                                 }
                                 Spacer(modifier = Modifier.height(20.dp))
                                 Text(
-                                    text = "No messages yet",
+                                    text = stringResource(R.string.no_messages),
                                     style = MaterialTheme.typography.titleLarge,
                                     color = MaterialTheme.colorScheme.onBackground
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = "Start a conversation by tapping\nthe compose button",
+                                    text = stringResource(R.string.no_messages_subtitle),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     textAlign = TextAlign.Center
@@ -605,26 +607,26 @@ fun ConversationsScreen(
                 },
                 title = {
                     Text(
-                        if (count == 1) "Delete conversation?"
-                        else "Delete $count conversations?"
+                        if (count == 1) stringResource(R.string.delete_conversation)
+                        else stringResource(R.string.delete_n_conversations, count)
                     )
                 },
                 text = {
                     Text(
-                        if (count == 1) "This conversation will be permanently deleted. This action cannot be undone."
-                        else "These $count conversations will be permanently deleted. This action cannot be undone.",
+                        if (count == 1) stringResource(R.string.delete_conversation_text)
+                        else stringResource(R.string.delete_n_conversations_text, count),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
                 confirmButton = {
                     TextButton(onClick = { viewModel.confirmDelete() }) {
-                        Text("Delete", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.SemiBold)
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { viewModel.dismissDeleteConfirmation() }) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel))
                     }
                 }
             )
@@ -649,17 +651,16 @@ fun ConversationsScreen(
                         )
                     }
                 },
-                title = { Text("Default messaging app required") },
+                title = { Text(stringResource(R.string.default_messaging_app_required)) },
                 text = {
                     Text(
-                        "To delete conversations, Aura needs to be set as your " +
-                            "default messaging app. This allows Aura to manage " +
-                            "your messages.",
+                        stringResource(R.string.default_sms_required_text),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
                 confirmButton = {
+                    val unableToOpenSmsSettings = stringResource(R.string.unable_sms_settings)
                     Button(
                         onClick = {
                             try {
@@ -673,23 +674,19 @@ fun ConversationsScreen(
                                 }
                                 defaultSmsLauncher.launch(intent)
                             } catch (e: Exception) {
-                                Toast.makeText(
-                                    context,
-                                    "Unable to open default SMS settings. Please set Aura as default in your device Settings > Apps > Default apps.",
-                                    Toast.LENGTH_LONG
-                                ).show()
+                                Toast.makeText(context, unableToOpenSmsSettings, Toast.LENGTH_LONG).show()
                             }
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary
                         )
                     ) {
-                        Text("Set as Default")
+                        Text(stringResource(R.string.set_as_default))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { viewModel.dismissDefaultSmsPrompt() }) {
-                        Text("Not now")
+                        Text(stringResource(R.string.not_now))
                     }
                 }
             )
@@ -731,17 +728,16 @@ fun ConversationsScreen(
                         )
                     }
                 },
-                title = { Text("Set as default messaging app") },
+                title = { Text(stringResource(R.string.set_as_default_title)) },
                 text = {
                     Text(
-                        "For the best experience, set Aura as your default messaging " +
-                            "app. This enables full message management including marking " +
-                            "messages as read, deleting conversations, and sending messages.",
+                        stringResource(R.string.set_as_default_text),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
                 confirmButton = {
+                    val unableToOpenSmsSettings = stringResource(R.string.unable_sms_settings)
                     Button(
                         onClick = {
                             try {
@@ -755,11 +751,7 @@ fun ConversationsScreen(
                                 }
                                 defaultSmsCheckLauncher.launch(intent)
                             } catch (e: Exception) {
-                                Toast.makeText(
-                                    context,
-                                    "Unable to open default SMS settings. Please set Aura as default in your device Settings > Apps > Default apps.",
-                                    Toast.LENGTH_LONG
-                                ).show()
+                                Toast.makeText(context, unableToOpenSmsSettings, Toast.LENGTH_LONG).show()
                                 viewModel.dismissDefaultSmsCheck()
                             }
                         },
@@ -767,12 +759,12 @@ fun ConversationsScreen(
                             containerColor = MaterialTheme.colorScheme.primary
                         )
                     ) {
-                        Text("Set as Default")
+                        Text(stringResource(R.string.set_as_default))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { viewModel.dismissDefaultSmsCheck() }) {
-                        Text("Not now")
+                        Text(stringResource(R.string.not_now))
                     }
                 }
             )
@@ -813,12 +805,12 @@ private fun BlockConfirmationDialog(
                 )
             }
         },
-        title = { Text("Block $displayName") },
+        title = { Text(stringResource(R.string.block_contact_title, displayName)) },
         text = {
             if (selectedOption == null) {
                 Column {
                     Text(
-                        text = "Choose how you want to block this contact. Blocked messages will be moved to the spam folder.",
+                        text = stringResource(R.string.block_choose_how),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -844,7 +836,7 @@ private fun BlockConfirmationDialog(
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
                                     Text(
-                                        text = "Block by number",
+                                        text = stringResource(R.string.block_by_number),
                                         style = MaterialTheme.typography.bodyLarge,
                                         fontWeight = FontWeight.SemiBold,
                                         color = MaterialTheme.colorScheme.onErrorContainer
@@ -879,7 +871,7 @@ private fun BlockConfirmationDialog(
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
                                     Text(
-                                        text = "Block by sender",
+                                        text = stringResource(R.string.block_by_sender),
                                         style = MaterialTheme.typography.bodyLarge,
                                         fontWeight = FontWeight.SemiBold,
                                         color = MaterialTheme.colorScheme.onErrorContainer
@@ -912,7 +904,7 @@ private fun BlockConfirmationDialog(
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                text = "Block by words",
+                                text = stringResource(R.string.block_by_words),
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onErrorContainer
@@ -939,7 +931,7 @@ private fun BlockConfirmationDialog(
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                text = "Block by language",
+                                text = stringResource(R.string.block_by_language),
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onErrorContainer
@@ -951,8 +943,8 @@ private fun BlockConfirmationDialog(
                 Column {
                     Text(
                         text = when (selectedOption) {
-                            "WORDS" -> "Enter words to block (comma separated)"
-                            "LANGUAGE" -> "Enter language code (e.g., en, es, fr)"
+                            "WORDS" -> stringResource(R.string.block_enter_words)
+                            "LANGUAGE" -> stringResource(R.string.block_enter_language)
                             else -> ""
                         },
                         style = MaterialTheme.typography.bodyMedium,
@@ -980,7 +972,7 @@ private fun BlockConfirmationDialog(
                     },
                     enabled = inputText.isNotBlank()
                 ) {
-                    Text("Block")
+                    Text(stringResource(R.string.block))
                 }
             }
         },
@@ -995,7 +987,7 @@ private fun BlockConfirmationDialog(
                     }
                 }
             ) {
-                Text(if (selectedOption != null) "Back" else "Cancel")
+                Text(if (selectedOption != null) stringResource(R.string.back) else stringResource(R.string.cancel))
             }
         }
     )
@@ -1026,18 +1018,18 @@ private fun CategoryAssignDialog(
                 )
             }
         },
-        title = { Text("Assign Category") },
+        title = { Text(stringResource(R.string.assign_category)) },
         text = {
             Column {
                 if (customCategories.isEmpty()) {
                     Text(
-                        text = "No custom categories yet. Create one from the Edit button on the category bar.",
+                        text = stringResource(R.string.no_custom_categories_create_hint),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 } else {
                     Text(
-                        text = "Choose a category for the selected conversations",
+                        text = stringResource(R.string.choose_category_hint),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -1087,7 +1079,7 @@ private fun CategoryAssignDialog(
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                "Remove from category",
+                                stringResource(R.string.remove_from_category),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.error
                             )
@@ -1098,7 +1090,7 @@ private fun CategoryAssignDialog(
         },
         confirmButton = {},
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
         }
     )
 }
@@ -1119,12 +1111,12 @@ private fun ManageCategoriesDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Manage Categories") },
+        title = { Text(stringResource(R.string.manage_categories)) },
         text = {
             Column {
                 if (categories.isEmpty()) {
                     Text(
-                        text = "No custom categories yet.",
+                        text = stringResource(R.string.no_custom_categories),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -1154,7 +1146,7 @@ private fun ManageCategoriesDialog(
                             ) {
                                 Icon(
                                     Icons.Default.Edit,
-                                    contentDescription = "Edit",
+                                    contentDescription = stringResource(R.string.edit),
                                     modifier = Modifier.size(18.dp),
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -1165,7 +1157,7 @@ private fun ManageCategoriesDialog(
                             ) {
                                 Icon(
                                     Icons.Default.Delete,
-                                    contentDescription = "Delete",
+                                    contentDescription = stringResource(R.string.delete),
                                     modifier = Modifier.size(18.dp),
                                     tint = MaterialTheme.colorScheme.error
                                 )
@@ -1192,7 +1184,7 @@ private fun ManageCategoriesDialog(
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            "Add new category",
+                            stringResource(R.string.add_new_category),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -1203,7 +1195,7 @@ private fun ManageCategoriesDialog(
         },
         confirmButton = {},
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Done") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.done)) }
         }
     )
 
@@ -1211,12 +1203,12 @@ private fun ManageCategoriesDialog(
         var newName by remember { mutableStateOf("") }
         AlertDialog(
             onDismissRequest = onAddDismiss,
-            title = { Text("New Category") },
+            title = { Text(stringResource(R.string.new_category)) },
             text = {
                 OutlinedTextField(
                     value = newName,
                     onValueChange = { newName = it },
-                    label = { Text("Category name") },
+                    label = { Text(stringResource(R.string.category_name)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp)
@@ -1227,11 +1219,11 @@ private fun ManageCategoriesDialog(
                     onClick = { onAddConfirm(newName) },
                     enabled = newName.isNotBlank()
                 ) {
-                    Text("Create")
+                    Text(stringResource(R.string.create))
                 }
             },
             dismissButton = {
-                TextButton(onClick = onAddDismiss) { Text("Cancel") }
+                TextButton(onClick = onAddDismiss) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
@@ -1240,12 +1232,12 @@ private fun ManageCategoriesDialog(
         var editName by remember(editingCategory.first) { mutableStateOf(editingCategory.second) }
         AlertDialog(
             onDismissRequest = onEditDismiss,
-            title = { Text("Rename Category") },
+            title = { Text(stringResource(R.string.rename_category)) },
             text = {
                 OutlinedTextField(
                     value = editName,
                     onValueChange = { editName = it },
-                    label = { Text("Category name") },
+                    label = { Text(stringResource(R.string.category_name)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp)
@@ -1256,11 +1248,11 @@ private fun ManageCategoriesDialog(
                     onClick = { onRenameConfirm(editingCategory.first, editName) },
                     enabled = editName.isNotBlank()
                 ) {
-                    Text("Rename")
+                    Text(stringResource(R.string.rename))
                 }
             },
             dismissButton = {
-                TextButton(onClick = onEditDismiss) { Text("Cancel") }
+                TextButton(onClick = onEditDismiss) { Text(stringResource(R.string.cancel)) }
             }
         )
     }

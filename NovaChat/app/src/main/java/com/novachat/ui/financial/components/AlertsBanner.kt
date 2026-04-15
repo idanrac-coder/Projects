@@ -24,8 +24,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.novachat.R
 import com.novachat.domain.model.AlertInfo
 
 @Composable
@@ -50,7 +52,7 @@ fun AlertsBanner(
             }
             item {
                 TextButton(onClick = onViewAll) {
-                    Text("View All →")
+                    Text(stringResource(R.string.view_all) + " →")
                 }
             }
         }
@@ -97,7 +99,7 @@ private fun AlertBannerCard(
             IconButton(onClick = onDismiss, modifier = Modifier.size(20.dp)) {
                 Icon(
                     Icons.Default.Close,
-                    contentDescription = "Dismiss",
+                    contentDescription = stringResource(R.string.dismiss),
                     modifier = Modifier.size(14.dp)
                 )
             }

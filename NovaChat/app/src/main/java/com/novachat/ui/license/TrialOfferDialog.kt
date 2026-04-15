@@ -27,10 +27,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.novachat.R
 
 @Composable
 fun TrialOfferDialog(
@@ -66,7 +68,7 @@ fun TrialOfferDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Try Premium Free",
+                    text = stringResource(R.string.try_premium_free),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
@@ -79,7 +81,7 @@ fun TrialOfferDialog(
                     color = MaterialTheme.colorScheme.primaryContainer
                 ) {
                     Text(
-                        text = "21 DAYS FREE",
+                        text = stringResource(R.string.trial_duration),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
@@ -90,7 +92,7 @@ fun TrialOfferDialog(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = "Unlock all premium features — themes, unlimited block rules, financial dashboard and more — completely free for 21 days.",
+                    text = stringResource(R.string.trial_offer_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
@@ -99,7 +101,7 @@ fun TrialOfferDialog(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "No payment required. No credit card.",
+                    text = stringResource(R.string.no_payment_required),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                     textAlign = TextAlign.Center
@@ -115,7 +117,7 @@ fun TrialOfferDialog(
                     shape = RoundedCornerShape(14.dp)
                 ) {
                     Text(
-                        "Start Free Trial",
+                        stringResource(R.string.start_free_trial),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -128,10 +130,10 @@ fun TrialOfferDialog(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     TextButton(onClick = onViewPlans) {
-                        Text("View Plans")
+                        Text(stringResource(R.string.view_plans))
                     }
                     TextButton(onClick = onDismiss) {
-                        Text("Not now")
+                        Text(stringResource(R.string.not_now))
                     }
                 }
             }

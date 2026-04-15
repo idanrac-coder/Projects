@@ -43,6 +43,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
+import com.novachat.R
 import com.novachat.domain.model.CardInfo
 
 private val CARD_COLORS = listOf(
@@ -61,10 +63,10 @@ fun CardManagerScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Card Management") },
+                title = { Text(stringResource(R.string.card_management)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -88,7 +90,7 @@ fun CardManagerScreen(
 
             item {
                 Text(
-                    text = "Cards are auto-detected from SMS. Toggle monitoring off to stop tracking a card.",
+                    text = stringResource(R.string.card_manager_footer),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier
@@ -141,24 +143,24 @@ private fun CardRow(
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = card.nickname ?: "Card *${card.last4}",
+                        text = card.nickname ?: stringResource(R.string.card_number_fmt, card.last4),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium
                     )
                     IconButton(onClick = { showEditDialog = true }, modifier = Modifier.size(24.dp)) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit nickname", modifier = Modifier.size(14.dp))
+                        Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit_nickname), modifier = Modifier.size(14.dp))
                     }
                 }
                 Text(
                     text = buildString {
                         card.issuer?.let { append("$it · ") }
-                        append("Auto-detected")
+                        append(stringResource(R.string.auto_detected))
                     },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "${card.transactionCount} transactions",
+                    text = "${card.transactionCount} ${stringResource(R.string.transactions_suffix)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -166,7 +168,7 @@ private fun CardRow(
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "Monitor",
+                    text = stringResource(R.string.monitor_label),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -182,23 +184,23 @@ private fun CardRow(
         var nickname by remember { mutableStateOf(card.nickname ?: "") }
         AlertDialog(
             onDismissRequest = { showEditDialog = false },
-            title = { Text("Card Nickname") },
+            title = { Text(stringResource(R.string.card_nickname_title)) },
             text = {
                 OutlinedTextField(
                     value = nickname,
                     onValueChange = { nickname = it },
-                    label = { Text("Nickname") },
-                    placeholder = { Text("e.g., Mom's Visa") }
+                    label = { Text(stringResource(R.string.nickname_label)) },
+                    placeholder = { Text(stringResource(R.string.card_nickname_placeholder)) }
                 )
             },
             confirmButton = {
                 TextButton(onClick = {
                     onUpdateNickname(nickname)
                     showEditDialog = false
-                }) { Text("Save") }
+                }) { Text(stringResource(R.string.save)) }
             },
             dismissButton = {
-                TextButton(onClick = { showEditDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showEditDialog = false }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }

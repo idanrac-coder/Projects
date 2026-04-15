@@ -8,6 +8,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.novachat.R
 import com.novachat.domain.repository.BlockRepository
 
 @Composable
@@ -24,18 +26,18 @@ fun BlockRuleLimitDialog(
                 tint = MaterialTheme.colorScheme.primary
             )
         },
-        title = { Text("Block Rule Limit Reached") },
+        title = { Text(stringResource(R.string.block_rule_limit_title)) },
         text = {
-            Text("You've used all ${BlockRepository.FREE_RULE_LIMIT} free block rules. Upgrade to Premium for unlimited block rules.")
+            Text(stringResource(R.string.block_rule_limit_message, BlockRepository.FREE_RULE_LIMIT))
         },
         confirmButton = {
             TextButton(onClick = onUpgrade) {
-                Text("Upgrade to Premium")
+                Text(stringResource(R.string.upgrade_to_premium))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )

@@ -1,6 +1,5 @@
 package com.novachat.ui.backup
 
-import android.content.Context
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -44,8 +43,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,10 +51,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.novachat.R
 import com.novachat.core.backup.exportDatabaseBackup
 import com.novachat.core.backup.importDatabaseBackup
 import com.novachat.core.backup.restartApp
@@ -84,10 +83,16 @@ fun BackupRestoreScreen(
     val backupFrequency by viewModel.backupFrequency.collectAsStateWithLifecycle()
     val lastBackupTime by viewModel.lastBackupTime.collectAsStateWithLifecycle()
 
+    val neverLabel = stringResource(R.string.never)
     val lastBackupLabel = remember(lastBackupTime) {
-        if (lastBackupTime <= 0L) "Never"
+        if (lastBackupTime <= 0L) neverLabel
         else SimpleDateFormat("MMM d, h:mm a", Locale.getDefault()).format(Date(lastBackupTime))
     }
+
+    val backupSavedStr = stringResource(R.string.backup_saved_successfully)
+    val backupFailedStr = stringResource(R.string.backup_failed)
+    val restoreSuccessfulStr = stringResource(R.string.restore_successful)
+    val restoreFailedStr = stringResource(R.string.restore_failed)
 
     val backupLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/zip")
@@ -99,9 +104,9 @@ fun BackupRestoreScreen(
             isBackingUp = false
             if (success) {
                 viewModel.setLastBackupTime(System.currentTimeMillis())
-                Toast.makeText(context, "Backup saved successfully", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, backupSavedStr, Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(context, "Backup failed. Please try again.", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, backupFailedStr, Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -120,13 +125,8 @@ fun BackupRestoreScreen(
                 showRestoreConfirmDialog = false
                 pendingRestoreUri = null
             },
-            title = { Text("Restore Backup") },
-            text = {
-                Text(
-                    "This will replace all current messages and data with the backup. " +
-                        "The app will restart after restore. This action cannot be undone."
-                )
-            },
+            title = { Text(stringResource(R.string.restore_backup_title)) },
+            text = { Text(stringResource(R.string.restore_backup_text)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -138,15 +138,15 @@ fun BackupRestoreScreen(
                             val success = importDatabaseBackup(context, uri)
                             isRestoring = false
                             if (success) {
-                                Toast.makeText(context, "Restore successful. Restarting...", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, restoreSuccessfulStr, Toast.LENGTH_SHORT).show()
                                 restartApp(context)
                             } else {
-                                Toast.makeText(context, "Restore failed. The backup file may be invalid.", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, restoreFailedStr, Toast.LENGTH_LONG).show()
                             }
                         }
                     }
                 ) {
-                    Text("Restore", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.restore_label), color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.SemiBold)
                 }
             },
             dismissButton = {
@@ -154,7 +154,7 @@ fun BackupRestoreScreen(
                     showRestoreConfirmDialog = false
                     pendingRestoreUri = null
                 }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -163,10 +163,10 @@ fun BackupRestoreScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Backup & Restore") },
+                title = { Text(stringResource(R.string.backup_restore)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -200,12 +200,12 @@ fun BackupRestoreScreen(
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
                         Text(
-                            text = "Cloud Backup",
+                            text = stringResource(R.string.cloud_backup),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Last backup: $lastBackupLabel",
+                            text = stringResource(R.string.last_backup_label, lastBackupLabel),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                         )
@@ -219,7 +219,7 @@ fun BackupRestoreScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        "Backup",
+                        stringResource(R.string.backup_label),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -234,7 +234,7 @@ fun BackupRestoreScreen(
                     ) {
                         Icon(Icons.Default.CloudUpload, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Backup Now")
+                        Text(stringResource(R.string.backup_now))
                     }
 
                     if (isBackingUp) {
@@ -242,7 +242,7 @@ fun BackupRestoreScreen(
                         LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            "Backing up messages...",
+                            stringResource(R.string.backing_up),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -256,7 +256,7 @@ fun BackupRestoreScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        "Restore",
+                        stringResource(R.string.restore_label),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -269,7 +269,7 @@ fun BackupRestoreScreen(
                     ) {
                         Icon(Icons.Default.CloudDownload, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Restore from Google Drive")
+                        Text(stringResource(R.string.restore_from_google_drive))
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -281,7 +281,7 @@ fun BackupRestoreScreen(
                     ) {
                         Icon(Icons.Default.Restore, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Restore from Local File")
+                        Text(stringResource(R.string.restore_from_local_file))
                     }
 
                     if (isRestoring) {
@@ -289,7 +289,7 @@ fun BackupRestoreScreen(
                         LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            "Restoring backup...",
+                            stringResource(R.string.restoring),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -303,7 +303,7 @@ fun BackupRestoreScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        "Settings",
+                        stringResource(R.string.backup_settings),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -321,9 +321,9 @@ fun BackupRestoreScreen(
                             Icon(Icons.Default.History, contentDescription = null, modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
-                                Text("Auto-backup", style = MaterialTheme.typography.bodyLarge)
+                                Text(stringResource(R.string.auto_backup), style = MaterialTheme.typography.bodyLarge)
                                 Text(
-                                    "Automatically backup on schedule",
+                                    stringResource(R.string.auto_backup_subtitle),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -343,10 +343,15 @@ fun BackupRestoreScreen(
                     }
 
                     AnimatedVisibility(visible = autoBackupEnabled) {
+                        val freqLabels = mapOf(
+                            "daily" to stringResource(R.string.freq_daily),
+                            "weekly" to stringResource(R.string.freq_weekly),
+                            "monthly" to stringResource(R.string.freq_monthly)
+                        )
                         Column {
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(
-                                "Backup frequency",
+                                stringResource(R.string.backup_frequency),
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Medium
                             )
@@ -362,7 +367,7 @@ fun BackupRestoreScreen(
                                             BackupWorker.schedule(context, freq)
                                         },
                                         label = {
-                                            Text(freq.replaceFirstChar { it.uppercase() })
+                                            Text(freqLabels[freq] ?: freq.replaceFirstChar { it.uppercase() })
                                         }
                                     )
                                 }
@@ -385,7 +390,7 @@ fun BackupRestoreScreen(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Backups include messages, themes, and settings. Media files are backed up separately.",
+                    text = stringResource(R.string.backup_note),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                 )

@@ -37,8 +37,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.novachat.R
 
 @Composable
 fun VoiceRecorderOverlay(
@@ -73,7 +75,7 @@ fun VoiceRecorderOverlay(
                 ) {
                     Icon(
                         Icons.Default.Close,
-                        contentDescription = "Cancel recording",
+                        contentDescription = stringResource(R.string.cancel_recording),
                         tint = MaterialTheme.colorScheme.error,
                         modifier = Modifier.size(20.dp)
                     )
@@ -121,7 +123,7 @@ fun VoiceRecorderOverlay(
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             Icons.AutoMirrored.Filled.Send,
-                            contentDescription = "Send voice",
+                            contentDescription = stringResource(R.string.send_voice),
                             tint = Color.White,
                             modifier = Modifier.size(18.dp)
                         )

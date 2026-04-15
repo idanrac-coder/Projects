@@ -18,8 +18,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.novachat.R
 import com.novachat.domain.model.TopMerchant
 
 private val MERCHANT_AVATAR_COLORS = listOf(
@@ -44,7 +46,7 @@ fun TopMerchantsCard(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "Top Merchants",
+                text = stringResource(R.string.top_merchants),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
             )
@@ -91,7 +93,7 @@ fun TopMerchantsCard(
                             maxLines = 1
                         )
                         Text(
-                            text = "${merchant.transactionCount} transaction${if (merchant.transactionCount != 1) "s" else ""}",
+                            text = "${merchant.transactionCount} ${if (merchant.transactionCount != 1) stringResource(R.string.transactions_plural) else stringResource(R.string.transaction_singular)}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

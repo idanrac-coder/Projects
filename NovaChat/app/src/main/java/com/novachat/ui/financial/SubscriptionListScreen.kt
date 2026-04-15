@@ -37,6 +37,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
+import com.novachat.R
 import com.novachat.ui.financial.components.SubscriptionItem
 import com.novachat.ui.financial.components.currencySymbol
 
@@ -51,10 +53,10 @@ fun SubscriptionListScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Subscriptions") },
+                title = { Text(stringResource(R.string.subscriptions)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
@@ -84,7 +86,7 @@ fun SubscriptionListScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Monthly Subscription Total:",
+                        text = stringResource(R.string.subscriptions_total_label),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.White.copy(alpha = 0.8f)
                     )
@@ -95,7 +97,7 @@ fun SubscriptionListScreen(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "${state.activeCount} active subscriptions",
+                        text = "${state.activeCount} ${stringResource(R.string.subscriptions_active_suffix)}",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.White.copy(alpha = 0.7f)
                     )
@@ -113,7 +115,7 @@ fun SubscriptionListScreen(
                             FilterChip(
                                 selected = state.selectedCardLast4 == null,
                                 onClick = { viewModel.selectCard(null) },
-                                label = { Text("All Cards") }
+                                label = { Text(stringResource(R.string.all_cards)) }
                             )
                         }
                         items(state.cards.filter { !it.isHidden }) { card ->
@@ -154,7 +156,7 @@ fun SubscriptionListScreen(
             // Footer hint
             item {
                 Text(
-                    text = "Swipe left to mark inactive",
+                    text = stringResource(R.string.subscriptions_footer_hint),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier

@@ -43,10 +43,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.novachat.R
 import com.novachat.domain.model.BubbleShape
 
 private val colorPalette = listOf(
@@ -76,17 +78,17 @@ fun ThemeEditorScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Theme Editor") },
+                title = { Text(stringResource(R.string.theme_editor)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { viewModel.saveTheme() }) {
-                Icon(Icons.Default.Save, contentDescription = "Save theme")
+                Icon(Icons.Default.Save, contentDescription = stringResource(R.string.save))
             }
         }
     ) { padding ->
@@ -100,7 +102,7 @@ fun ThemeEditorScreen(
         ) {
             // Live Preview
             Text(
-                text = "Live Preview",
+                text = stringResource(R.string.live_preview),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -148,14 +150,14 @@ fun ThemeEditorScreen(
             OutlinedTextField(
                 value = theme.name,
                 onValueChange = { viewModel.updateName(it) },
-                label = { Text("Theme Name") },
+                label = { Text(stringResource(R.string.theme_name_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true
             )
 
             // Bubble Shape
-            Text("Bubble Shape", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.bubble_style), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 BubbleShape.entries.forEach { shape ->
                     FilterChip(
@@ -170,14 +172,22 @@ fun ThemeEditorScreen(
             }
 
             // Color Sections
-            ColorPickerSection("Primary Color", theme.primaryColor) { viewModel.updatePrimaryColor(it) }
-            ColorPickerSection("Secondary Color", theme.secondaryColor) { viewModel.updateSecondaryColor(it) }
-            ColorPickerSection("Background", theme.backgroundColor) { viewModel.updateBackgroundColor(it) }
-            ColorPickerSection("Surface", theme.surfaceColor) { viewModel.updateSurfaceColor(it) }
-            ColorPickerSection("Sent Bubble", theme.sentBubbleColor) { viewModel.updateSentBubbleColor(it) }
-            ColorPickerSection("Received Bubble", theme.receivedBubbleColor) { viewModel.updateReceivedBubbleColor(it) }
-            ColorPickerSection("Sent Text", theme.sentTextColor) { viewModel.updateSentTextColor(it) }
-            ColorPickerSection("Received Text", theme.receivedTextColor) { viewModel.updateReceivedTextColor(it) }
+            val primaryColorLabel = stringResource(R.string.primary_color_label)
+            val secondaryColorLabel = stringResource(R.string.secondary_color_label)
+            val backgroundLabel = stringResource(R.string.background_label)
+            val surfaceLabel = stringResource(R.string.surface_label)
+            val sentBubbleLabel = stringResource(R.string.sent_bubble_label)
+            val receivedBubbleLabel = stringResource(R.string.received_bubble_label)
+            val sentTextLabel = stringResource(R.string.sent_text_label)
+            val receivedTextLabel = stringResource(R.string.received_text_label)
+            ColorPickerSection(primaryColorLabel, theme.primaryColor) { viewModel.updatePrimaryColor(it) }
+            ColorPickerSection(secondaryColorLabel, theme.secondaryColor) { viewModel.updateSecondaryColor(it) }
+            ColorPickerSection(backgroundLabel, theme.backgroundColor) { viewModel.updateBackgroundColor(it) }
+            ColorPickerSection(surfaceLabel, theme.surfaceColor) { viewModel.updateSurfaceColor(it) }
+            ColorPickerSection(sentBubbleLabel, theme.sentBubbleColor) { viewModel.updateSentBubbleColor(it) }
+            ColorPickerSection(receivedBubbleLabel, theme.receivedBubbleColor) { viewModel.updateReceivedBubbleColor(it) }
+            ColorPickerSection(sentTextLabel, theme.sentTextColor) { viewModel.updateSentTextColor(it) }
+            ColorPickerSection(receivedTextLabel, theme.receivedTextColor) { viewModel.updateReceivedTextColor(it) }
 
             Spacer(modifier = Modifier.height(80.dp))
         }

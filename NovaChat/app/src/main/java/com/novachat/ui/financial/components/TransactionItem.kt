@@ -31,8 +31,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.novachat.R
 import com.novachat.core.sms.financial.FinancialCategory
 import com.novachat.domain.model.TransactionInfo
 import java.text.SimpleDateFormat
@@ -103,7 +105,7 @@ fun TransactionItem(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = transaction.merchantName ?: "Unknown merchant",
+                    text = transaction.merchantName ?: stringResource(R.string.unknown_merchant),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium
                 )
@@ -155,7 +157,7 @@ fun TransactionItem(
         ) {
             if (onCategoryChange != null) {
                 DropdownMenuItem(
-                    text = { Text("Change Category") },
+                    text = { Text(stringResource(R.string.change_category)) },
                     onClick = {
                         showContextMenu = false
                         showCategoryPicker = true
@@ -167,7 +169,7 @@ fun TransactionItem(
             }
             if (transaction.senderAddress != null && onViewInConversation != null) {
                 DropdownMenuItem(
-                    text = { Text("View in Conversation") },
+                    text = { Text(stringResource(R.string.view_in_conversation)) },
                     onClick = {
                         showContextMenu = false
                         onViewInConversation(transaction.senderAddress)

@@ -45,6 +45,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
+import com.novachat.R
 import com.novachat.domain.model.ScheduledMessage
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -62,10 +64,10 @@ fun ScheduledMessagesScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Scheduled Messages") },
+                title = { Text(stringResource(R.string.scheduled_messages)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -110,13 +112,13 @@ fun ScheduledMessagesScreen(
                         }
                         Spacer(modifier = Modifier.height(20.dp))
                         Text(
-                            text = "No scheduled messages",
+                            text = stringResource(R.string.no_scheduled_messages),
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onBackground
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Schedule a message from any chat\nusing the schedule button",
+                            text = stringResource(R.string.no_scheduled_messages_hint),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
@@ -144,21 +146,21 @@ fun ScheduledMessagesScreen(
         cancelTarget?.let { msg ->
             AlertDialog(
                 onDismissRequest = { cancelTarget = null },
-                title = { Text("Cancel Scheduled Message") },
+                title = { Text(stringResource(R.string.cancel_scheduled_message)) },
                 text = {
-                    Text("This message will not be sent. Are you sure?")
+                    Text(stringResource(R.string.cancel_scheduled_message_text))
                 },
                 confirmButton = {
                     TextButton(onClick = {
                         viewModel.cancelMessage(msg.id)
                         cancelTarget = null
                     }) {
-                        Text("Cancel Message", color = MaterialTheme.colorScheme.error)
+                        Text(stringResource(R.string.cancel_message), color = MaterialTheme.colorScheme.error)
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { cancelTarget = null }) {
-                        Text("Keep")
+                        Text(stringResource(R.string.keep))
                     }
                 }
             )
@@ -206,7 +208,7 @@ private fun ScheduledMessageCard(
                 IconButton(onClick = onCancel, modifier = Modifier.size(32.dp)) {
                     Icon(
                         Icons.Default.Close,
-                        contentDescription = "Cancel",
+                        contentDescription = stringResource(R.string.cancel),
                         modifier = Modifier.size(18.dp),
                         tint = MaterialTheme.colorScheme.error
                     )
@@ -217,7 +219,7 @@ private fun ScheduledMessageCard(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "To: $displayName",
+                    text = stringResource(R.string.to_display_fmt, displayName),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onBackground,

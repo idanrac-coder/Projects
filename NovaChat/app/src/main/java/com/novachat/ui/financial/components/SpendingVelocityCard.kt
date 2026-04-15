@@ -17,8 +17,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.novachat.R
 import com.novachat.domain.model.SpendingVelocity
 
 @Composable
@@ -46,7 +48,7 @@ fun SpendingVelocityCard(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text(
-                text = "Spending Pace",
+                text = stringResource(R.string.spending_pace),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
             )
@@ -57,7 +59,7 @@ fun SpendingVelocityCard(
             ) {
                 Column {
                     Text(
-                        text = "Daily rate",
+                        text = stringResource(R.string.daily_rate_label),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -69,7 +71,7 @@ fun SpendingVelocityCard(
                 }
                 Column(horizontalAlignment = androidx.compose.ui.Alignment.End) {
                     Text(
-                        text = "Projected total",
+                        text = stringResource(R.string.projected_total),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -98,8 +100,9 @@ fun SpendingVelocityCard(
                 )
             }
 
+            val daysRemainingStr = if (daysLeft != 1) stringResource(R.string.days_remaining_plural_fmt, daysLeft) else stringResource(R.string.day_remaining_singular)
             Text(
-                text = "${velocity.daysElapsed} of ${velocity.daysInMonth} days elapsed · $daysLeft day${if (daysLeft != 1) "s" else ""} remaining",
+                text = "${velocity.daysElapsed} of ${velocity.daysInMonth} days elapsed · $daysRemainingStr",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

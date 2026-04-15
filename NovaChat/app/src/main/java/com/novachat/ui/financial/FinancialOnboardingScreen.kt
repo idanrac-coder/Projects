@@ -40,11 +40,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.novachat.R
 import java.util.Locale
 
 @Composable
@@ -67,7 +69,7 @@ fun FinancialOnboardingScreen(
                 color = Color(0xFFFFC107)
             ) {
                 Text(
-                    text = "Premium Feature",
+                    text = stringResource(R.string.financial_onboarding_badge),
                     color = Color.White,
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
@@ -125,7 +127,7 @@ fun FinancialOnboardingScreen(
         ) {
             if (currentStep > 0) {
                 OutlinedButton(onClick = viewModel::previousStep) {
-                    Text("Back")
+                    Text(stringResource(R.string.back))
                 }
             } else {
                 Spacer(modifier = Modifier.weight(1f))
@@ -133,7 +135,7 @@ fun FinancialOnboardingScreen(
 
             if (currentStep < 2) {
                 Button(onClick = viewModel::nextStep) {
-                    Text("Next")
+                    Text(stringResource(R.string.next))
                 }
             }
         }
@@ -148,7 +150,7 @@ private fun Step1FeatureIntro() {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Financial Intelligence",
+            text = stringResource(R.string.financial_intelligence),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -157,7 +159,7 @@ private fun Step1FeatureIntro() {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Track your spending, monitor subscriptions, and get alerts for unusual charges — all automatically from your SMS messages.",
+            text = stringResource(R.string.financial_onboarding_description),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -181,7 +183,7 @@ private fun Step1FeatureIntro() {
                     modifier = Modifier.size(20.dp)
                 )
                 Text(
-                    text = "All data stays on your device. Nothing is sent to the cloud.",
+                    text = stringResource(R.string.financial_onboarding_privacy_note),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color(0xFF4CAF50)
                 )
@@ -219,7 +221,7 @@ private fun Step2ProviderLinks(
 
     Column(modifier = Modifier.fillMaxSize()) {
         Text(
-            text = "Enable SMS Alerts from Your Providers",
+            text = stringResource(R.string.financial_onboarding_step2_title),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold
         )
@@ -227,7 +229,7 @@ private fun Step2ProviderLinks(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Check the providers you have enabled SMS alerts for. Only checked providers will be monitored.",
+            text = stringResource(R.string.financial_onboarding_step2_description),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -260,7 +262,7 @@ private fun Step2ProviderLinks(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Contact your bank or credit card company to enable SMS transaction alerts.",
+                    text = stringResource(R.string.financial_onboarding_no_providers_message),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -269,7 +271,7 @@ private fun Step2ProviderLinks(
         }
 
         Text(
-            text = "Don't see your provider? You can add senders manually in Settings.",
+            text = stringResource(R.string.financial_onboarding_manual_add_hint),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 8.dp)
@@ -319,7 +321,7 @@ private fun ProviderRow(
                 modifier = Modifier.weight(1f)
             )
             OutlinedButton(onClick = onOpenSetup) {
-                Text("Open Setup")
+                Text(stringResource(R.string.open_setup))
             }
         }
     }
@@ -339,7 +341,7 @@ private fun Step3ConfirmEnable(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "You're All Set!",
+            text = stringResource(R.string.youre_all_set),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -356,7 +358,7 @@ private fun Step3ConfirmEnable(
                 onCheckedChange = { smsEnabled = it }
             )
             Text(
-                text = "I have enabled SMS alerts from at least one provider",
+                text = stringResource(R.string.financial_confirm_sms),
                 style = MaterialTheme.typography.bodyMedium
             )
         }
@@ -373,11 +375,11 @@ private fun Step3ConfirmEnable(
             )
             Column {
                 Text(
-                    text = "Scan existing SMS inbox for past transactions",
+                    text = stringResource(R.string.financial_confirm_scan_inbox),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = "Finds transactions from previous months",
+                    text = stringResource(R.string.financial_confirm_scan_description),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -392,7 +394,7 @@ private fun Step3ConfirmEnable(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Enable Financial Intelligence",
+                text = stringResource(R.string.enable_financial_intelligence),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Medium
             )
@@ -414,7 +416,7 @@ private fun Step3ConfirmEnable(
         ) {
             Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(20.dp))
             Text(
-                text = "Get Started",
+                text = stringResource(R.string.get_started),
                 modifier = Modifier.padding(start = 8.dp),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold

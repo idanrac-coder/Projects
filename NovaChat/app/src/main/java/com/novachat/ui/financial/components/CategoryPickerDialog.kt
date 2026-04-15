@@ -25,8 +25,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.novachat.R
 import com.novachat.core.sms.financial.FinancialCategory
 
 @Composable
@@ -41,7 +43,7 @@ fun CategoryPickerDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Change Category",
+                text = stringResource(R.string.change_category_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
@@ -49,7 +51,7 @@ fun CategoryPickerDialog(
         text = {
             Column {
             Text(
-                text = "This will update all transactions from this merchant.",
+                text = stringResource(R.string.change_category_description),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -102,7 +104,7 @@ fun CategoryPickerDialog(
         confirmButton = {},
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )

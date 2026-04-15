@@ -54,6 +54,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
+import com.novachat.R
 import com.novachat.domain.model.BubbleShape
 import com.novachat.domain.model.NovaChatTheme
 
@@ -71,10 +73,10 @@ fun ThemesScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Themes") },
+                title = { Text(stringResource(R.string.themes)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -82,7 +84,7 @@ fun ThemesScreen(
         floatingActionButton = {
             if (uiState.isPremium) {
                 FloatingActionButton(onClick = onEditTheme) {
-                    Icon(Icons.Default.Add, contentDescription = "Create theme")
+                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.create_theme))
                 }
             }
         }
@@ -156,14 +158,14 @@ private fun ThemeModeSelector(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Theme Mode",
+                text = stringResource(R.string.theme_mode),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "How the app chooses light or dark appearance",
+                text = stringResource(R.string.theme_mode_subtitle),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -171,7 +173,7 @@ private fun ThemeModeSelector(
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                listOf("system" to "System", "custom" to "Custom Theme").forEach { (value, label) ->
+                listOf("system" to stringResource(R.string.theme_mode_system), "custom" to stringResource(R.string.theme_mode_custom)).forEach { (value, label) ->
                     FilterChip(
                         selected = currentMode == value,
                         onClick = { onModeSelected(value) },
@@ -222,12 +224,12 @@ private fun BackgroundsPicker(onClick: () -> Unit) {
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Conversation Backgrounds",
+                        text = stringResource(R.string.conversation_backgrounds),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium
                     )
                     Text(
-                        text = "Premium",
+                        text = stringResource(R.string.premium_feature),
                         style = MaterialTheme.typography.labelMedium.copy(
                             brush = Brush.horizontalGradient(
                                 colors = listOf(
@@ -241,7 +243,7 @@ private fun BackgroundsPicker(onClick: () -> Unit) {
                     )
                 }
                 Text(
-                    text = "Sky, Ocean, Aurora & more",
+                    text = stringResource(R.string.backgrounds_subtitle),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -270,7 +272,7 @@ private fun BubbleStylePicker(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Bubble Style",
+                text = stringResource(R.string.bubble_style),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface

@@ -41,11 +41,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.novachat.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,10 +65,10 @@ fun ComposeMessageScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("New Message") },
+                title = { Text(stringResource(R.string.new_message)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -88,8 +90,8 @@ fun ComposeMessageScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
-                label = { Text("To") },
-                placeholder = { Text("Phone number or contact name") },
+                label = { Text(stringResource(R.string.compose_to_label)) },
+                placeholder = { Text(stringResource(R.string.compose_recipient_placeholder)) },
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true
             )
@@ -163,7 +165,7 @@ fun ComposeMessageScreen(
                     value = messageText,
                     onValueChange = { messageText = it },
                     modifier = Modifier.weight(1f),
-                    placeholder = { Text("Type a message\u2026") },
+                    placeholder = { Text(stringResource(R.string.compose_message_placeholder)) },
                     shape = RoundedCornerShape(24.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),

@@ -31,8 +31,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.novachat.R
 
 data class AutoDeleteOption(
     val label: String,
@@ -46,14 +48,14 @@ fun DisappearingMessagesDialog(
     onSelect: (Long?) -> Unit
 ) {
     val options = listOf(
-        AutoDeleteOption("Off", null),
-        AutoDeleteOption("5 seconds", 5_000L),
-        AutoDeleteOption("1 minute", 60_000L),
-        AutoDeleteOption("1 hour", 3_600_000L),
-        AutoDeleteOption("24 hours", 86_400_000L),
-        AutoDeleteOption("7 days", 604_800_000L),
-        AutoDeleteOption("30 days", 2_592_000_000L),
-        AutoDeleteOption("90 days", 7_776_000_000L),
+        AutoDeleteOption(stringResource(R.string.disappearing_off), null),
+        AutoDeleteOption(stringResource(R.string.disappearing_5_seconds), 5_000L),
+        AutoDeleteOption(stringResource(R.string.disappearing_1_minute), 60_000L),
+        AutoDeleteOption(stringResource(R.string.disappearing_1_hour), 3_600_000L),
+        AutoDeleteOption(stringResource(R.string.disappearing_24_hours), 86_400_000L),
+        AutoDeleteOption(stringResource(R.string.disappearing_7_days), 604_800_000L),
+        AutoDeleteOption(stringResource(R.string.disappearing_30_days), 2_592_000_000L),
+        AutoDeleteOption(stringResource(R.string.disappearing_90_days), 7_776_000_000L),
     )
 
     var selected by remember { mutableStateOf(currentDurationMs) }
@@ -78,14 +80,14 @@ fun DisappearingMessagesDialog(
         },
         title = {
             Text(
-                "Disappearing Messages",
+                stringResource(R.string.disappearing_messages),
                 fontWeight = FontWeight.Bold
             )
         },
         text = {
             Column {
                 Text(
-                    "Messages will be automatically deleted after the selected time.",
+                    stringResource(R.string.disappearing_messages_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -125,12 +127,12 @@ fun DisappearingMessagesDialog(
         },
         confirmButton = {
             TextButton(onClick = { onSelect(selected) }) {
-                Text("Save", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.save), fontWeight = FontWeight.SemiBold)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )

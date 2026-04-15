@@ -42,6 +42,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
+import com.novachat.R
 import com.novachat.domain.model.AlertInfo
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -58,10 +60,10 @@ fun AlertsScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Alerts") },
+                title = { Text(stringResource(R.string.alerts)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
@@ -87,7 +89,7 @@ fun AlertsScreen(
             if (state.alerts.isEmpty()) {
                 item {
                     Text(
-                        text = "No active alerts",
+                        text = stringResource(R.string.no_active_alerts),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier
@@ -124,7 +126,7 @@ fun AlertsScreen(
                             modifier = Modifier.size(16.dp)
                         )
                         Text(
-                            text = "Alerts are generated automatically based on your spending patterns. All data stays on your device.",
+                            text = stringResource(R.string.alerts_privacy_footer),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -140,12 +142,18 @@ private fun AlertCard(
     alert: AlertInfo,
     onDismiss: () -> Unit
 ) {
+    val titleUnusual = stringResource(R.string.alert_unusual_charge)
+    val titleDuplicate = stringResource(R.string.alert_duplicate_charge)
+    val titleNewMerchant = stringResource(R.string.alert_new_merchant_high)
+    val titleSubscription = stringResource(R.string.alert_subscription_price_increase)
+    val titleDefault = stringResource(R.string.alert_financial_default)
+
     val (borderColor, icon, title) = when (alert.type) {
-        "UNUSUAL_AMOUNT" -> Triple(Color(0xFFF44336), Icons.Default.Warning, "Unusual Charge Detected")
-        "DUPLICATE_CHARGE" -> Triple(Color(0xFFFF9800), Icons.Default.ContentCopy, "Duplicate Charge")
-        "NEW_MERCHANT_HIGH" -> Triple(Color(0xFFFFC107), Icons.Default.NewReleases, "New Merchant - High Amount")
-        "SUBSCRIPTION_PRICE_INCREASE" -> Triple(Color(0xFF2196F3), Icons.Default.TrendingUp, "Subscription Price Increase")
-        else -> Triple(Color.Gray, Icons.Default.Warning, "Financial Alert")
+        "UNUSUAL_AMOUNT" -> Triple(Color(0xFFF44336), Icons.Default.Warning, titleUnusual)
+        "DUPLICATE_CHARGE" -> Triple(Color(0xFFFF9800), Icons.Default.ContentCopy, titleDuplicate)
+        "NEW_MERCHANT_HIGH" -> Triple(Color(0xFFFFC107), Icons.Default.NewReleases, titleNewMerchant)
+        "SUBSCRIPTION_PRICE_INCREASE" -> Triple(Color(0xFF2196F3), Icons.Default.TrendingUp, titleSubscription)
+        else -> Triple(Color.Gray, Icons.Default.Warning, titleDefault)
     }
 
     val dateStr = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault()).format(Date(alert.timestamp))
@@ -204,10 +212,10 @@ private fun AlertCard(
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Dismiss")
+                        Text(stringResource(R.string.dismiss))
                     }
                     TextButton(onClick = { /* View transaction */ }) {
-                        Text("View Transaction")
+                        Text(stringResource(R.string.view_transaction))
                     }
                 }
             }

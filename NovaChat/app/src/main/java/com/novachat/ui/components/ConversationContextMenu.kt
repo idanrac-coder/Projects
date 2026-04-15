@@ -34,8 +34,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.novachat.R
 import com.novachat.domain.model.Conversation
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,7 +84,7 @@ fun ConversationContextMenu(
             if (conversation.isCurrentlyMuted) {
                 ContextMenuItem(
                     icon = Icons.Default.Notifications,
-                    label = "Unmute notifications",
+                    label = stringResource(R.string.context_menu_unmute),
                     onClick = {
                         onUnmute()
                         onDismiss()
@@ -91,7 +93,7 @@ fun ConversationContextMenu(
             } else {
                 ContextMenuItem(
                     icon = Icons.Default.NotificationsOff,
-                    label = "Mute notifications",
+                    label = stringResource(R.string.context_menu_mute),
                     onClick = { showMutePicker = true }
                 )
             }
@@ -99,7 +101,7 @@ fun ConversationContextMenu(
             // Pin / Unpin
             ContextMenuItem(
                 icon = Icons.Default.PushPin,
-                label = if (conversation.isPinned) "Unpin conversation" else "Pin conversation",
+                label = if (conversation.isPinned) stringResource(R.string.context_menu_unpin) else stringResource(R.string.context_menu_pin),
                 onClick = {
                     if (conversation.isPinned) onUnpin() else onPin()
                     onDismiss()
@@ -109,7 +111,7 @@ fun ConversationContextMenu(
             // Favorite / Unfavorite
             ContextMenuItem(
                 icon = if (conversation.isFavorite) Icons.Default.Star else Icons.Default.StarOutline,
-                label = if (conversation.isFavorite) "Remove from favorites" else "Add to favorites",
+                label = if (conversation.isFavorite) stringResource(R.string.context_menu_remove_favorite) else stringResource(R.string.context_menu_add_favorite),
                 onClick = {
                     if (conversation.isFavorite) onUnfavorite() else onFavorite()
                     onDismiss()
@@ -119,7 +121,7 @@ fun ConversationContextMenu(
             // Archive
             ContextMenuItem(
                 icon = Icons.Default.Archive,
-                label = "Archive",
+                label = stringResource(R.string.archive),
                 onClick = {
                     onArchive()
                     onDismiss()
@@ -130,7 +132,7 @@ fun ConversationContextMenu(
             if (conversation.unreadCount > 0) {
                 ContextMenuItem(
                     icon = Icons.Default.DoneAll,
-                    label = "Mark as read",
+                    label = stringResource(R.string.context_menu_mark_as_read),
                     onClick = {
                         onMarkAsRead()
                         onDismiss()
@@ -141,7 +143,7 @@ fun ConversationContextMenu(
             // Select
             ContextMenuItem(
                 icon = Icons.Outlined.CheckBox,
-                label = "Select",
+                label = stringResource(R.string.context_menu_select),
                 onClick = {
                     onSelect()
                     onDismiss()
@@ -155,7 +157,7 @@ fun ConversationContextMenu(
             // Delete
             ContextMenuItem(
                 icon = Icons.Default.Delete,
-                label = "Delete",
+                label = stringResource(R.string.delete),
                 tint = MaterialTheme.colorScheme.error,
                 onClick = {
                     onDelete()

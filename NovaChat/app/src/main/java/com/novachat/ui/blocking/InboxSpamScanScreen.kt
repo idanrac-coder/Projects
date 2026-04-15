@@ -52,11 +52,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.novachat.R
 import com.novachat.core.theme.AuroraColors
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -124,7 +126,7 @@ private fun ScanningPhase(uiState: InboxSpamScanUiState, onBack: () -> Unit) {
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Text(
-                    text = "Scanning your inbox...",
+                    text = stringResource(R.string.scanning_inbox),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -133,7 +135,7 @@ private fun ScanningPhase(uiState: InboxSpamScanUiState, onBack: () -> Unit) {
 
                 if (uiState.totalMessages > 0) {
                     Text(
-                        text = "${uiState.scannedCount} of ${uiState.totalMessages} messages checked",
+                        text = stringResource(R.string.scan_progress_fmt, uiState.scannedCount, uiState.totalMessages),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -153,7 +155,7 @@ private fun ScanningPhase(uiState: InboxSpamScanUiState, onBack: () -> Unit) {
                     if (uiState.spamResults.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = "${uiState.spamResults.size} spam found so far",
+                            text = stringResource(R.string.spam_found_so_far_fmt, uiState.spamResults.size),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error
                         )
@@ -163,7 +165,7 @@ private fun ScanningPhase(uiState: InboxSpamScanUiState, onBack: () -> Unit) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "This may take a moment",
+                    text = stringResource(R.string.may_take_a_moment),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                 )
@@ -171,7 +173,7 @@ private fun ScanningPhase(uiState: InboxSpamScanUiState, onBack: () -> Unit) {
                 Spacer(modifier = Modifier.height(32.dp))
 
                 TextButton(onClick = onBack) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         }
@@ -205,12 +207,15 @@ private fun ReviewPhase(
             },
             title = {
                 Text(
-                    "Permanently delete?",
+                    stringResource(R.string.permanently_delete),
                     color = MaterialTheme.colorScheme.error
                 )
             },
             text = {
-                Text("$count message${if (count != 1) "s" else ""} will be permanently deleted. This cannot be undone.")
+                Text(
+                    if (count == 1) stringResource(R.string.delete_confirm_singular)
+                    else stringResource(R.string.delete_confirm_plural_fmt, count)
+                )
             },
             confirmButton = {
                 TextButton(
@@ -222,12 +227,12 @@ private fun ReviewPhase(
                         contentColor = MaterialTheme.colorScheme.error
                     )
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -237,10 +242,10 @@ private fun ReviewPhase(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("Scan Results", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.scan_results), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -283,7 +288,7 @@ private fun ReviewPhase(
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Not Spam (${uiState.selectedCount})")
+                            Text(stringResource(R.string.not_spam_count_fmt, uiState.selectedCount))
                         }
 
                         Row(
@@ -301,7 +306,7 @@ private fun ReviewPhase(
                                     modifier = Modifier.size(18.dp)
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("Spam (${uiState.selectedCount})")
+                                Text(stringResource(R.string.spam_count_fmt, uiState.selectedCount))
                             }
 
                             OutlinedButton(
@@ -325,7 +330,7 @@ private fun ReviewPhase(
                                     modifier = Modifier.size(18.dp)
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("Delete (${uiState.selectedCount})")
+                                Text(stringResource(R.string.delete_count_fmt, uiState.selectedCount))
                             }
                         }
                     }
@@ -349,19 +354,19 @@ private fun ReviewPhase(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Your inbox is clean!",
+                        text = stringResource(R.string.your_inbox_is_clean),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "No spam detected.",
+                        text = stringResource(R.string.no_spam_detected),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     FilledTonalButton(onClick = onBack) {
-                        Text("Done")
+                        Text(stringResource(R.string.done))
                     }
                 }
             }
@@ -391,7 +396,10 @@ private fun ReviewPhase(
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                text = "Found ${uiState.spamResults.size} suspected spam message${if (uiState.spamResults.size != 1) "s" else ""}",
+                                text = if (uiState.spamResults.size == 1)
+                                    stringResource(R.string.spam_found_singular)
+                                else
+                                    stringResource(R.string.spam_found_plural_fmt, uiState.spamResults.size),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onErrorContainer
@@ -414,13 +422,13 @@ private fun ReviewPhase(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = if (uiState.allSelected) "Deselect all" else "Select all",
+                            text = if (uiState.allSelected) stringResource(R.string.deselect_all) else stringResource(R.string.select_all),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
-                            text = "${uiState.selectedCount} selected",
+                            text = stringResource(R.string.selected_count_fmt, uiState.selectedCount),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -521,10 +529,10 @@ private fun ProcessingPhase(uiState: InboxSpamScanUiState) {
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 val actionText = when (uiState.lastAction) {
-                    ScanAction.MOVE_TO_SPAM -> "Moving messages to spam..."
-                    ScanAction.DELETE_PERMANENTLY -> "Deleting messages..."
-                    ScanAction.MARK_NOT_SPAM -> "Marking as not spam..."
-                    null -> "Processing..."
+                    ScanAction.MOVE_TO_SPAM -> stringResource(R.string.moving_to_spam)
+                    ScanAction.DELETE_PERMANENTLY -> stringResource(R.string.deleting_messages)
+                    ScanAction.MARK_NOT_SPAM -> stringResource(R.string.marking_not_spam)
+                    null -> stringResource(R.string.processing)
                 }
                 Text(
                     text = actionText,
@@ -534,7 +542,7 @@ private fun ProcessingPhase(uiState: InboxSpamScanUiState) {
                 if (uiState.processedCount > 0) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "${uiState.processedCount} of ${uiState.selectedCount} processed",
+                        text = stringResource(R.string.processed_count_fmt, uiState.processedCount, uiState.selectedCount),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -580,14 +588,18 @@ private fun DonePhase(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                val count = uiState.processedCount
                 val message = when (uiState.lastAction) {
                     ScanAction.MOVE_TO_SPAM ->
-                        "${uiState.processedCount} message${if (uiState.processedCount != 1) "s" else ""} moved to spam folder"
+                        if (count == 1) stringResource(R.string.result_moved_spam_singular)
+                        else stringResource(R.string.result_moved_spam_plural_fmt, count)
                     ScanAction.DELETE_PERMANENTLY ->
-                        "${uiState.processedCount} message${if (uiState.processedCount != 1) "s" else ""} permanently deleted"
+                        if (count == 1) stringResource(R.string.result_deleted_singular)
+                        else stringResource(R.string.result_deleted_plural_fmt, count)
                     ScanAction.MARK_NOT_SPAM ->
-                        "${uiState.processedCount} message${if (uiState.processedCount != 1) "s" else ""} marked as not spam"
-                    null -> "Done"
+                        if (count == 1) stringResource(R.string.result_not_spam_singular)
+                        else stringResource(R.string.result_not_spam_plural_fmt, count)
+                    null -> stringResource(R.string.done)
                 }
                 Text(
                     text = message,
@@ -605,34 +617,35 @@ private fun DonePhase(
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("View Spam Folder")
+                        Text(stringResource(R.string.view_spam_folder))
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                 }
 
                 TextButton(onClick = onBack) {
-                    Text("Done")
+                    Text(stringResource(R.string.done))
                 }
             }
         }
     }
 }
 
+@Composable
 private fun formatScanMatchedRuleType(ruleType: String): String = when {
     ruleType.startsWith("SCAM:") -> ruleType.removePrefix("SCAM:").replace('_', ' ').lowercase()
         .replaceFirstChar { it.uppercase() }
-    ruleType.startsWith("HEBREW:") -> "Hebrew spam"
-    ruleType.startsWith("DET_RAW:") -> "Suspicious pattern"
+    ruleType.startsWith("HEBREW:") -> stringResource(R.string.spam_reason_hebrew)
+    ruleType.startsWith("DET_RAW:") -> stringResource(R.string.spam_reason_suspicious_pattern)
     ruleType.startsWith("DET:") -> when (ruleType.removePrefix("DET:")) {
-        "SHORTENED_URL" -> "Shortened link"
-        "SUSPICIOUS_TLD" -> "Suspicious website"
-        "IP_URL" -> "Suspicious link"
-        "URGENT_KEYWORDS" -> "Urgency tactics"
-        else -> "Suspicious content"
+        "SHORTENED_URL" -> stringResource(R.string.spam_reason_shortened_link)
+        "SUSPICIOUS_TLD" -> stringResource(R.string.spam_reason_suspicious_website)
+        "IP_URL" -> stringResource(R.string.spam_reason_suspicious_link)
+        "URGENT_KEYWORDS" -> stringResource(R.string.spam_reason_urgency)
+        else -> stringResource(R.string.spam_reason_suspicious_content)
     }
-    ruleType.startsWith("HEUR:") -> "Spam detected"
-    ruleType.startsWith("SCORE_") -> "Spam detected"
-    else -> "Spam detected"
+    ruleType.startsWith("HEUR:") -> stringResource(R.string.spam_reason_detected)
+    ruleType.startsWith("SCORE_") -> stringResource(R.string.spam_reason_detected)
+    else -> stringResource(R.string.spam_reason_detected)
 }
 
 private fun formatScanTimestamp(timestamp: Long): String {

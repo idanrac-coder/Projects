@@ -40,10 +40,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.novachat.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,13 +76,13 @@ fun SpamDetailSheet(
                 .verticalScroll(rememberScrollState())
         ) {
             Text(
-                text = "Why was this flagged?",
+                text = stringResource(R.string.spam_detail_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "From: $address",
+                text = stringResource(R.string.spam_detail_from_prefix) + address,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -95,12 +97,12 @@ fun SpamDetailSheet(
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Spam Score",
+                            text = stringResource(R.string.spam_detail_score_label),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = "$score / 100",
+                            text = "$score " + stringResource(R.string.spam_detail_score_suffix),
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
                             color = when {
@@ -130,7 +132,7 @@ fun SpamDetailSheet(
             }
 
             Text(
-                text = "Reason",
+                text = stringResource(R.string.spam_detail_reason_label),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
             )
@@ -150,7 +152,7 @@ fun SpamDetailSheet(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Message Preview",
+                text = stringResource(R.string.spam_detail_preview_label),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
             )
@@ -220,49 +222,56 @@ private data class ReasonInfo(
     val color: Color
 )
 
+@Composable
 private fun buildReasons(ruleType: String): List<ReasonInfo> {
     val stripped = ruleType.replace(Regex("\\|SCORE_\\d+$"), "")
 
     return when {
         stripped == "NUMBER" -> listOf(
             ReasonInfo(
-                Icons.Default.Block, "Number blocked",
-                "This number is on your block list.",
+                Icons.Default.Block,
+                stringResource(R.string.spam_detail_number_blocked_label),
+                stringResource(R.string.spam_detail_number_blocked_description),
                 Color(0xFFE53935)
             )
         )
         stripped == "SENDER_NAME" -> listOf(
             ReasonInfo(
-                Icons.Default.Person, "Sender blocked",
-                "This sender name is on your block list.",
+                Icons.Default.Person,
+                stringResource(R.string.spam_detail_sender_blocked_label),
+                stringResource(R.string.spam_detail_sender_blocked_description),
                 Color(0xFFE53935)
             )
         )
         stripped == "KEYWORD" -> listOf(
             ReasonInfo(
-                Icons.Default.TextFields, "Keyword match",
-                "The message contains a word or phrase you've blocked.",
+                Icons.Default.TextFields,
+                stringResource(R.string.spam_detail_keyword_match_label),
+                stringResource(R.string.spam_detail_keyword_match_description),
                 Color(0xFFE53935)
             )
         )
         stripped == "LANGUAGE" -> listOf(
             ReasonInfo(
-                Icons.Default.Language, "Language filtered",
-                "The message is in a language you've chosen to block.",
+                Icons.Default.Language,
+                stringResource(R.string.spam_detail_language_filtered_label),
+                stringResource(R.string.spam_detail_language_filtered_description),
                 Color(0xFFFF9800)
             )
         )
         stripped == "INTERNATIONAL_FILTER" -> listOf(
             ReasonInfo(
-                Icons.Default.Public, "International number",
-                "This message came from a foreign number and your international filter is on.",
+                Icons.Default.Public,
+                stringResource(R.string.spam_detail_international_filter_label),
+                stringResource(R.string.spam_detail_international_filter_description),
                 Color(0xFFFF9800)
             )
         )
         stripped == "SCAM_REPORT" -> listOf(
             ReasonInfo(
-                Icons.Default.Report, "Reported as spam",
-                "You or other users reported this number as spam.",
+                Icons.Default.Report,
+                stringResource(R.string.spam_detail_scam_report_label),
+                stringResource(R.string.spam_detail_scam_report_description),
                 Color(0xFFE53935)
             )
         )
@@ -270,7 +279,8 @@ private fun buildReasons(ruleType: String): List<ReasonInfo> {
             val category = stripped.removePrefix("SCAM:")
             listOf(
                 ReasonInfo(
-                    Icons.Default.Shield, "Scam detected",
+                    Icons.Default.Shield,
+                    stringResource(R.string.spam_detail_scam_detected_label),
                     formatScamCategory(category),
                     Color(0xFFE53935)
                 )
@@ -278,7 +288,8 @@ private fun buildReasons(ruleType: String): List<ReasonInfo> {
         }
         stripped.startsWith("SPAM_AGENT:") -> listOf(
             ReasonInfo(
-                Icons.Default.Psychology, "AI flagged",
+                Icons.Default.Psychology,
+                stringResource(R.string.spam_detail_ai_flagged_label),
                 stripped.removePrefix("SPAM_AGENT:").replace('_', ' ')
                     .lowercase().replaceFirstChar { it.uppercase() } + ".",
                 Color(0xFF1E88E5)
@@ -288,7 +299,8 @@ private fun buildReasons(ruleType: String): List<ReasonInfo> {
         stripped.startsWith("INBOX_SCAN:") -> buildSpamFilterReasons(stripped.removePrefix("INBOX_SCAN:"))
         else -> listOf(
             ReasonInfo(
-                Icons.Default.Shield, "Blocked",
+                Icons.Default.Shield,
+                stringResource(R.string.spam_filter_blocked_as_spam),
                 stripped.replace('_', ' ').lowercase().replaceFirstChar { it.uppercase() } + ".",
                 Color(0xFF757575)
             )
@@ -296,6 +308,7 @@ private fun buildReasons(ruleType: String): List<ReasonInfo> {
     }
 }
 
+@Composable
 private fun buildSpamFilterReasons(inner: String): List<ReasonInfo> {
     val cleaned = inner.replace(Regex("\\|SCORE_\\d+$"), "")
 
@@ -304,7 +317,8 @@ private fun buildSpamFilterReasons(inner: String): List<ReasonInfo> {
             val det = cleaned.removePrefix("DET:")
             listOf(
                 ReasonInfo(
-                    Icons.Default.Shield, "Suspicious content",
+                    Icons.Default.Shield,
+                    stringResource(R.string.spam_detail_suspicious_content_label),
                     formatDetReason(det),
                     Color(0xFFFF9800)
                 )
@@ -321,7 +335,8 @@ private fun buildSpamFilterReasons(inner: String): List<ReasonInfo> {
             val reason = cleaned.removePrefix("HEBREW:")
             listOf(
                 ReasonInfo(
-                    Icons.Default.TextFields, "Content analysis",
+                    Icons.Default.TextFields,
+                    stringResource(R.string.spam_detail_suspicious_content_label),
                     formatHebrewReason(reason),
                     Color(0xFF1E88E5)
                 )
@@ -329,69 +344,80 @@ private fun buildSpamFilterReasons(inner: String): List<ReasonInfo> {
         }
         cleaned.startsWith("SCORE_") -> listOf(
             ReasonInfo(
-                Icons.Default.Psychology, "Spam detected",
-                "Our filters flagged this message as spam.",
+                Icons.Default.Psychology,
+                stringResource(R.string.spam_filter_spam_detected),
+                stringResource(R.string.spam_detail_general_spam_description),
                 Color(0xFF1E88E5)
             )
         )
         else -> listOf(
             ReasonInfo(
-                Icons.Default.Psychology, "Spam detected",
-                "Our filters flagged this message as spam.",
+                Icons.Default.Psychology,
+                stringResource(R.string.spam_filter_spam_detected),
+                stringResource(R.string.spam_detail_general_spam_description),
                 Color(0xFF1E88E5)
             )
         )
     }
 }
 
+@Composable
 private fun heuristicToReason(key: String): ReasonInfo = when (key) {
     "sender_unknown" -> ReasonInfo(
-        Icons.Default.Person, "Unknown sender",
-        "The sender is not in your contacts.",
+        Icons.Default.Person,
+        stringResource(R.string.spam_reason_unknown_sender_label),
+        stringResource(R.string.spam_reason_unknown_sender_description),
         Color(0xFFFF9800)
     )
     "contains_url" -> ReasonInfo(
-        Icons.Default.Link, "Contains a link",
-        "The message includes a URL, which is common in spam.",
+        Icons.Default.Link,
+        stringResource(R.string.spam_reason_contains_url_label),
+        stringResource(R.string.spam_reason_contains_url_description),
         Color(0xFFE53935)
     )
     "otp_verify" -> ReasonInfo(
-        Icons.Default.TextFields, "Fake verification code",
-        "The message looks like a fraudulent verification request.",
+        Icons.Default.TextFields,
+        stringResource(R.string.spam_reason_otp_verify_label),
+        stringResource(R.string.spam_reason_otp_verify_description),
         Color(0xFFE53935)
     )
     "high_special_chars" -> ReasonInfo(
-        Icons.Default.TextFields, "Unusual formatting",
-        "The message has an unusual amount of special characters.",
+        Icons.Default.TextFields,
+        stringResource(R.string.spam_reason_high_special_chars_label),
+        stringResource(R.string.spam_reason_high_special_chars_description),
         Color(0xFF7B1FA2)
     )
     "deterministic" -> ReasonInfo(
-        Icons.Default.Shield, "Known spam pattern",
-        "The message matches a known spam template.",
+        Icons.Default.Shield,
+        stringResource(R.string.spam_reason_deterministic_label),
+        stringResource(R.string.spam_reason_deterministic_description),
         Color(0xFFFF9800)
     )
     else -> ReasonInfo(
-        Icons.Default.Shield, key.replace('_', ' ').replaceFirstChar { it.uppercase() },
-        "Flagged by our spam filters.",
+        Icons.Default.Shield,
+        key.replace('_', ' ').replaceFirstChar { it.uppercase() },
+        stringResource(R.string.spam_reason_default_description),
         Color(0xFF757575)
     )
 }
 
+@Composable
 private fun formatDetReason(det: String): String = when (det) {
-    "SHORTENED_URL" -> "The message contains a shortened link that could hide a malicious destination."
-    "SUSPICIOUS_TLD" -> "The message links to a website with a suspicious domain."
-    "IP_URL" -> "The message contains a direct IP address link, often used in phishing."
-    "URGENT_KEYWORDS" -> "The message uses urgency tactics commonly found in scam messages."
-    "OTP_VERIFY_EN", "OTP_VERIFY_HE" -> "The message looks like a fraudulent verification request."
-    else -> "The message contains content commonly found in spam."
+    "SHORTENED_URL" -> stringResource(R.string.spam_detail_shortened_url_description)
+    "SUSPICIOUS_TLD" -> stringResource(R.string.spam_detail_suspicious_tld_description)
+    "IP_URL" -> stringResource(R.string.spam_detail_ip_url_description)
+    "URGENT_KEYWORDS" -> stringResource(R.string.spam_detail_urgent_keywords_description)
+    "OTP_VERIFY_EN", "OTP_VERIFY_HE" -> stringResource(R.string.spam_detail_otp_verify_description)
+    else -> stringResource(R.string.spam_detail_general_spam_description)
 }
 
+@Composable
 private fun formatScamCategory(category: String): String = when (category.uppercase()) {
-    "SUSPICIOUS_LINK" -> "The message contains a link that appears unsafe."
-    "OTP_FRAUD" -> "The message looks like a fake verification or login code."
-    "FINANCIAL_SCAM" -> "The message appears to be a financial scam."
-    "PHISHING" -> "The message is trying to steal personal information."
-    "UNKNOWN" -> "The message matches known scam patterns."
+    "SUSPICIOUS_LINK" -> stringResource(R.string.spam_detail_suspicious_link_description)
+    "OTP_FRAUD" -> stringResource(R.string.spam_detail_otp_fraud_description)
+    "FINANCIAL_SCAM" -> stringResource(R.string.spam_detail_financial_scam_description)
+    "PHISHING" -> stringResource(R.string.spam_detail_phishing_description)
+    "UNKNOWN" -> stringResource(R.string.spam_detail_unknown_scam_description)
     else -> category.replace('_', ' ').lowercase().replaceFirstChar { it.uppercase() } + " detected."
 }
 

@@ -23,8 +23,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.novachat.R
 import com.novachat.domain.model.MessageEdit
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -52,24 +54,26 @@ fun EditHistorySheet(
                 .verticalScroll(rememberScrollState())
         ) {
             Text(
-                text = "Message Edit History",
+                text = stringResource(R.string.edit_history_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
             TimelineEntry(
-                label = "Current version",
+                label = stringResource(R.string.edit_history_current),
                 body = currentBody,
                 timestamp = null,
                 isFirst = true,
                 isLast = edits.isEmpty()
             )
 
+            val originalLabel = stringResource(R.string.edit_history_original)
+            val previousLabel = stringResource(R.string.edit_history_previous)
             edits.reversed().forEachIndexed { index, edit ->
                 val isOriginal = index == edits.size - 1
                 TimelineEntry(
-                    label = if (isOriginal) "Original message" else "Previous version",
+                    label = if (isOriginal) originalLabel else previousLabel,
                     body = edit.previousBody,
                     timestamp = edit.timestamp,
                     isFirst = false,

@@ -32,10 +32,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.novachat.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,13 +58,13 @@ fun MessagingSettingsScreen(
             LargeTopAppBar(
                 title = {
                     Text(
-                        "Messaging Settings",
+                        stringResource(R.string.messaging_settings),
                         fontWeight = FontWeight.Bold
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 scrollBehavior = scrollBehavior,
@@ -80,7 +82,7 @@ fun MessagingSettingsScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp)
         ) {
-            SectionHeader(title = "Sending")
+            SectionHeader(title = stringResource(R.string.section_sending))
             Spacer(modifier = Modifier.height(8.dp))
             Surface(
                 shape = RoundedCornerShape(16.dp),
@@ -89,15 +91,15 @@ fun MessagingSettingsScreen(
             ) {
                 Column {
                     ToggleRow(
-                        title = "Undo send",
-                        subtitle = "Allow undoing a sent message for a few seconds",
+                        title = stringResource(R.string.undo_send),
+                        subtitle = stringResource(R.string.undo_send_subtitle),
                         checked = undoSendEnabled,
                         onCheckedChange = { viewModel.setUndoSendEnabled(it) }
                     )
                     Divider()
                     ToggleRow(
-                        title = "Forward SMS to WhatsApp",
-                        subtitle = "Auto-forward contact SMS to WhatsApp",
+                        title = stringResource(R.string.forward_sms_whatsapp),
+                        subtitle = stringResource(R.string.forward_sms_whatsapp_subtitle),
                         checked = whatsAppForwardEnabled,
                         onCheckedChange = { viewModel.setWhatsAppForwardEnabled(it) }
                     )
@@ -106,7 +108,7 @@ fun MessagingSettingsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            SectionHeader(title = "Smart Links")
+            SectionHeader(title = stringResource(R.string.smart_links))
             Spacer(modifier = Modifier.height(8.dp))
             Surface(
                 shape = RoundedCornerShape(16.dp),
@@ -115,15 +117,15 @@ fun MessagingSettingsScreen(
             ) {
                 Column {
                     ToggleRow(
-                        title = "Calendar links",
-                        subtitle = "Tap dates in messages to add to Calendar",
+                        title = stringResource(R.string.calendar_links),
+                        subtitle = stringResource(R.string.calendar_links_subtitle),
                         checked = calendarLinksEnabled,
                         onCheckedChange = { viewModel.setCalendarLinksEnabled(it) }
                     )
                     Divider()
                     ToggleRow(
-                        title = "Maps links",
-                        subtitle = "Tap addresses in messages to open in Maps",
+                        title = stringResource(R.string.maps_links),
+                        subtitle = stringResource(R.string.maps_links_subtitle),
                         checked = mapsLinksEnabled,
                         onCheckedChange = { viewModel.setMapsLinksEnabled(it) }
                     )

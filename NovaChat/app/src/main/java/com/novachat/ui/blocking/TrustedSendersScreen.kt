@@ -45,6 +45,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
+import com.novachat.R
 import com.novachat.core.theme.AuroraColors
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,10 +62,10 @@ fun TrustedSendersScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("Trusted Senders", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.trusted_senders), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -77,7 +79,7 @@ fun TrustedSendersScreen(
                 containerColor = AuroraColors.TealSpark,
                 contentColor = Color.White
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add trusted sender")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_trusted_sender))
             }
         }
     ) { padding ->
@@ -97,13 +99,13 @@ fun TrustedSendersScreen(
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "No trusted senders yet",
+                        text = stringResource(R.string.no_trusted_senders),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Tap + to add a sender, or mark a message as \"Not spam\"",
+                        text = stringResource(R.string.no_trusted_senders_hint),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
                     )
@@ -118,7 +120,7 @@ fun TrustedSendersScreen(
             ) {
                 item {
                     Text(
-                        text = "Messages from these senders skip spam checks.",
+                        text = stringResource(R.string.trusted_senders_description),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                         modifier = Modifier.padding(start = 4.dp, top = 8.dp, bottom = 12.dp)
@@ -191,7 +193,7 @@ private fun TrustedSenderItem(
         ) {
             Icon(
                 Icons.Default.Close,
-                contentDescription = "Remove from trusted",
+                contentDescription = stringResource(R.string.remove),
                 modifier = Modifier.size(18.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
             )
@@ -208,11 +210,11 @@ private fun AddTrustedSenderDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Add Trusted Sender") },
+        title = { Text(stringResource(R.string.add_trusted_sender)) },
         text = {
             Column {
                 Text(
-                    text = "Enter a phone number or sender name to trust. Messages from this sender will skip spam checks.",
+                    text = stringResource(R.string.add_trusted_sender_text),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -220,7 +222,7 @@ private fun AddTrustedSenderDialog(
                 OutlinedTextField(
                     value = address,
                     onValueChange = { address = it },
-                    label = { Text("Phone number or sender name") },
+                    label = { Text(stringResource(R.string.phone_or_sender_name)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -231,12 +233,12 @@ private fun AddTrustedSenderDialog(
                 onClick = { onAdd(address) },
                 enabled = address.isNotBlank()
             ) {
-                Text("Add")
+                Text(stringResource(R.string.add))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )

@@ -20,8 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.novachat.R
 import com.novachat.domain.model.MonthlySummary
 import java.text.DateFormatSymbols
 
@@ -53,7 +55,7 @@ fun MonthlySummaryCard(
             IconButton(onClick = onPreviousMonth) {
                 Icon(
                     Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                    contentDescription = "Previous month",
+                    contentDescription = stringResource(R.string.previous_month),
                     tint = Color.White
                 )
             }
@@ -66,7 +68,7 @@ fun MonthlySummaryCard(
             IconButton(onClick = onNextMonth) {
                 Icon(
                     Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = "Next month",
+                    contentDescription = stringResource(R.string.next_month),
                     tint = Color.White
                 )
             }

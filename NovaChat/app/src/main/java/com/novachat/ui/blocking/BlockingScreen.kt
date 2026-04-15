@@ -43,10 +43,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.novachat.R
 import com.novachat.domain.model.BlockRule
 import com.novachat.domain.model.BlockType
 import com.novachat.domain.repository.BlockRepository
@@ -61,15 +63,20 @@ fun BlockingScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val showBlockLimitDialog by viewModel.showBlockLimitDialog.collectAsStateWithLifecycle()
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
-    val tabs = listOf("By Number", "By Words", "By Sender", "By Language")
+    val tabs = listOf(
+        stringResource(R.string.by_number),
+        stringResource(R.string.by_words),
+        stringResource(R.string.by_sender),
+        stringResource(R.string.by_language)
+    )
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Blocking") },
+                title = { Text(stringResource(R.string.blocking)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -87,7 +94,7 @@ fun BlockingScreen(
                         viewModel.showAddDialog(type)
                     }
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add rule")
+                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add))
                 }
             }
         }
@@ -107,7 +114,7 @@ fun BlockingScreen(
                     )
                 ) {
                     Text(
-                        text = "Free plan: ${uiState.ruleCount}/${BlockRepository.FREE_RULE_LIMIT} block rules used. Upgrade to Premium for unlimited rules.",
+                        text = stringResource(R.string.free_plan_rules_fmt, uiState.ruleCount, BlockRepository.FREE_RULE_LIMIT),
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(12.dp)
                     )
@@ -148,12 +155,12 @@ fun BlockingScreen(
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = "No ${tabs[selectedTab].lowercase()} rules yet",
+                            text = stringResource(R.string.no_rules_yet_fmt, tabs[selectedTab].lowercase()),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = "Tap + to add a rule",
+                            text = stringResource(R.string.tap_to_add_rule),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                         )
@@ -218,7 +225,7 @@ private fun BlockRuleCard(
                 )
                 if (rule.isRegex) {
                     Text(
-                        text = "Regex pattern",
+                        text = stringResource(R.string.regex_pattern),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -227,7 +234,7 @@ private fun BlockRuleCard(
             IconButton(onClick = onDelete) {
                 Icon(
                     Icons.Default.Delete,
-                    contentDescription = "Delete",
+                    contentDescription = stringResource(R.string.delete),
                     tint = MaterialTheme.colorScheme.error
                 )
             }
@@ -245,16 +252,16 @@ private fun AddBlockRuleDialog(
     var isRegex by remember { mutableStateOf(false) }
 
     val title = when (type) {
-        BlockType.NUMBER -> "Block Number"
-        BlockType.KEYWORD -> "Block Keyword"
-        BlockType.SENDER_NAME -> "Block Sender"
-        BlockType.LANGUAGE -> "Block Language"
+        BlockType.NUMBER -> stringResource(R.string.block_number)
+        BlockType.KEYWORD -> stringResource(R.string.block_keyword)
+        BlockType.SENDER_NAME -> stringResource(R.string.block_sender_rule)
+        BlockType.LANGUAGE -> stringResource(R.string.block_language)
     }
     val placeholder = when (type) {
-        BlockType.NUMBER -> "Phone number (e.g., +1555*)"
-        BlockType.KEYWORD -> "Keyword or phrase"
-        BlockType.SENDER_NAME -> "Sender name"
-        BlockType.LANGUAGE -> "Language code (e.g. en, es, fr)"
+        BlockType.NUMBER -> stringResource(R.string.phone_number_example)
+        BlockType.KEYWORD -> stringResource(R.string.keyword_or_phrase)
+        BlockType.SENDER_NAME -> stringResource(R.string.sender_name_label)
+        BlockType.LANGUAGE -> stringResource(R.string.language_code_example)
     }
 
     AlertDialog(
@@ -277,13 +284,13 @@ private fun AddBlockRuleDialog(
                         onCheckedChange = { isRegex = it }
                     )
                     Text(
-                        text = "Use regex pattern",
+                        text = stringResource(R.string.use_regex_pattern),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
                 if (type == BlockType.NUMBER) {
                     Text(
-                        text = "Use * as wildcard (e.g., +1555* blocks all numbers starting with +1555)",
+                        text = stringResource(R.string.wildcard_note),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -294,10 +301,10 @@ private fun AddBlockRuleDialog(
             TextButton(
                 onClick = { onConfirm(value, isRegex) },
                 enabled = value.isNotBlank()
-            ) { Text("Add") }
+            ) { Text(stringResource(R.string.add)) }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
         }
     )
 }

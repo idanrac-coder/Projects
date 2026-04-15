@@ -47,9 +47,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.novachat.R
 import com.novachat.core.backup.importDatabaseBackup
 import com.novachat.core.backup.restartApp
 import com.novachat.core.theme.AuroraColors
@@ -81,12 +83,9 @@ fun RestoreOnboardingScreen(
                 showConfirmDialog = false
                 pendingRestoreUri = null
             },
-            title = { Text("Restore Backup") },
+            title = { Text(stringResource(R.string.restore_backup_title)) },
             text = {
-                Text(
-                    "This will restore all messages and data from the backup file. " +
-                        "The app will restart after restore."
-                )
+                Text(stringResource(R.string.restore_backup_text))
             },
             confirmButton = {
                 TextButton(
@@ -107,7 +106,7 @@ fun RestoreOnboardingScreen(
                         }
                     }
                 ) {
-                    Text("Restore", fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.restore_label), fontWeight = FontWeight.SemiBold)
                 }
             },
             dismissButton = {
@@ -115,7 +114,7 @@ fun RestoreOnboardingScreen(
                     showConfirmDialog = false
                     pendingRestoreUri = null
                 }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -157,7 +156,7 @@ fun RestoreOnboardingScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                text = "Welcome to NovaChat",
+                text = stringResource(R.string.welcome_to_novachat),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -166,7 +165,7 @@ fun RestoreOnboardingScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Do you have a previous backup to restore?",
+                text = stringResource(R.string.restore_onboarding_question),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
@@ -189,7 +188,7 @@ fun RestoreOnboardingScreen(
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        "Restoring your data...",
+                        stringResource(R.string.restore_in_progress),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -223,7 +222,7 @@ fun RestoreOnboardingScreen(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
-                        Text("Restore from Google Drive", fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.restore_from_google_drive), fontWeight = FontWeight.SemiBold)
                     }
 
                     OutlinedButton(
@@ -238,7 +237,7 @@ fun RestoreOnboardingScreen(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
-                        Text("Restore from Local File", fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.restore_from_local_file), fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -250,7 +249,7 @@ fun RestoreOnboardingScreen(
                 enabled = !isRestoring
             ) {
                 Text(
-                    "Start Fresh",
+                    stringResource(R.string.start_fresh),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant

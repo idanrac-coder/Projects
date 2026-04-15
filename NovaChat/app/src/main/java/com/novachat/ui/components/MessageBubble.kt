@@ -54,9 +54,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import android.widget.Toast
+import com.novachat.R
 import com.novachat.core.theme.LocalChatColors
 import com.novachat.core.theme.LocalChatShapes
 import com.novachat.core.theme.sentBubbleGradient
@@ -235,6 +237,7 @@ fun MessageBubble(
                     } else {
                         val uriHandler = LocalUriHandler.current
                         val context = LocalContext.current
+                        val suspiciousLinkWarning = stringResource(R.string.suspicious_link_warning)
                         val formatted = remember(message.body, calendarLinksEnabled, mapsLinksEnabled) {
                             parseFormattedText(message.body, calendarLinksEnabled, mapsLinksEnabled)
                         }
@@ -264,7 +267,7 @@ fun MessageBubble(
                                                 if (isSuspicious) {
                                                     Toast.makeText(
                                                         context,
-                                                        "Suspicious link – open only after marking as not spam",
+                                                        suspiciousLinkWarning,
                                                         Toast.LENGTH_SHORT
                                                     ).show()
                                                 } else {
@@ -306,7 +309,7 @@ fun MessageBubble(
                 ) {
                     if (message.isEdited) {
                         Text(
-                            text = "Edited",
+                            text = stringResource(R.string.message_edited),
                             color = textColor.copy(alpha = 0.4f),
                             fontSize = 10.sp,
                             fontStyle = FontStyle.Italic
@@ -321,7 +324,7 @@ fun MessageBubble(
                     if (isSent) {
                         Icon(
                             imageVector = if (message.isRead) Icons.Default.DoneAll else Icons.Default.Done,
-                            contentDescription = if (message.isRead) "Read" else "Sent",
+                            contentDescription = if (message.isRead) stringResource(R.string.message_status_read) else stringResource(R.string.message_status_sent),
                             modifier = Modifier.size(14.dp),
                             tint = if (message.isRead) Color(0xFF55EFC4)
                             else textColor.copy(alpha = 0.45f)
@@ -387,13 +390,13 @@ private fun ScamWarningBanner(
                 Spacer(modifier = Modifier.width(6.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = scamAnalysis.reason ?: "Suspicious message",
+                        text = scamAnalysis.reason ?: stringResource(R.string.suspicious_message),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.SemiBold,
                         color = Color(0xFFFF6B6B)
                     )
                     Text(
-                        text = "${(scamAnalysis.confidence * 100).toInt()}% confidence" +
+                        text = stringResource(R.string.confidence_suffix_fmt, (scamAnalysis.confidence * 100).toInt()) +
                             (scamAnalysis.category?.let { " \u2022 ${it.name.replace('_', ' ').lowercase().replaceFirstChar { c -> c.uppercase() }}" } ?: ""),
                         style = MaterialTheme.typography.labelSmall,
                         color = Color(0xFFFF6B6B).copy(alpha = 0.7f),
@@ -410,7 +413,7 @@ private fun ScamWarningBanner(
                     modifier = Modifier.height(28.dp)
                 ) {
                     Text(
-                        "Not spam",
+                        stringResource(R.string.not_spam),
                         style = MaterialTheme.typography.labelSmall,
                         color = textColor.copy(alpha = 0.6f),
                         fontSize = 10.sp
@@ -422,7 +425,7 @@ private fun ScamWarningBanner(
                     modifier = Modifier.height(28.dp)
                 ) {
                     Text(
-                        "Report spam",
+                        stringResource(R.string.report_spam),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFFFF6B6B),
@@ -733,7 +736,7 @@ fun VoiceMessageContent(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Voice message",
+                    text = stringResource(R.string.voice_message),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
                     color = textColor
@@ -759,10 +762,10 @@ fun VoiceMessageContent(
                 ) {
                     Text(
                         text = when {
-                            isTranscribing -> "Transcribing..."
-                            showTranscription && transcription != null -> "Hide transcript"
-                            transcription != null -> "Show transcript"
-                            else -> "Transcribe"
+                            isTranscribing -> stringResource(R.string.transcribing)
+                            showTranscription && transcription != null -> stringResource(R.string.hide_transcript)
+                            transcription != null -> stringResource(R.string.show_transcript)
+                            else -> stringResource(R.string.transcribe)
                         },
                         style = MaterialTheme.typography.labelSmall,
                         color = textColor.copy(alpha = 0.7f),

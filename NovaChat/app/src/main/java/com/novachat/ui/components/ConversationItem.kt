@@ -42,11 +42,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
+import com.novachat.R
 import com.novachat.core.theme.GradientAvatar
 import com.novachat.domain.model.Conversation
 import com.novachat.domain.model.MessageCategory
@@ -197,8 +199,10 @@ fun ConversationItem(
                     }
                 }
                 Spacer(modifier = Modifier.width(10.dp))
+                val nowLabel = stringResource(R.string.now_label)
+                val yesterdayLabel = stringResource(R.string.yesterday)
                 Text(
-                    text = formatTimestamp(conversation.timestamp),
+                    text = formatTimestamp(conversation.timestamp, nowLabel, yesterdayLabel),
                     style = MaterialTheme.typography.labelSmall,
                     color = if (hasUnread) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -226,8 +230,9 @@ fun ConversationItem(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    val contactsLabel = stringResource(R.string.category_contacts)
                     val categoryLabel = conversation.customCategory
-                        ?: if (conversation.category == MessageCategory.CONTACTS) "Contacts" else null
+                        ?: if (conversation.category == MessageCategory.CONTACTS) contactsLabel else null
                     if (categoryLabel != null) {
                         CategoryBadge(name = categoryLabel)
                     }
@@ -295,7 +300,7 @@ private val dayFormat = ThreadLocal.withInitial { SimpleDateFormat("EEE", Locale
 private val dateYearFormat = ThreadLocal.withInitial { SimpleDateFormat("MMM d, yyyy", Locale.getDefault()) }
 private val dateFormat = ThreadLocal.withInitial { SimpleDateFormat("MMM d", Locale.getDefault()) }
 
-private fun formatTimestamp(timestamp: Long): String {
+private fun formatTimestamp(timestamp: Long, nowLabel: String, yesterdayLabel: String): String {
     val now = Calendar.getInstance()
     val msgTime = Calendar.getInstance().apply { timeInMillis = timestamp }
     val date = Date(timestamp)
@@ -304,11 +309,11 @@ private fun formatTimestamp(timestamp: Long): String {
         now.get(Calendar.DATE) == msgTime.get(Calendar.DATE) &&
             now.get(Calendar.YEAR) == msgTime.get(Calendar.YEAR) -> {
             val diff = System.currentTimeMillis() - timestamp
-            if (diff < 60_000) "Now"
+            if (diff < 60_000) nowLabel
             else timeFormat.get()!!.format(date)
         }
         now.get(Calendar.DATE) - msgTime.get(Calendar.DATE) == 1 &&
-            now.get(Calendar.YEAR) == msgTime.get(Calendar.YEAR) -> "Yesterday"
+            now.get(Calendar.YEAR) == msgTime.get(Calendar.YEAR) -> yesterdayLabel
         now.get(Calendar.WEEK_OF_YEAR) == msgTime.get(Calendar.WEEK_OF_YEAR) &&
             now.get(Calendar.YEAR) == msgTime.get(Calendar.YEAR) -> {
             dayFormat.get()!!.format(date)

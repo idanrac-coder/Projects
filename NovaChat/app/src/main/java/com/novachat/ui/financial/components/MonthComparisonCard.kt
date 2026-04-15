@@ -15,8 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.novachat.R
 import com.novachat.domain.model.MonthComparison
 import java.text.DateFormatSymbols
 import kotlin.math.abs
@@ -33,8 +35,9 @@ fun MonthComparisonCard(
     val prevMonthName = months[prevMonth - 1].take(3)
     val symbol = currencySymbol(comparison.currency)
 
+    val newLabel = stringResource(R.string.comparison_new_label)
     val isUp = comparison.percentageChange > 0
-    val pctText = if (comparison.previousTotal == 0.0) "New" else "${if (isUp) "+" else "-"}${"%.1f".format(abs(comparison.percentageChange))}%"
+    val pctText = if (comparison.previousTotal == 0.0) newLabel else "${if (isUp) "+" else "-"}${"%.1f".format(abs(comparison.percentageChange))}%"
     val pctColor = if (isUp) Color(0xFFE53935) else Color(0xFF43A047)
 
     Card(
@@ -53,7 +56,7 @@ fun MonthComparisonCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Month vs Last Month",
+                    text = stringResource(R.string.month_vs_last_month),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold
                 )

@@ -58,6 +58,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -66,6 +67,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.novachat.BuildConfig
+import com.novachat.R
 import com.novachat.core.billing.TrialState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -92,10 +94,10 @@ fun LicenseScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Premium") },
+                title = { Text(stringResource(R.string.premium)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -135,13 +137,13 @@ fun LicenseScreen(
                             )
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(
-                                text = "You're Premium!",
+                                text = stringResource(R.string.youre_premium),
                                 style = MaterialTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
                             )
                             Text(
-                                text = "All features are unlocked",
+                                text = stringResource(R.string.all_features_unlocked),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = Color.White.copy(alpha = 0.9f)
                             )
@@ -155,13 +157,16 @@ fun LicenseScreen(
                             )
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(
-                                text = "Premium Trial",
+                                text = stringResource(R.string.premium_trial),
                                 style = MaterialTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
                             )
                             Text(
-                                text = "$trialDaysRemaining day${if (trialDaysRemaining != 1) "s" else ""} remaining",
+                                text = if (trialDaysRemaining == 1)
+                                    stringResource(R.string.trial_days_remaining_fmt, trialDaysRemaining)
+                                else
+                                    stringResource(R.string.trial_days_remaining_plural_fmt, trialDaysRemaining),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = Color.White.copy(alpha = 0.9f)
                             )
@@ -175,13 +180,13 @@ fun LicenseScreen(
                             )
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(
-                                text = "Trial Ended",
+                                text = stringResource(R.string.trial_ended),
                                 style = MaterialTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
                             )
                             Text(
-                                text = "Purchase to unlock all premium features",
+                                text = stringResource(R.string.trial_ended_description),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = Color.White.copy(alpha = 0.9f)
                             )
@@ -195,13 +200,13 @@ fun LicenseScreen(
                             )
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(
-                                text = "Aura Premium",
+                                text = stringResource(R.string.aura_premium),
                                 style = MaterialTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
                             )
                             Text(
-                                text = "One-time purchase, lifetime access",
+                                text = stringResource(R.string.one_time_purchase),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = Color.White.copy(alpha = 0.9f)
                             )
@@ -219,7 +224,7 @@ fun LicenseScreen(
                         contentColor = MaterialTheme.colorScheme.error
                     )
                 ) {
-                    Text("Reset License (Dev)")
+                    Text(stringResource(R.string.reset_license_dev))
                 }
             }
 
@@ -231,7 +236,7 @@ fun LicenseScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
-                    text = "What's included",
+                    text = stringResource(R.string.whats_included),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -240,23 +245,23 @@ fun LicenseScreen(
 
                 PremiumFeatureRow(
                     icon = Icons.Default.Palette,
-                    title = "Unlimited Themes",
-                    description = "Access all 18 built-in themes and create unlimited custom themes"
+                    title = stringResource(R.string.feature_unlimited_themes),
+                    description = stringResource(R.string.feature_unlimited_themes_desc)
                 )
                 PremiumFeatureRow(
                     icon = Icons.Default.Block,
-                    title = "Unlimited Block Rules",
-                    description = "Create as many block rules as you need (free limit: 15)"
+                    title = stringResource(R.string.feature_unlimited_block_rules),
+                    description = stringResource(R.string.feature_unlimited_block_rules_desc)
                 )
                 PremiumFeatureRow(
                     icon = Icons.Default.Notifications,
-                    title = "Advanced Notifications",
-                    description = "Per-contact custom sounds, LED colors, and bubble preferences"
+                    title = stringResource(R.string.feature_advanced_notifications),
+                    description = stringResource(R.string.feature_advanced_notifications_desc)
                 )
                 PremiumFeatureRow(
                     icon = Icons.Default.Star,
-                    title = "Priority Support",
-                    description = "Get faster responses and feature requests prioritized"
+                    title = stringResource(R.string.feature_priority_support),
+                    description = stringResource(R.string.feature_priority_support_desc)
                 )
             }
 
@@ -281,7 +286,7 @@ fun LicenseScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Lifetime License",
+                            text = stringResource(R.string.lifetime_license),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -292,7 +297,7 @@ fun LicenseScreen(
                             modifier = Modifier.padding(bottom = 8.dp)
                         ) {
                             Text(
-                                text = "67% OFF",
+                                text = stringResource(R.string.discount_badge),
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFFFF6B6B),
@@ -300,7 +305,7 @@ fun LicenseScreen(
                             )
                         }
                         Text(
-                            text = "$15.00",
+                            text = stringResource(R.string.license_original_price),
                             style = MaterialTheme.typography.titleLarge,
                             textDecoration = TextDecoration.LineThrough,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.45f)
@@ -312,7 +317,7 @@ fun LicenseScreen(
                             color = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            text = "One-time payment \u2022 No subscriptions",
+                            text = stringResource(R.string.no_subscriptions_note),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                         )
@@ -337,13 +342,13 @@ fun LicenseScreen(
                                     color = MaterialTheme.colorScheme.onPrimary
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
-                                Text("Processing...")
+                                Text(stringResource(R.string.processing))
                             } else {
                                 Text(
                                     text = if (trialState == TrialState.ACTIVE)
-                                        "Purchase to Keep Premium"
+                                        stringResource(R.string.purchase_to_keep_premium)
                                     else
-                                        "Purchase Lifetime License",
+                                        stringResource(R.string.purchase_lifetime_license),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold
                                 )
@@ -358,7 +363,7 @@ fun LicenseScreen(
                     onClick = { viewModel.restorePurchase() },
                     modifier = Modifier.padding(horizontal = 24.dp)
                 ) {
-                    Text("Restore Purchase")
+                    Text(stringResource(R.string.restore_purchase))
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -372,7 +377,7 @@ fun LicenseScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Terms & Conditions",
+                        text = stringResource(R.string.terms_and_conditions),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.primary,
                         textDecoration = TextDecoration.Underline
@@ -380,7 +385,7 @@ fun LicenseScreen(
                     Spacer(Modifier.width(4.dp))
                     Icon(
                         if (termsExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                        contentDescription = if (termsExpanded) "Collapse" else "Expand",
+                        contentDescription = if (termsExpanded) stringResource(R.string.collapse) else stringResource(R.string.expand),
                         modifier = Modifier.size(16.dp),
                         tint = MaterialTheme.colorScheme.primary
                     )
@@ -397,24 +402,24 @@ fun LicenseScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         DisclaimerItem(
-                            title = "Refund Policy",
-                            body = "Refunds are available within 30 days of purchase. After this period, all sales are final. Refund requests can be submitted through Google Play."
+                            title = stringResource(R.string.refund_policy),
+                            body = stringResource(R.string.refund_policy_body)
                         )
                         DisclaimerItem(
-                            title = "Lifetime License",
-                            body = "\"Lifetime\" refers to the operational lifetime of the Aura app. If the app is discontinued or removed from the Google Play Store, the license expires with no further obligation to the developer."
+                            title = stringResource(R.string.lifetime_license_terms_title),
+                            body = stringResource(R.string.lifetime_license_terms_body)
                         )
                         DisclaimerItem(
-                            title = "What's Included",
-                            body = "Your license includes all current premium features and future updates for as long as the app is actively maintained."
+                            title = stringResource(R.string.whats_included_terms_title),
+                            body = stringResource(R.string.whats_included_terms_body)
                         )
                         DisclaimerItem(
-                            title = "Non-Transferable",
-                            body = "This license is tied to your Google account and cannot be transferred, shared, or resold."
+                            title = stringResource(R.string.non_transferable_title),
+                            body = stringResource(R.string.non_transferable_body)
                         )
                         DisclaimerItem(
-                            title = "Google Play",
-                            body = "This purchase is subject to Google Play's Terms of Service."
+                            title = stringResource(R.string.google_play_title),
+                            body = stringResource(R.string.google_play_body)
                         )
                     }
                 }
@@ -423,7 +428,7 @@ fun LicenseScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Payment is processed through Google Play.\nYour purchase is linked to your Google account.",
+                text = stringResource(R.string.payment_disclaimer),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,

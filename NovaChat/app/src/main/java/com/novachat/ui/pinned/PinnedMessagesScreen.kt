@@ -33,11 +33,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.novachat.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
@@ -111,10 +113,10 @@ fun PinnedMessagesScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Pinned Messages") },
+                title = { Text(stringResource(R.string.pinned_messages)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -157,13 +159,13 @@ fun PinnedMessagesScreen(
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "No pinned messages",
+                        text = stringResource(R.string.no_pinned_messages),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Long-press a message in the chat to pin it",
+                        text = stringResource(R.string.no_pinned_messages_hint),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
@@ -220,14 +222,14 @@ private fun PinnedMessageCard(
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = if (isSent) "You" else (contactName ?: message.address),
+                        text = if (isSent) stringResource(R.string.pinned_message_sender_you) else (contactName ?: message.address),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
                 TextButton(onClick = onUnpin) {
-                    Text("Unpin", style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.unpin), style = MaterialTheme.typography.labelMedium)
                 }
             }
 

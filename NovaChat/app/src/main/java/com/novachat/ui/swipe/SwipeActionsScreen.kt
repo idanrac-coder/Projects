@@ -44,6 +44,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
+import com.novachat.R
 import com.novachat.domain.model.SwipeAction
 import com.novachat.ui.components.swipeActionColor
 import com.novachat.ui.components.swipeActionIcon
@@ -59,10 +61,10 @@ fun SwipeActionsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Swipe Actions") },
+                title = { Text(stringResource(R.string.swipe_actions)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -78,7 +80,7 @@ fun SwipeActionsScreen(
         ) {
             // Preview
             Text(
-                text = "Preview",
+                text = stringResource(R.string.preview),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -90,8 +92,8 @@ fun SwipeActionsScreen(
 
             // Left swipe configuration
             SwipeActionSelector(
-                title = "Swipe Right",
-                subtitle = "Swipe from left to right",
+                title = stringResource(R.string.swipe_right_label),
+                subtitle = stringResource(R.string.swipe_right_subtitle),
                 icon = Icons.Default.SwipeRight,
                 currentAction = uiState.leftAction,
                 onActionSelected = { viewModel.setLeftAction(it) }
@@ -99,8 +101,8 @@ fun SwipeActionsScreen(
 
             // Right swipe configuration
             SwipeActionSelector(
-                title = "Swipe Left",
-                subtitle = "Swipe from right to left",
+                title = stringResource(R.string.swipe_left_label),
+                subtitle = stringResource(R.string.swipe_left_subtitle),
                 icon = Icons.Default.SwipeLeft,
                 currentAction = uiState.rightAction,
                 onActionSelected = { viewModel.setRightAction(it) }
@@ -115,7 +117,7 @@ fun SwipeActionsScreen(
                 )
             ) {
                 Text(
-                    text = "Swipe on any conversation in the main list to quickly perform the configured action.",
+                    text = stringResource(R.string.swipe_info),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(16.dp)
                 )
@@ -170,8 +172,8 @@ private fun SwipePreview(
                     .background(MaterialTheme.colorScheme.surface)
                     .padding(12.dp)
             ) {
-                Text("Sample Conversation", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                Text("Last message preview...", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.sample_conversation), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.last_message_preview), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
 
             Box(
@@ -279,12 +281,13 @@ private fun SwipeActionSelector(
     }
 }
 
+@Composable
 private fun formatActionName(action: SwipeAction): String = when (action) {
-    SwipeAction.ARCHIVE -> "Archive"
-    SwipeAction.DELETE -> "Delete"
-    SwipeAction.PIN -> "Pin"
-    SwipeAction.MARK_READ_UNREAD -> "Read/Unread"
-    SwipeAction.MUTE -> "Mute"
-    SwipeAction.BLOCK -> "Block"
-    SwipeAction.OFF -> "Off"
+    SwipeAction.ARCHIVE -> stringResource(R.string.swipe_action_archive)
+    SwipeAction.DELETE -> stringResource(R.string.swipe_action_delete)
+    SwipeAction.PIN -> stringResource(R.string.swipe_action_pin)
+    SwipeAction.MARK_READ_UNREAD -> stringResource(R.string.swipe_action_read_unread)
+    SwipeAction.MUTE -> stringResource(R.string.swipe_action_mute)
+    SwipeAction.BLOCK -> stringResource(R.string.swipe_action_block)
+    SwipeAction.OFF -> stringResource(R.string.swipe_action_off)
 }

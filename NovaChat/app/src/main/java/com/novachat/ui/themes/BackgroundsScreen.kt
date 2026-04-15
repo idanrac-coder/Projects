@@ -47,9 +47,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.novachat.R
 import com.novachat.domain.model.ConversationBackground
 import com.novachat.domain.model.WallpaperType
 
@@ -66,10 +68,10 @@ fun BackgroundsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Conversation Backgrounds") },
+                title = { Text(stringResource(R.string.conversation_backgrounds_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -118,13 +120,13 @@ fun BackgroundsScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            "Conversation backgrounds are a Premium feature",
+                            stringResource(R.string.backgrounds_premium_message),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.height(24.dp))
                         Button(onClick = onNavigateToPremium) {
-                            Text("Upgrade to Premium")
+                            Text(stringResource(R.string.upgrade_to_premium))
                         }
                     }
                 }
@@ -134,7 +136,7 @@ fun BackgroundsScreen(
         uiState.previewBackground?.let { bg ->
             AlertDialog(
                 onDismissRequest = { viewModel.dismissPreview() },
-                title = { Text("Preview: ${bg.displayName}") },
+                title = { Text(stringResource(R.string.preview_prefix) + bg.displayName) },
                 text = {
                     Box(
                         modifier = Modifier
@@ -216,12 +218,12 @@ fun BackgroundsScreen(
                 },
                 confirmButton = {
                     Button(onClick = { viewModel.confirmPreview() }) {
-                        Text("Apply")
+                        Text(stringResource(R.string.apply))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { viewModel.dismissPreview() }) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel))
                     }
                 }
             )

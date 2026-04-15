@@ -1,33 +1,746 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Aura</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_messages">Messages</string>
+    <string name="nav_financial">Financial</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Conversations Screen -->
+    <string name="aura_messaging">Aura Messaging</string>
+    <string name="search_conversations">Search conversations…</string>
     <string name="conversations">Conversations</string>
     <string name="search">Search</string>
-    <string name="settings">Settings</string>
     <string name="new_message">New Message</string>
     <string name="no_messages">No messages yet</string>
-    <string name="no_messages_subtitle">Start a conversation by tapping the compose button</string>
+    <string name="no_messages_subtitle">Start a conversation by tapping\nthe compose button</string>
+    <string name="archived">Archived</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="back">Back</string>
+    <string name="clear">Clear</string>
+    <string name="archive">Archive</string>
+    <string name="category">Category</string>
+    <string name="rename">Rename</string>
+    <string name="add_new_category">Add new category</string>
+    <string name="category_name">Category name</string>
+    <string name="rename_category">Rename Category</string>
+    <string name="no_custom_categories">No custom categories yet.</string>
+    <string name="no_custom_categories_create_hint">No custom categories yet. Create one from the Edit button on the category bar.</string>
+    <string name="choose_category_hint">Choose a category for the selected conversations</string>
+    <string name="remove_from_category">Remove from category</string>
+    <string name="block_contact_title">Block %s</string>
+    <string name="block_choose_how">Choose how you want to block this contact. Blocked messages will be moved to the spam folder.</string>
+    <string name="block_by_number">Block by number</string>
+    <string name="block_by_sender">Block by sender</string>
+    <string name="block_by_words">Block by words</string>
+    <string name="block_by_language">Block by language</string>
+    <string name="block_enter_words">Enter words to block (comma separated)</string>
+    <string name="block_enter_language">Enter language code (e.g., en, es, fr)</string>
+    <string name="unable_sms_settings">Unable to open default SMS settings. Please set Aura as default in your device Settings > Apps > Default apps.</string>
+    <string name="delete_conversation">Delete conversation?</string>
+    <string name="delete_n_conversations">Delete %d conversations?</string>
+    <string name="delete_conversation_text">This conversation will be permanently deleted. This action cannot be undone.</string>
+    <string name="delete_n_conversations_text">These %d conversations will be permanently deleted. This action cannot be undone.</string>
+    <string name="default_messaging_app_required">Default messaging app required</string>
+    <string name="default_sms_required_text">To delete conversations, Aura needs to be set as your default messaging app. This allows Aura to manage your messages.</string>
+    <string name="set_as_default">Set as Default</string>
+    <string name="not_now">Not now</string>
+    <string name="set_as_default_title">Set as default messaging app</string>
+    <string name="set_as_default_text">For the best experience, set Aura as your default messaging app. This enables full message management including marking messages as read, deleting conversations, and sending messages.</string>
+    <string name="assign_category">Assign Category</string>
+    <string name="manage_categories">Manage Categories</string>
+    <string name="new_category">New Category</string>
+
+    <!-- Chat Screen -->
     <string name="type_message">Type a message…</string>
     <string name="send">Send</string>
-    <string name="blocking">Blocking</string>
-    <string name="themes">Themes</string>
-    <string name="notifications">Notifications</string>
-    <string name="swipe_actions">Swipe Actions</string>
-    <string name="premium">Premium</string>
-    <string name="blocked_spam">Blocked / Spam</string>
-    <string name="by_number">By Number</string>
-    <string name="by_words">By Words</string>
-    <string name="by_sender">By Sender</string>
+    <string name="search_in_conversation">Search in conversation…</string>
+    <string name="pinned_messages">Pinned messages</string>
+    <string name="media_gallery">Media gallery</string>
+    <string name="disappearing_messages">Disappearing messages</string>
+    <string name="reply">Reply</string>
+    <string name="copy">Copy</string>
+    <string name="forward">Forward</string>
+    <string name="remind">Remind</string>
+    <string name="share">Share</string>
+    <string name="view_details">View Details</string>
+    <string name="send_message_action">Send message</string>
+    <string name="add_to_contacts">Add to contacts</string>
+    <string name="call">Call</string>
+    <string name="copy_number">Copy number</string>
+    <string name="unknown_sender">Unknown sender</string>
+    <string name="trust">Trust</string>
+    <string name="block">Block</string>
+    <string name="reported_as_spam">Reported as spam</string>
+    <string name="more">More</string>
+
+    <!-- Settings Screen -->
+    <string name="settings">Settings</string>
+    <string name="premium_account">Premium Account</string>
     <string name="upgrade_to_premium">Upgrade to Premium</string>
-    <string name="lifetime_license">Lifetime License</string>
-    <string name="restore_purchase">Restore Purchase</string>
-    <string name="permission_required">Permission Required</string>
-    <string name="sms_permission_rationale">Aura needs SMS permissions to read and send messages.</string>
-    <string name="grant_permission">Grant Permission</string>
+    <string name="all_features_unlocked">All features unlocked</string>
+    <string name="unlock_all_features">Unlock all themes, features &amp; more</string>
+    <string name="section_appearance">Appearance</string>
+    <string name="themes">Themes</string>
+    <string name="themes_subtitle">Colors, bubbles &amp; wallpapers</string>
+    <string name="swipe_actions">Swipe Actions</string>
+    <string name="swipe_actions_subtitle">Configure swipe gestures</string>
+    <string name="app_language">App Language</string>
+    <string name="language_hebrew">Hebrew</string>
+    <string name="language_english">English</string>
+    <string name="language_system_default">System default</string>
+    <string name="section_protection">Protection</string>
+    <string name="smart_and_secure">Smart &amp; Secure</string>
+    <string name="smart_and_secure_subtitle">AI spam detection, protection stats</string>
+    <string name="financial_intelligence">Financial Intelligence</string>
+    <string name="financial_intelligence_subtitle">Track spending &amp; subscriptions</string>
+    <string name="premium_feature">Premium feature</string>
+    <string name="section_messages">Messages</string>
+    <string name="messaging_settings">Messaging Settings</string>
+    <string name="messaging_settings_subtitle">Undo send, smart links &amp; forwarding</string>
+    <string name="notifications">Notifications</string>
+    <string name="notifications_subtitle">Sounds, vibration &amp; DND</string>
+    <string name="notification_profiles">Notification Profiles</string>
+    <string name="notification_profiles_subtitle">Work, Sleep, Personal modes</string>
+    <string name="scheduled_messages">Scheduled Messages</string>
+    <string name="scheduled_messages_subtitle">Manage pending messages</string>
+    <string name="archived_subtitle">View archived chats</string>
+    <string name="section_data_privacy">Data &amp; Privacy</string>
+    <string name="backup_and_restore">Backup &amp; Restore</string>
+    <string name="backup_subtitle">Back up to Google Drive</string>
+    <string name="qr_contact_sharing">QR Contact Sharing</string>
+    <string name="qr_contact_sharing_subtitle">Share your contact via QR</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="privacy_policy_subtitle">How your data is handled</string>
+    <string name="section_support">Support</string>
+    <string name="send_feedback">Send Feedback</string>
+    <string name="send_feedback_subtitle">Report bugs or suggest features</string>
+    <string name="rate_us">Rate Us</string>
+    <string name="rate_us_subtitle">Leave a review on Google Play</string>
+    <string name="apply">Apply</string>
+    <string name="language_hebrew_native">&#x05E2;&#x05D1;&#x05E8;&#x05D9;&#x05EA; (Hebrew)</string>
+
+    <!-- Spam-related strings -->
     <string name="report_spam">Report spam</string>
     <string name="not_spam">Not spam</string>
     <string name="suspicious_message">Suspicious message</string>
     <string name="trust_sender">Trust sender</string>
     <string name="block_contact">Block contact</string>
+    <string name="blocked_spam">Blocked / Spam</string>
     <string name="suspicious_link_hint">Suspicious link – open only after marking as not spam</string>
+
+    <!-- Smart &amp; Secure -->
+    <string name="spam_protection">Spam Protection</string>
+    <string name="suspected_scam_detected">Suspected scam detected</string>
+    <string name="spam_blocked_fmt">%d spam blocked this month</string>
+    <string name="ai_scam_detection">AI Scam Detection</string>
+    <string name="ai_scam_detection_subtitle">Automatically filter malicious messages</string>
+    <string name="filter_international_senders">Filter international senders</string>
+    <string name="filter_international_subtitle">Hide messages from numbers outside your country</string>
+    <string name="spam_folder">Spam Folder</string>
+    <string name="spam_folder_subtitle">View filtered messages</string>
+    <string name="trusted_senders">Trusted Senders</string>
+    <string name="trusted_senders_subtitle">Senders that skip spam checks</string>
+    <string name="scan_inbox">Scan Inbox</string>
+    <string name="scan_inbox_subtitle">Find old spam in your inbox</string>
+    <string name="blocking_subtitle">Number, keywords &amp; sender rules</string>
+
+    <!-- Trusted Senders -->
+    <string name="no_trusted_senders">No trusted senders yet</string>
+    <string name="no_trusted_senders_hint">Tap + to add a sender, or mark a message as \"Not spam\"</string>
+    <string name="trusted_senders_description">Messages from these senders skip spam checks.</string>
+    <string name="add_trusted_sender">Add Trusted Sender</string>
+    <string name="add_trusted_sender_text">Enter a phone number or sender name to trust. Messages from this sender will skip spam checks.</string>
+    <string name="phone_or_sender_name">Phone number or sender name</string>
+
+    <!-- Blocking -->
+    <string name="blocking">Blocking</string>
+    <string name="by_number">By Number</string>
+    <string name="by_words">By Words</string>
+    <string name="by_sender">By Sender</string>
+    <string name="by_language">By Language</string>
+    <string name="tap_to_add_rule">Tap + to add a rule</string>
+    <string name="regex_pattern">Regex pattern</string>
+    <string name="use_regex_pattern">Use regex pattern</string>
+    <string name="block_number">Block Number</string>
+    <string name="block_keyword">Block Keyword</string>
+    <string name="block_sender_rule">Block Sender</string>
+    <string name="block_language">Block Language</string>
+    <string name="wildcard_note">Use * as wildcard (e.g., +1555* blocks all numbers starting with +1555)</string>
+    <string name="free_plan_rules_fmt">Free plan: %1$d/%2$d block rules used. Upgrade to Premium for unlimited rules.</string>
+    <string name="no_rules_yet_fmt">No %s rules yet</string>
+    <string name="phone_number_example">Phone number (e.g., +1555*)</string>
+    <string name="keyword_or_phrase">Keyword or phrase</string>
+    <string name="sender_name_label">Sender name</string>
+    <string name="language_code_example">Language code (e.g. en, es, fr)</string>
+    <string name="add">Add</string>
+
+    <!-- Inbox Spam Scan -->
+    <string name="scanning_inbox">Scanning your inbox…</string>
+    <string name="may_take_a_moment">This may take a moment</string>
+    <string name="scan_results">Scan Results</string>
+    <string name="permanently_delete">Permanently delete?</string>
+    <string name="your_inbox_is_clean">Your inbox is clean!</string>
+    <string name="no_spam_detected">No spam detected.</string>
+    <string name="done">Done</string>
+    <string name="deselect_all">Deselect all</string>
+    <string name="select_all">Select all</string>
+    <string name="view_spam_folder">View Spam Folder</string>
+    <string name="moving_to_spam">Moving messages to spam…</string>
+    <string name="deleting_messages">Deleting messages…</string>
+    <string name="marking_not_spam">Marking as not spam…</string>
+    <string name="processing">Processing…</string>
+    <string name="scan_progress_fmt">%1$d of %2$d messages checked</string>
+    <string name="spam_found_so_far_fmt">%d spam found so far</string>
+    <string name="delete_confirm_singular">1 message will be permanently deleted. This cannot be undone.</string>
+    <string name="delete_confirm_plural_fmt">%d messages will be permanently deleted. This cannot be undone.</string>
+    <string name="not_spam_count_fmt">Not Spam (%d)</string>
+    <string name="spam_count_fmt">Spam (%d)</string>
+    <string name="delete_count_fmt">Delete (%d)</string>
+    <string name="spam_found_singular">Found 1 suspected spam message</string>
+    <string name="spam_found_plural_fmt">Found %d suspected spam messages</string>
+    <string name="selected_count_fmt">%d selected</string>
+    <string name="processed_count_fmt">%1$d of %2$d processed</string>
+    <string name="result_moved_spam_singular">1 message moved to spam folder</string>
+    <string name="result_moved_spam_plural_fmt">%d messages moved to spam folder</string>
+    <string name="result_deleted_singular">1 message permanently deleted</string>
+    <string name="result_deleted_plural_fmt">%d messages permanently deleted</string>
+    <string name="result_not_spam_singular">1 message marked as not spam</string>
+    <string name="result_not_spam_plural_fmt">%d messages marked as not spam</string>
+    <string name="spam_reason_hebrew">Hebrew spam</string>
+    <string name="spam_reason_suspicious_pattern">Suspicious pattern</string>
+    <string name="spam_reason_shortened_link">Shortened link</string>
+    <string name="spam_reason_suspicious_website">Suspicious website</string>
+    <string name="spam_reason_suspicious_link">Suspicious link</string>
+    <string name="spam_reason_urgency">Urgency tactics</string>
+    <string name="spam_reason_suspicious_content">Suspicious content</string>
+    <string name="spam_reason_detected">Spam detected</string>
+
+    <!-- Swipe Actions -->
+    <string name="preview">Preview</string>
+    <string name="swipe_right_label">Swipe Right</string>
+    <string name="swipe_right_subtitle">Swipe from left to right</string>
+    <string name="swipe_left_label">Swipe Left</string>
+    <string name="swipe_left_subtitle">Swipe from right to left</string>
+    <string name="swipe_info">Swipe on any conversation in the main list to quickly perform the configured action.</string>
+    <string name="swipe_action_archive">Archive</string>
+    <string name="swipe_action_delete">Delete</string>
+    <string name="swipe_action_pin">Pin</string>
+    <string name="swipe_action_read_unread">Read/Unread</string>
+    <string name="swipe_action_mute">Mute</string>
+    <string name="swipe_action_block">Block</string>
+    <string name="swipe_action_off">Off</string>
+    <string name="sample_conversation">Sample Conversation</string>
+    <string name="last_message_preview">Last message preview…</string>
+
+    <!-- Themes -->
+    <string name="theme_mode">Theme Mode</string>
+    <string name="theme_mode_subtitle">How the app chooses light or dark appearance</string>
+    <string name="theme_mode_system">System</string>
+    <string name="theme_mode_custom">Custom Theme</string>
+    <string name="conversation_backgrounds">Conversation Backgrounds</string>
+    <string name="backgrounds_subtitle">Sky, Ocean, Aurora &amp; more</string>
+    <string name="bubble_style">Bubble Style</string>
+    <string name="create_theme">Create theme</string>
+
+    <!-- Notifications -->
+    <string name="notifications_enable_subtitle">Enable or disable all notifications</string>
+    <string name="vibration">Vibration</string>
+    <string name="vibration_subtitle">Vibrate on new messages</string>
+    <string name="quick_reply">Quick Reply</string>
+    <string name="quick_reply_subtitle">Enable inline reply from notifications</string>
+    <string name="popup_style">Popup Style</string>
+    <string name="notification_grouping">Notification Grouping</string>
+    <string name="scheduled_dnd">Scheduled Do Not Disturb</string>
+    <string name="scheduled_dnd_subtitle">Silence notifications during quiet hours</string>
+    <string name="dnd_start">Start</string>
+    <string name="dnd_end">End</string>
+    <string name="dnd_format_hint">Use 24h format (e.g., 22:00 - 07:00)</string>
+    <string name="per_conversation_hint">To set per-conversation notification preferences, long-press on a conversation in the main list.</string>
+    <string name="popup_heads_up">Heads-up</string>
+    <string name="popup_banner">Banner</string>
+    <string name="popup_silent">Silent</string>
+    <string name="grouping_by_contact">By Contact</string>
+    <string name="grouping_bundle_all">Bundle All</string>
+    <string name="grouping_individual">Individual</string>
+
+    <!-- Notification Profiles -->
+    <string name="no_notification_profiles">No notification profiles</string>
+    <string name="no_notification_profiles_hint">Create profiles like Work, Sleep, or\nPersonal with custom notification settings</string>
+    <string name="default_profile">Default</string>
+    <string name="standard_notifications">Standard notifications</string>
+    <string name="vibrate_on_notifications">Vibrate on notifications</string>
+    <string name="popup_notifications">Popup notifications</string>
+    <string name="show_heads_up">Show heads-up notifications</string>
+    <string name="priority">Priority</string>
+    <string name="schedule_label">Schedule</string>
+    <string name="schedule_subtitle">Auto-activate at specific times</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="new_profile">New Profile</string>
+    <string name="profile_name">Profile name</string>
+    <string name="profile_name_hint">e.g., Work, Sleep, Personal</string>
+    <string name="update">Update</string>
+    <string name="create">Create</string>
+    <string name="silent_label">Silent</string>
+
+    <!-- Messaging Settings -->
+    <string name="section_sending">Sending</string>
+    <string name="undo_send">Undo send</string>
+    <string name="undo_send_subtitle">Allow undoing a sent message for a few seconds</string>
+    <string name="forward_sms_whatsapp">Forward SMS to WhatsApp</string>
+    <string name="forward_sms_whatsapp_subtitle">Auto-forward contact SMS to WhatsApp</string>
+    <string name="smart_links">Smart Links</string>
+    <string name="calendar_links">Calendar links</string>
+    <string name="calendar_links_subtitle">Tap dates in messages to add to Calendar</string>
+    <string name="maps_links">Maps links</string>
+    <string name="maps_links_subtitle">Tap addresses in messages to open in Maps</string>
+
+    <!-- Backup &amp; Restore -->
+    <string name="backup_restore">Backup &amp; Restore</string>
+    <string name="cloud_backup">Cloud Backup</string>
+    <string name="never">Never</string>
+    <string name="backup_label">Backup</string>
+    <string name="backup_now">Backup Now</string>
+    <string name="backing_up">Backing up messages…</string>
+    <string name="restore_label">Restore</string>
+    <string name="restore_from_google_drive">Restore from Google Drive</string>
+    <string name="restore_from_local_file">Restore from Local File</string>
+    <string name="restoring">Restoring backup…</string>
+    <string name="auto_backup">Auto-backup</string>
+    <string name="auto_backup_subtitle">Automatically backup on schedule</string>
+    <string name="backup_frequency">Backup frequency</string>
+    <string name="freq_daily">Daily</string>
+    <string name="freq_weekly">Weekly</string>
+    <string name="freq_monthly">Monthly</string>
+    <string name="backup_note">Backups include messages, themes, and settings. Media files are backed up separately.</string>
+    <string name="restore_backup_title">Restore Backup</string>
+    <string name="restore_backup_text">This will replace all current messages and data with the backup. The app will restart after restore. This action cannot be undone.</string>
+    <string name="backup_saved_successfully">Backup saved successfully</string>
+    <string name="backup_failed">Backup failed. Please try again.</string>
+    <string name="restore_successful">Restore successful. Restarting…</string>
+    <string name="restore_failed">Restore failed. The backup file may be invalid.</string>
+    <string name="backup_settings">Settings</string>
+    <string name="last_backup_label">Last backup: %s</string>
+
+    <!-- Scheduled Messages -->
+    <string name="to_display_fmt">To: %s</string>
+    <string name="no_scheduled_messages">No scheduled messages</string>
+    <string name="no_scheduled_messages_hint">Schedule a message from any chat\nusing the schedule button</string>
+    <string name="cancel_scheduled_message">Cancel Scheduled Message</string>
+    <string name="cancel_scheduled_message_text">This message will not be sent. Are you sure?</string>
+    <string name="cancel_message">Cancel Message</string>
+    <string name="keep">Keep</string>
+
+    <!-- Financial Dashboard -->
+    <string name="all_cards">All Cards</string>
+    <string name="recent_transactions">Recent Transactions</string>
+    <string name="show_less">Show less</string>
+    <string name="show_more_fmt">Show %d more</string>
+    <string name="card_number_fmt">Card *%s</string>
+    <string name="cards_detected_fmt">%d cards detected</string>
+    <string name="remove_sender_confirm">Remove "%1$s"? All %2$d transactions from this sender will be permanently deleted.</string>
+
+    <!-- Financial Settings -->
+    <string name="financial_settings">Financial Settings</string>
+    <string name="general">General</string>
+    <string name="primary_currency">Primary Currency</string>
+    <string name="scan_inbox_financial_subtitle">Re-scan all SMS for transactions from your senders</string>
+    <string name="card_management">Card Management</string>
+    <string name="manage_cards">Manage Cards</string>
+    <string name="sender_management">Sender Management</string>
+    <string name="add_sender">Add Sender</string>
+    <string name="privacy_and_security">Privacy &amp; Security</string>
+    <string name="database_encryption">Database Encryption</string>
+    <string name="database_encryption_subtitle">Financial data is encrypted with SQLCipher</string>
+    <string name="on_device_only">On-Device Only</string>
+    <string name="on_device_only_subtitle">No data leaves your device</string>
+    <string name="clear_financial_data">Clear Financial Data</string>
+    <string name="clear_financial_data_subtitle">Delete all tracked transactions and subscriptions</string>
+    <string name="categories">Categories</string>
+    <string name="category_bills">Bills</string>
+    <string name="category_subscriptions">Subscriptions</string>
+    <string name="category_payments">Payments</string>
+    <string name="category_expenses">Expenses</string>
+    <string name="setup">Setup</string>
+    <string name="setup_guide">Setup Guide</string>
+    <string name="setup_guide_subtitle">Re-open provider SMS activation links</string>
+    <string name="clear_financial_data_dialog_text">This will permanently delete all tracked transactions, subscriptions, merchant data, and alerts. This cannot be undone.</string>
+    <string name="delete_all">Delete All</string>
+    <string name="remove_sender">Remove Sender</string>
+    <string name="remove">Remove</string>
+    <string name="sender_address">Sender Address</string>
+    <string name="sender_address_hint">e.g., MAX, Leumi</string>
+    <string name="display_name_optional">Display Name (optional)</string>
+    <string name="monitor">Monitor</string>
+    <string name="alerts">Alerts</string>
+
+    <!-- Permission -->
+    <string name="permission_required">Permission Required</string>
+    <string name="sms_permission_rationale">Aura needs SMS permissions to read and send messages.</string>
+    <string name="grant_permission">Grant Permission</string>
+    <string name="lifetime_license">Lifetime License</string>
+    <string name="restore_purchase">Restore Purchase</string>
+
+    <!-- Chat Screen additional -->
+    <string name="message_copied">Message copied</string>
+    <string name="number_copied">Number copied</string>
+    <string name="pin">Pin</string>
+    <string name="unpin">Unpin</string>
+    <string name="replying_to">Replying to</string>
+    <string name="editing_message">Editing message</string>
+    <string name="sending_via_whatsapp">Sending via WhatsApp</string>
+    <string name="voice_mms_unavailable">Voice messages will be available with MMS support</string>
+    <string name="sending">Sending…</string>
+    <string name="whatsapp_message">WhatsApp message</string>
+    <string name="message_placeholder">Message</string>
+    <string name="schedule_message">Schedule Message</string>
+    <string name="will_send_whatsapp">Will be sent via WhatsApp</string>
+    <string name="choose_when_to_send">Choose when to send this message</string>
+    <string name="schedule_in_1h">In 1 hour</string>
+    <string name="schedule_in_3h">In 3 hours</string>
+    <string name="schedule_tomorrow_morning">Tomorrow morning (9 AM)</string>
+    <string name="schedule_tomorrow_evening">Tomorrow evening (6 PM)</string>
+    <string name="remind_me">Remind Me</string>
+    <string name="when_to_remind">When should we remind you?</string>
+    <string name="remind_in_30min">In 30 minutes</string>
+    <string name="remind_in_1h">In 1 hour</string>
+    <string name="remind_in_3h">In 3 hours</string>
+    <string name="remind_tomorrow_morning">Tomorrow morning (9 AM)</string>
+    <string name="code_copied">Code copied to clipboard</string>
+    <string name="code_name_copied">Code &#8220;%s&#8221; copied</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="now_label">Now</string>
+    <string name="forward_message">Forward message</string>
+    <string name="share_message">Share</string>
+
+    <!-- Archived Conversations -->
+    <string name="no_archived_conversations">No archived conversations</string>
+    <string name="no_archived_conversations_hint">Archived conversations will appear here.\nSwipe left or use the menu to archive.</string>
+    <string name="restore_to_inbox">Restore to inbox</string>
+    <string name="restore_to_inbox_subtitle">Move this conversation back to your main list</string>
+    <string name="delete_conversation_action">Delete conversation</string>
+    <string name="delete_conversation_subtitle">Permanently remove this conversation</string>
+
+    <!-- Spam Folder -->
+    <string name="no_spam_messages">No spam messages</string>
+    <string name="spam_filter_shortened_link">Shortened link</string>
+    <string name="spam_filter_suspicious_tld">Suspicious website</string>
+    <string name="spam_filter_ip_url">Suspicious link</string>
+    <string name="spam_filter_urgent_keywords">Urgency tactics</string>
+    <string name="spam_filter_otp_verify">Possible OTP scam</string>
+    <string name="spam_filter_suspicious_content">Suspicious content</string>
+    <string name="spam_filter_unknown_sender">Unknown sender</string>
+    <string name="spam_filter_spam_detected">Spam detected</string>
+    <string name="spam_filter_blocked_as_spam">Blocked as spam</string>
+
+    <!-- Spam Detail Sheet -->
+    <string name="spam_detail_title">Why was this flagged?</string>
+    <string name="spam_detail_from_prefix">From: </string>
+    <string name="spam_detail_score_label">Spam Score</string>
+    <string name="spam_detail_score_suffix">/ 100</string>
+    <string name="spam_detail_reason_label">Reason</string>
+    <string name="spam_detail_preview_label">Message Preview</string>
+    <string name="spam_detail_number_blocked_label">Number blocked</string>
+    <string name="spam_detail_number_blocked_description">This number is on your block list.</string>
+    <string name="spam_detail_sender_blocked_label">Sender blocked</string>
+    <string name="spam_detail_sender_blocked_description">This sender name is on your block list.</string>
+    <string name="spam_detail_keyword_match_label">Keyword match</string>
+    <string name="spam_detail_keyword_match_description">The message contains a word or phrase you\'ve blocked.</string>
+    <string name="spam_detail_language_filtered_label">Language filtered</string>
+    <string name="spam_detail_language_filtered_description">The message is in a language you\'ve chosen to block.</string>
+    <string name="spam_detail_international_filter_label">International number</string>
+    <string name="spam_detail_international_filter_description">This message came from a foreign number and your international filter is on.</string>
+    <string name="spam_detail_scam_report_label">Reported as spam</string>
+    <string name="spam_detail_scam_report_description">You or other users reported this number as spam.</string>
+    <string name="spam_detail_scam_detected_label">Scam detected</string>
+    <string name="spam_detail_ai_flagged_label">AI flagged</string>
+    <string name="spam_detail_suspicious_content_label">Suspicious content</string>
+    <string name="spam_detail_shortened_url_description">The message contains a shortened link that could hide a malicious destination.</string>
+    <string name="spam_detail_suspicious_tld_description">The message links to a website with a suspicious domain.</string>
+    <string name="spam_detail_ip_url_description">The message contains a direct IP address link, often used in phishing.</string>
+    <string name="spam_detail_urgent_keywords_description">The message uses urgency tactics commonly found in scam messages.</string>
+    <string name="spam_detail_otp_verify_description">The message looks like a fraudulent verification request.</string>
+    <string name="spam_detail_general_spam_description">The message contains content commonly found in spam.</string>
+    <string name="spam_detail_suspicious_link_description">The message contains a link that appears unsafe.</string>
+    <string name="spam_detail_otp_fraud_description">The message looks like a fake verification or login code.</string>
+    <string name="spam_detail_financial_scam_description">The message appears to be a financial scam.</string>
+    <string name="spam_detail_phishing_description">The message is trying to steal personal information.</string>
+    <string name="spam_detail_unknown_scam_description">The message matches known scam patterns.</string>
+    <string name="spam_reason_unknown_sender_label">Unknown sender</string>
+    <string name="spam_reason_unknown_sender_description">The sender is not in your contacts.</string>
+    <string name="spam_reason_contains_url_label">Contains a link</string>
+    <string name="spam_reason_contains_url_description">The message includes a URL, which is common in spam.</string>
+    <string name="spam_reason_otp_verify_label">Fake verification code</string>
+    <string name="spam_reason_otp_verify_description">The message looks like a fraudulent verification request.</string>
+    <string name="spam_reason_high_special_chars_label">Unusual formatting</string>
+    <string name="spam_reason_high_special_chars_description">The message has an unusual amount of special characters.</string>
+    <string name="spam_reason_deterministic_label">Known spam pattern</string>
+    <string name="spam_reason_deterministic_description">The message matches a known spam template.</string>
+    <string name="spam_reason_default_description">Flagged by our spam filters.</string>
+
+    <!-- Block Rule Limit Dialog -->
+    <string name="block_rule_limit_title">Block Rule Limit Reached</string>
+    <string name="block_rule_limit_message">You\'ve used all %d free block rules. Upgrade to Premium for unlimited block rules.</string>
+
+    <!-- Compose Message Screen -->
+    <string name="compose_to_label">To</string>
+    <string name="compose_recipient_placeholder">Phone number or contact name</string>
+    <string name="compose_message_placeholder">Type a message…</string>
+
+    <!-- Pinned Messages -->
+    <string name="no_pinned_messages">No pinned messages</string>
+    <string name="no_pinned_messages_hint">Long-press a message in the chat to pin it</string>
+    <string name="pinned_message_sender_you">You</string>
+
+    <!-- Media Gallery -->
+    <string name="media_gallery_title">Media</string>
+    <string name="photos">Photos</string>
+    <string name="videos">Videos</string>
+    <string name="links">Links</string>
+    <string name="files">Files</string>
+    <string name="no_photos_shared">No photos shared yet</string>
+    <string name="no_videos_shared">No videos shared yet</string>
+    <string name="no_links_shared">No links shared yet</string>
+    <string name="no_files_shared">No files shared yet</string>
+
+    <!-- QR Contact Screen -->
+    <string name="share_contact">Share Contact</string>
+    <string name="scan_to_start_conversation">Scan this code to start a conversation</string>
+    <string name="scan_qr_code">Scan QR Code</string>
+    <string name="share_qr_image">Share QR Image</string>
+    <string name="qr_library_error">QR generation requires\nZXing library</string>
+
+    <!-- Search Screen -->
+    <string name="search_placeholder">Search messages…</string>
+    <string name="no_results_found">No results found</string>
+
+    <!-- Card Manager -->
+    <string name="card_manager_footer">Cards are auto-detected from SMS. Toggle monitoring off to stop tracking a card.</string>
+    <string name="edit_nickname">Edit nickname</string>
+    <string name="auto_detected">Auto-detected</string>
+    <string name="transactions_suffix">transactions</string>
+    <string name="monitor_label">Monitor</string>
+    <string name="card_nickname_title">Card Nickname</string>
+    <string name="nickname_label">Nickname</string>
+    <string name="card_nickname_placeholder">e.g., Mom\'s Visa</string>
+    <string name="save">Save</string>
+
+    <!-- Alerts Banner -->
+    <string name="view_all">View All</string>
+    <string name="no_spending_data">No spending data yet</string>
+
+    <!-- Alerts Screen -->
+    <string name="no_active_alerts">No active alerts</string>
+    <string name="alert_unusual_charge">Unusual Charge Detected</string>
+    <string name="alert_duplicate_charge">Duplicate Charge</string>
+    <string name="alert_new_merchant_high">New Merchant - High Amount</string>
+    <string name="alert_subscription_price_increase">Subscription Price Increase</string>
+    <string name="alert_financial_default">Financial Alert</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="view_transaction">View Transaction</string>
+    <string name="alerts_privacy_footer">Alerts are generated automatically based on your spending patterns. All data stays on your device.</string>
+
+    <!-- Subscriptions Screen -->
+    <string name="subscriptions">Subscriptions</string>
+    <string name="subscriptions_total_label">Monthly Subscription Total:</string>
+    <string name="subscriptions_active_suffix">active subscriptions</string>
+    <string name="subscriptions_footer_hint">Swipe left to mark inactive</string>
+
+    <!-- Financial Onboarding -->
+    <string name="financial_onboarding_badge">Premium Feature</string>
+    <string name="financial_onboarding_description">Track your spending, monitor subscriptions, and get alerts for unusual charges — all automatically from your SMS messages.</string>
+    <string name="financial_onboarding_privacy_note">All data stays on your device. Nothing is sent to the cloud.</string>
+    <string name="financial_onboarding_step2_title">Enable SMS Alerts from Your Providers</string>
+    <string name="financial_onboarding_step2_description">Check the providers you have enabled SMS alerts for. Only checked providers will be monitored.</string>
+    <string name="financial_onboarding_no_providers_message">Contact your bank or credit card company to enable SMS transaction alerts.</string>
+    <string name="financial_onboarding_manual_add_hint">Don\'t see your provider? You can add senders manually in Settings.</string>
+    <string name="open_setup">Open Setup</string>
+    <string name="youre_all_set">You\'re All Set!</string>
+    <string name="financial_confirm_sms">I have enabled SMS alerts from at least one provider</string>
+    <string name="financial_confirm_scan_inbox">Scan existing SMS inbox for past transactions</string>
+    <string name="financial_confirm_scan_description">Finds transactions from previous months</string>
+    <string name="enable_financial_intelligence">Enable Financial Intelligence</string>
+    <string name="get_started">Get Started</string>
+    <string name="next">Next</string>
+
+    <!-- Backgrounds Screen -->
+    <string name="conversation_backgrounds_title">Conversation Backgrounds</string>
+    <string name="backgrounds_premium_message">Conversation backgrounds are a Premium feature</string>
+    <string name="preview_prefix">Preview: </string>
+
+    <!-- Theme Editor -->
+    <string name="theme_editor">Theme Editor</string>
+    <string name="live_preview">Live Preview</string>
+    <string name="theme_name_label">Theme Name</string>
+    <string name="primary_color_label">Primary Color</string>
+    <string name="secondary_color_label">Secondary Color</string>
+    <string name="background_label">Background</string>
+    <string name="surface_label">Surface</string>
+    <string name="sent_bubble_label">Sent Bubble</string>
+    <string name="received_bubble_label">Received Bubble</string>
+    <string name="sent_text_label">Sent Text</string>
+    <string name="received_text_label">Received Text</string>
+
+    <!-- License / Premium Screen -->
+    <string name="premium">Premium</string>
+    <string name="youre_premium">You\'re Premium!</string>
+    <string name="premium_trial">Premium Trial</string>
+    <string name="trial_days_remaining_fmt">%d day remaining</string>
+    <string name="trial_days_remaining_plural_fmt">%d days remaining</string>
+    <string name="trial_ended">Trial Ended</string>
+    <string name="trial_ended_description">Purchase to unlock all premium features</string>
+    <string name="aura_premium">Aura Premium</string>
+    <string name="one_time_purchase">One-time purchase, lifetime access</string>
+    <string name="whats_included">What\'s included</string>
+    <string name="feature_unlimited_themes">Unlimited Themes</string>
+    <string name="feature_unlimited_themes_desc">Access all 18 built-in themes and create unlimited custom themes</string>
+    <string name="feature_unlimited_block_rules">Unlimited Block Rules</string>
+    <string name="feature_unlimited_block_rules_desc">Create as many block rules as you need (free limit: 15)</string>
+    <string name="feature_advanced_notifications">Advanced Notifications</string>
+    <string name="feature_advanced_notifications_desc">Per-contact custom sounds, LED colors, and bubble preferences</string>
+    <string name="feature_priority_support">Priority Support</string>
+    <string name="feature_priority_support_desc">Get faster responses and feature requests prioritized</string>
+    <string name="discount_badge">67% OFF</string>
+    <string name="license_original_price">$15.00</string>
+    <string name="no_subscriptions_note">One-time payment • No subscriptions</string>
+    <string name="purchase_to_keep_premium">Purchase to Keep Premium</string>
+    <string name="purchase_lifetime_license">Purchase Lifetime License</string>
+    <string name="terms_and_conditions">Terms &amp; Conditions</string>
+    <string name="collapse">Collapse</string>
+    <string name="expand">Expand</string>
+    <string name="refund_policy">Refund Policy</string>
+    <string name="refund_policy_body">Refunds are available within 30 days of purchase. After this period, all sales are final. Refund requests can be submitted through Google Play.</string>
+    <string name="lifetime_license_terms_title">Lifetime License</string>
+    <string name="lifetime_license_terms_body">\"Lifetime\" refers to the operational lifetime of the Aura app. If the app is discontinued or removed from the Google Play Store, the license expires with no further obligation to the developer.</string>
+    <string name="whats_included_terms_title">What\'s Included</string>
+    <string name="whats_included_terms_body">Your license includes all current premium features and future updates for as long as the app is actively maintained.</string>
+    <string name="non_transferable_title">Non-Transferable</string>
+    <string name="non_transferable_body">This license is tied to your Google account and cannot be transferred, shared, or resold.</string>
+    <string name="google_play_title">Google Play</string>
+    <string name="google_play_body">This purchase is subject to Google Play\'s Terms of Service.</string>
+    <string name="payment_disclaimer">Payment is processed through Google Play.\nYour purchase is linked to your Google account.</string>
+    <string name="reset_license_dev">Reset License (Dev)</string>
+
+    <!-- Trial Offer Dialog -->
+    <string name="try_premium_free">Try Premium Free</string>
+    <string name="trial_duration">21 DAYS FREE</string>
+    <string name="trial_offer_description">Unlock all premium features — themes, unlimited block rules, financial dashboard and more — completely free for 21 days.</string>
+    <string name="no_payment_required">No payment required. No credit card.</string>
+    <string name="start_free_trial">Start Free Trial</string>
+    <string name="view_plans">View Plans</string>
+
+    <!-- Conversation Item Component -->
+    <string name="category_contacts">Contacts</string>
+
+    <!-- Message Bubble Component -->
+    <string name="message_edited">Edited</string>
+    <string name="message_status_read">Read</string>
+    <string name="message_status_sent">Sent</string>
+    <string name="voice_message">Voice message</string>
+    <string name="suspicious_link_warning">Suspicious link – open only after marking as not spam</string>
+    <string name="confidence_suffix_fmt">%d%% confidence</string>
+    <string name="transcribing">Transcribing...</string>
+    <string name="hide_transcript">Hide transcript</string>
+    <string name="show_transcript">Show transcript</string>
+    <string name="transcribe">Transcribe</string>
+
+    <!-- AI Compose Sheet -->
+    <string name="ai_compose_title">AI Compose Assistant</string>
+    <string name="ai_compose_subtitle">Transform your message with AI</string>
+    <string name="ai_compose_your_message">Your message</string>
+    <string name="ai_compose_change_tone">Change Tone</string>
+    <string name="ai_tone_formal">Formal</string>
+    <string name="ai_tone_formal_desc">Professional and polished</string>
+    <string name="ai_tone_casual">Casual</string>
+    <string name="ai_tone_casual_desc">Relaxed and friendly</string>
+    <string name="ai_tone_funny">Funny</string>
+    <string name="ai_tone_funny_desc">Humorous and witty</string>
+    <string name="ai_tone_translate">Translate</string>
+    <string name="ai_tone_translate_desc">Translate to another language</string>
+    <string name="ai_compose_custom_prompt_label">Or describe what you want to say</string>
+    <string name="ai_compose_placeholder">e.g., Write a birthday wish for my friend</string>
+    <string name="ai_compose_suggestion_label">Suggestion (tap to use)</string>
+    <string name="ai_compose_disclaimer">AI features require internet connection. Suggestions are generated locally when possible.</string>
+
+    <!-- Conversation Context Menu -->
+    <string name="context_menu_unmute">Unmute notifications</string>
+    <string name="context_menu_mute">Mute notifications</string>
+    <string name="context_menu_unpin">Unpin conversation</string>
+    <string name="context_menu_pin">Pin conversation</string>
+    <string name="context_menu_remove_favorite">Remove from favorites</string>
+    <string name="context_menu_add_favorite">Add to favorites</string>
+    <string name="context_menu_mark_as_read">Mark as read</string>
+    <string name="context_menu_select">Select</string>
+
+    <!-- Disappearing Messages Dialog -->
+    <string name="disappearing_messages_description">Messages will be automatically deleted after the selected time.</string>
+    <string name="disappearing_off">Off</string>
+    <string name="disappearing_5_seconds">5 seconds</string>
+    <string name="disappearing_1_minute">1 minute</string>
+    <string name="disappearing_1_hour">1 hour</string>
+    <string name="disappearing_24_hours">24 hours</string>
+    <string name="disappearing_7_days">7 days</string>
+    <string name="disappearing_30_days">30 days</string>
+    <string name="disappearing_90_days">90 days</string>
+
+    <!-- Mute Duration Picker -->
+    <string name="mute_notifications">Mute notifications</string>
+    <string name="mute_for_how_long">For how long?</string>
+    <string name="mute_1_hour">1 hour</string>
+    <string name="mute_8_hours">8 hours</string>
+    <string name="mute_1_week">1 week</string>
+    <string name="mute_forever">Forever</string>
+    <string name="mute">Mute</string>
+
+    <!-- Voice Recorder -->
+    <string name="cancel_recording">Cancel recording</string>
+    <string name="send_voice">Send voice</string>
+
+    <!-- Transaction Item -->
+    <string name="unknown_merchant">Unknown merchant</string>
+    <string name="change_category">Change Category</string>
+    <string name="view_in_conversation">View in Conversation</string>
+
+    <!-- Monthly Summary Card -->
+    <string name="previous_month">Previous month</string>
+    <string name="next_month">Next month</string>
+
+    <!-- Month Comparison Card -->
+    <string name="month_vs_last_month">Month vs Last Month</string>
+    <string name="comparison_new_label">New</string>
+
+    <!-- Top Merchants Card -->
+    <string name="top_merchants">Top Merchants</string>
+    <string name="transaction_singular">transaction</string>
+    <string name="transactions_plural">transactions</string>
+
+    <!-- Spending Velocity Card -->
+    <string name="spending_pace">Spending Pace</string>
+    <string name="daily_rate_label">Daily rate</string>
+    <string name="projected_total">Projected total</string>
+    <string name="day_remaining_singular">day remaining</string>
+    <string name="days_remaining_plural_fmt">%d days remaining</string>
+
+    <!-- Category Picker Dialog -->
+    <string name="change_category_title">Change Category</string>
+    <string name="change_category_description">This will update all transactions from this merchant.</string>
+
+    <!-- Subscription Item -->
+    <string name="last_charged_prefix">Last charged: </string>
+
+    <!-- Edit History Sheet -->
+    <string name="edit_history_title">Message Edit History</string>
+    <string name="edit_history_current">Current version</string>
+    <string name="edit_history_original">Original message</string>
+    <string name="edit_history_previous">Previous version</string>
+
+    <!-- Restore Onboarding Screen -->
+    <string name="welcome_to_novachat">Welcome to NovaChat</string>
+    <string name="restore_onboarding_question">Do you have a previous backup to restore?</string>
+    <string name="restore_in_progress">Restoring your data...</string>
+    <string name="start_fresh">Start Fresh</string>
 </resources>

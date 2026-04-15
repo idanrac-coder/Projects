@@ -46,8 +46,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.novachat.R
 import com.novachat.domain.model.Conversation
 import com.novachat.ui.components.ConversationItem
 
@@ -64,10 +66,10 @@ fun ArchivedConversationsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Archived") },
+                title = { Text(stringResource(R.string.archived)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -112,13 +114,13 @@ fun ArchivedConversationsScreen(
                         }
                         Spacer(modifier = Modifier.height(20.dp))
                         Text(
-                            text = "No archived conversations",
+                            text = stringResource(R.string.no_archived_conversations),
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onBackground
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Archived conversations will appear here.\nSwipe left or use the menu to archive.",
+                            text = stringResource(R.string.no_archived_conversations_hint),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
@@ -153,7 +155,7 @@ fun ArchivedConversationsScreen(
                                     ) {
                                         Icon(
                                             Icons.Default.Unarchive,
-                                            contentDescription = "Unarchive",
+                                            contentDescription = stringResource(R.string.restore_to_inbox),
                                             tint = MaterialTheme.colorScheme.primary
                                         )
                                     }
@@ -216,13 +218,13 @@ fun ArchivedConversationsScreen(
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
                                     Text(
-                                        text = "Restore to inbox",
+                                        text = stringResource(R.string.restore_to_inbox),
                                         style = MaterialTheme.typography.bodyLarge,
                                         fontWeight = FontWeight.SemiBold,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer
                                     )
                                     Text(
-                                        text = "Move this conversation back to your main list",
+                                        text = stringResource(R.string.restore_to_inbox_subtitle),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                                     )
@@ -252,13 +254,13 @@ fun ArchivedConversationsScreen(
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
                                     Text(
-                                        text = "Delete conversation",
+                                        text = stringResource(R.string.delete_conversation_action),
                                         style = MaterialTheme.typography.bodyLarge,
                                         fontWeight = FontWeight.SemiBold,
                                         color = MaterialTheme.colorScheme.onErrorContainer
                                     )
                                     Text(
-                                        text = "Permanently remove this conversation",
+                                        text = stringResource(R.string.delete_conversation_subtitle),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.7f)
                                     )
@@ -270,7 +272,7 @@ fun ArchivedConversationsScreen(
                 confirmButton = {},
                 dismissButton = {
                     TextButton(onClick = { selectedConversation = null }) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel))
                     }
                 }
             )

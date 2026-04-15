@@ -37,6 +37,8 @@ import com.novachat.ui.financial.components.MonthlySummaryCard
 import com.novachat.ui.financial.components.SpendingChart
 import com.novachat.ui.financial.components.SpendingVelocityCard
 import com.novachat.ui.financial.components.TopMerchantsCard
+import androidx.compose.ui.res.stringResource
+import com.novachat.R
 import com.novachat.ui.financial.components.TransactionItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,10 +56,10 @@ fun FinancialDashboardScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Financial Intelligence") },
+                title = { Text(stringResource(R.string.financial_intelligence)) },
                 actions = {
                     IconButton(onClick = onNavigateToSettings) {
-                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings))
                     }
                 }
             )
@@ -81,14 +83,14 @@ fun FinancialDashboardScreen(
                             FilterChip(
                                 selected = state.selectedCardLast4 == null,
                                 onClick = { viewModel.selectCard(null) },
-                                label = { Text("All Cards") }
+                                label = { Text(stringResource(R.string.all_cards)) }
                             )
                         }
                         items(state.cards.filter { !it.isHidden }) { card ->
                             FilterChip(
                                 selected = state.selectedCardLast4 == card.last4,
                                 onClick = { viewModel.selectCard(card.last4) },
-                                label = { Text(card.nickname ?: "Card *${card.last4}") }
+                                label = { Text(card.nickname ?: stringResource(R.string.card_number_fmt, card.last4)) }
                             )
                         }
                     }
@@ -172,7 +174,7 @@ fun FinancialDashboardScreen(
             if (state.recentTransactions.isNotEmpty()) {
                 item {
                     Text(
-                        text = "Recent Transactions",
+                        text = stringResource(R.string.recent_transactions),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 16.dp)
@@ -201,7 +203,7 @@ fun FinancialDashboardScreen(
                             onClick = { transactionsExpanded = !transactionsExpanded },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(if (transactionsExpanded) "Show less" else "Show ${state.recentTransactions.size - 5} more")
+                            Text(if (transactionsExpanded) stringResource(R.string.show_less) else stringResource(R.string.show_more_fmt, state.recentTransactions.size - 5))
                         }
                     }
                 }

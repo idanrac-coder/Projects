@@ -39,10 +39,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.novachat.R
 import com.novachat.domain.model.GroupingMode
 import com.novachat.domain.model.PopupStyle
 
@@ -59,10 +61,10 @@ fun NotificationSettingsScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeTopAppBar(
-                title = { Text("Notifications") },
+                title = { Text(stringResource(R.string.notifications)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 scrollBehavior = scrollBehavior
@@ -80,8 +82,8 @@ fun NotificationSettingsScreen(
             // Global toggle
             SwitchRow(
                 icon = Icons.Default.Notifications,
-                title = "Notifications",
-                subtitle = "Enable or disable all notifications",
+                title = stringResource(R.string.notifications),
+                subtitle = stringResource(R.string.notifications_enable_subtitle),
                 checked = uiState.isEnabled,
                 onCheckedChange = { viewModel.setNotificationsEnabled(it) }
             )
@@ -91,8 +93,8 @@ fun NotificationSettingsScreen(
             // Vibration
             SwitchRow(
                 icon = Icons.Default.Vibration,
-                title = "Vibration",
-                subtitle = "Vibrate on new messages",
+                title = stringResource(R.string.vibration),
+                subtitle = stringResource(R.string.vibration_subtitle),
                 checked = uiState.vibrationEnabled,
                 onCheckedChange = { viewModel.setVibrationEnabled(it) }
             )
@@ -100,8 +102,8 @@ fun NotificationSettingsScreen(
             // Quick Reply
             SwitchRow(
                 icon = Icons.Outlined.Quickreply,
-                title = "Quick Reply",
-                subtitle = "Enable inline reply from notifications",
+                title = stringResource(R.string.quick_reply),
+                subtitle = stringResource(R.string.quick_reply_subtitle),
                 checked = uiState.quickReplyEnabled,
                 onCheckedChange = { viewModel.setQuickReplyEnabled(it) }
             )
@@ -110,7 +112,7 @@ fun NotificationSettingsScreen(
 
             // Popup Style
             Text(
-                text = "Popup Style",
+                text = stringResource(R.string.popup_style),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
             )
@@ -126,7 +128,7 @@ fun NotificationSettingsScreen(
 
             // Grouping Mode
             Text(
-                text = "Notification Grouping",
+                text = stringResource(R.string.notification_grouping),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
             )
@@ -145,8 +147,8 @@ fun NotificationSettingsScreen(
             // Scheduled DND
             SwitchRow(
                 icon = Icons.Default.DoNotDisturb,
-                title = "Scheduled Do Not Disturb",
-                subtitle = "Silence notifications during quiet hours",
+                title = stringResource(R.string.scheduled_dnd),
+                subtitle = stringResource(R.string.scheduled_dnd_subtitle),
                 checked = uiState.dndEnabled,
                 onCheckedChange = { viewModel.setDndEnabled(it) }
             )
@@ -167,7 +169,7 @@ fun NotificationSettingsScreen(
                             OutlinedTextField(
                                 value = uiState.dndStartHour,
                                 onValueChange = { viewModel.setDndStartHour(it) },
-                                label = { Text("Start") },
+                                label = { Text(stringResource(R.string.dnd_start)) },
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp),
                                 singleLine = true
@@ -175,7 +177,7 @@ fun NotificationSettingsScreen(
                             OutlinedTextField(
                                 value = uiState.dndEndHour,
                                 onValueChange = { viewModel.setDndEndHour(it) },
-                                label = { Text("End") },
+                                label = { Text(stringResource(R.string.dnd_end)) },
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp),
                                 singleLine = true
@@ -183,7 +185,7 @@ fun NotificationSettingsScreen(
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Use 24h format (e.g., 22:00 - 07:00)",
+                            text = stringResource(R.string.dnd_format_hint),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -200,7 +202,7 @@ fun NotificationSettingsScreen(
                 )
             ) {
                 Text(
-                    text = "To set per-conversation notification preferences, long-press on a conversation in the main list.",
+                    text = stringResource(R.string.per_conversation_hint),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(16.dp)
                 )
@@ -242,14 +244,16 @@ private fun SwitchRow(
     }
 }
 
+@Composable
 private fun formatPopupStyle(style: PopupStyle): String = when (style) {
-    PopupStyle.HEADS_UP -> "Heads-up"
-    PopupStyle.BANNER -> "Banner"
-    PopupStyle.SILENT -> "Silent"
+    PopupStyle.HEADS_UP -> stringResource(R.string.popup_heads_up)
+    PopupStyle.BANNER -> stringResource(R.string.popup_banner)
+    PopupStyle.SILENT -> stringResource(R.string.popup_silent)
 }
 
+@Composable
 private fun formatGroupingMode(mode: GroupingMode): String = when (mode) {
-    GroupingMode.BY_CONTACT -> "By Contact"
-    GroupingMode.BUNDLE_ALL -> "Bundle All"
-    GroupingMode.INDIVIDUAL -> "Individual"
+    GroupingMode.BY_CONTACT -> stringResource(R.string.grouping_by_contact)
+    GroupingMode.BUNDLE_ALL -> stringResource(R.string.grouping_bundle_all)
+    GroupingMode.INDIVIDUAL -> stringResource(R.string.grouping_individual)
 }

@@ -31,8 +31,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.novachat.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,10 +51,10 @@ fun QrContactScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Share Contact") },
+                title = { Text(stringResource(R.string.share_contact)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -98,7 +100,7 @@ fun QrContactScreen(
                         )
                     } else {
                         Text(
-                            text = "QR generation requires\nZXing library",
+                            text = stringResource(R.string.qr_library_error),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -110,7 +112,7 @@ fun QrContactScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Scan this code to start a conversation",
+                text = stringResource(R.string.scan_to_start_conversation),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -120,7 +122,7 @@ fun QrContactScreen(
             Button(onClick = onScanQr) {
                 Icon(Icons.Default.QrCodeScanner, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.size(8.dp))
-                Text("Scan QR Code")
+                Text(stringResource(R.string.scan_qr_code))
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -128,7 +130,7 @@ fun QrContactScreen(
             OutlinedButton(onClick = { }) {
                 Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.size(8.dp))
-                Text("Share QR Image")
+                Text(stringResource(R.string.share_qr_image))
             }
         }
     }

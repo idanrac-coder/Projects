@@ -21,8 +21,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Policy
@@ -33,18 +31,20 @@ import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Verified
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.SwipeRight
 import androidx.compose.material.icons.filled.Translate
+import androidx.compose.material.icons.filled.Verified
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -67,10 +67,12 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.novachat.BuildConfig
+import com.novachat.R
 import com.novachat.core.theme.AuroraColors
 
 private const val PRIVACY_POLICY_URL = "https://idanrac-coder.github.io/Projects/privacy-policy.html"
@@ -107,13 +109,13 @@ fun SettingsScreen(
             LargeTopAppBar(
                 title = {
                     Text(
-                        "Settings",
+                        stringResource(R.string.settings),
                         fontWeight = FontWeight.Bold
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.nav_messages))
                     }
                 },
                 scrollBehavior = scrollBehavior,
@@ -159,12 +161,12 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = if (isPremium) "Premium Account" else "Upgrade to Premium",
+                            text = if (isPremium) stringResource(R.string.premium_account) else stringResource(R.string.upgrade_to_premium),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Text(
-                            text = if (isPremium) "All features unlocked" else "Unlock all themes, features & more",
+                            text = if (isPremium) stringResource(R.string.all_features_unlocked) else stringResource(R.string.unlock_all_features),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                         )
@@ -180,7 +182,7 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Appearance section
-            SettingsSectionHeader(title = "Appearance")
+            SettingsSectionHeader(title = stringResource(R.string.section_appearance))
             Spacer(modifier = Modifier.height(8.dp))
             Surface(
                 shape = RoundedCornerShape(16.dp),
@@ -190,25 +192,25 @@ fun SettingsScreen(
                 Column {
                     SettingsItem(
                         icon = Icons.Default.Palette,
-                        title = "Themes",
-                        subtitle = "Colors, bubbles & wallpapers",
+                        title = stringResource(R.string.themes),
+                        subtitle = stringResource(R.string.themes_subtitle),
                         onClick = onThemesClick
                     )
                     SettingsDivider()
                     SettingsItem(
                         icon = Icons.Default.SwipeRight,
-                        title = "Swipe Actions",
-                        subtitle = "Configure swipe gestures",
+                        title = stringResource(R.string.swipe_actions),
+                        subtitle = stringResource(R.string.swipe_actions_subtitle),
                         onClick = onSwipeActionsClick
                     )
                     SettingsDivider()
                     SettingsItem(
                         icon = Icons.Default.Translate,
-                        title = "App Language",
+                        title = stringResource(R.string.app_language),
                         subtitle = when (appLanguage) {
-                            "he" -> "Hebrew"
-                            "en" -> "English"
-                            else -> "System default"
+                            "he" -> stringResource(R.string.language_hebrew)
+                            "en" -> stringResource(R.string.language_english)
+                            else -> stringResource(R.string.language_system_default)
                         },
                         onClick = { showLanguagePicker = true }
                     )
@@ -217,8 +219,8 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Smart & Secure section
-            SettingsSectionHeader(title = "Protection")
+            // Protection section
+            SettingsSectionHeader(title = stringResource(R.string.section_protection))
             Spacer(modifier = Modifier.height(8.dp))
             Surface(
                 shape = RoundedCornerShape(16.dp),
@@ -227,8 +229,8 @@ fun SettingsScreen(
             ) {
                 SettingsItem(
                     icon = Icons.Default.Shield,
-                    title = "Smart & Secure",
-                    subtitle = "AI spam detection, protection stats",
+                    title = stringResource(R.string.smart_and_secure),
+                    subtitle = stringResource(R.string.smart_and_secure_subtitle),
                     onClick = onSmartSecureClick
                 )
             }
@@ -241,11 +243,11 @@ fun SettingsScreen(
             ) {
                 SettingsItem(
                     icon = Icons.Default.BarChart,
-                    title = "Financial Intelligence",
-                    subtitle = if (isPremium) "Track spending & subscriptions" else "Premium feature",
+                    title = stringResource(R.string.financial_intelligence),
+                    subtitle = if (isPremium) stringResource(R.string.financial_intelligence_subtitle) else stringResource(R.string.premium_feature),
                     onClick = onFinancialIntelligenceClick,
                     trailing = if (!isPremium) {
-                        { Icon(Icons.Default.Lock, contentDescription = "Premium", modifier = Modifier.size(16.dp), tint = AuroraColors.Warning) }
+                        { Icon(Icons.Default.Lock, contentDescription = stringResource(R.string.premium_feature), modifier = Modifier.size(16.dp), tint = AuroraColors.Warning) }
                     } else null
                 )
             }
@@ -253,7 +255,7 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Messages section
-            SettingsSectionHeader(title = "Messages")
+            SettingsSectionHeader(title = stringResource(R.string.section_messages))
             Spacer(modifier = Modifier.height(8.dp))
             Surface(
                 shape = RoundedCornerShape(16.dp),
@@ -263,36 +265,36 @@ fun SettingsScreen(
                 Column {
                     SettingsItem(
                         icon = Icons.Default.ChatBubbleOutline,
-                        title = "Messaging Settings",
-                        subtitle = "Undo send, smart links & forwarding",
+                        title = stringResource(R.string.messaging_settings),
+                        subtitle = stringResource(R.string.messaging_settings_subtitle),
                         onClick = onMessagingSettingsClick
                     )
                     SettingsDivider()
                     SettingsItem(
                         icon = Icons.Default.Notifications,
-                        title = "Notifications",
-                        subtitle = "Sounds, vibration & DND",
+                        title = stringResource(R.string.notifications),
+                        subtitle = stringResource(R.string.notifications_subtitle),
                         onClick = onNotificationsClick
                     )
                     SettingsDivider()
                     SettingsItem(
                         icon = Icons.Default.Notifications,
-                        title = "Notification Profiles",
-                        subtitle = "Work, Sleep, Personal modes",
+                        title = stringResource(R.string.notification_profiles),
+                        subtitle = stringResource(R.string.notification_profiles_subtitle),
                         onClick = onNotificationProfilesClick
                     )
                     SettingsDivider()
                     SettingsItem(
                         icon = Icons.Default.Schedule,
-                        title = "Scheduled Messages",
-                        subtitle = "Manage pending messages",
+                        title = stringResource(R.string.scheduled_messages),
+                        subtitle = stringResource(R.string.scheduled_messages_subtitle),
                         onClick = onScheduledClick
                     )
                     SettingsDivider()
                     SettingsItem(
                         icon = Icons.Default.Archive,
-                        title = "Archived",
-                        subtitle = "View archived chats",
+                        title = stringResource(R.string.archived),
+                        subtitle = stringResource(R.string.archived_subtitle),
                         onClick = onArchivedClick
                     )
                 }
@@ -301,7 +303,7 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Data & Privacy section
-            SettingsSectionHeader(title = "Data & Privacy")
+            SettingsSectionHeader(title = stringResource(R.string.section_data_privacy))
             Spacer(modifier = Modifier.height(8.dp))
             Surface(
                 shape = RoundedCornerShape(16.dp),
@@ -311,22 +313,22 @@ fun SettingsScreen(
                 Column {
                     SettingsItem(
                         icon = Icons.Default.Backup,
-                        title = "Backup & Restore",
-                        subtitle = "Back up to Google Drive",
+                        title = stringResource(R.string.backup_and_restore),
+                        subtitle = stringResource(R.string.backup_subtitle),
                         onClick = onBackupClick
                     )
                     SettingsDivider()
                     SettingsItem(
                         icon = Icons.Default.QrCode,
-                        title = "QR Contact Sharing",
-                        subtitle = "Share your contact via QR",
+                        title = stringResource(R.string.qr_contact_sharing),
+                        subtitle = stringResource(R.string.qr_contact_sharing_subtitle),
                         onClick = onQrClick
                     )
                     SettingsDivider()
                     SettingsItem(
                         icon = Icons.Default.Policy,
-                        title = "Privacy Policy",
-                        subtitle = "How your data is handled",
+                        title = stringResource(R.string.privacy_policy),
+                        subtitle = stringResource(R.string.privacy_policy_subtitle),
                         onClick = { uriHandler.openUri(PRIVACY_POLICY_URL) }
                     )
                 }
@@ -334,7 +336,7 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            SettingsSectionHeader(title = "Support")
+            SettingsSectionHeader(title = stringResource(R.string.section_support))
             Spacer(modifier = Modifier.height(8.dp))
             Surface(
                 shape = RoundedCornerShape(16.dp),
@@ -344,8 +346,8 @@ fun SettingsScreen(
                 Column {
                     SettingsItem(
                         icon = Icons.Default.Email,
-                        title = "Send Feedback",
-                        subtitle = "Report bugs or suggest features",
+                        title = stringResource(R.string.send_feedback),
+                        subtitle = stringResource(R.string.send_feedback_subtitle),
                         onClick = {
                             val intent = Intent(Intent.ACTION_SENDTO).apply {
                                 data = Uri.parse("mailto:iracsoftware@gmail.com")
@@ -362,8 +364,8 @@ fun SettingsScreen(
                     SettingsDivider()
                     SettingsItem(
                         icon = Icons.Default.RateReview,
-                        title = "Rate Us",
-                        subtitle = "Leave a review on Google Play",
+                        title = stringResource(R.string.rate_us),
+                        subtitle = stringResource(R.string.rate_us_subtitle),
                         onClick = {
                             val intent = Intent(Intent.ACTION_VIEW).apply {
                                 data = Uri.parse("market://details?id=${BuildConfig.APPLICATION_ID}")
@@ -520,12 +522,6 @@ private fun SettingsToggleItem(
     }
 }
 
-private val LANGUAGE_OPTIONS = listOf(
-    "" to "System default",
-    "en" to "English",
-    "he" to "עברית (Hebrew)"
-)
-
 @Composable
 private fun LanguagePickerDialog(
     currentLanguage: String,
@@ -534,12 +530,18 @@ private fun LanguagePickerDialog(
 ) {
     var selectedTag by remember { mutableStateOf(currentLanguage) }
 
+    val languageOptions = listOf(
+        "" to stringResource(R.string.language_system_default),
+        "en" to stringResource(R.string.language_english),
+        "he" to stringResource(R.string.language_hebrew_native)
+    )
+
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("App Language", fontWeight = FontWeight.SemiBold) },
+        title = { Text(stringResource(R.string.app_language), fontWeight = FontWeight.SemiBold) },
         text = {
             Column {
-                LANGUAGE_OPTIONS.forEach { (tag, label) ->
+                languageOptions.forEach { (tag, label) ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -566,11 +568,11 @@ private fun LanguagePickerDialog(
         },
         confirmButton = {
             TextButton(onClick = { onConfirm(selectedTag) }) {
-                Text("Apply", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.apply), fontWeight = FontWeight.SemiBold)
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
         }
     )
 }

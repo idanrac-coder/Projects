@@ -40,54 +40,58 @@ import androidx.compose.runtime.setValue
 import com.novachat.core.database.entity.SpamMessageEntity
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.novachat.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@Composable
 private fun formatMatchedRuleType(ruleType: String): String = when {
-        ruleType.startsWith("SPAM_AGENT:") -> ruleType.removePrefix("SPAM_AGENT:").replace('_', ' ')
-        ruleType == "SCAM_REPORT" -> "Reported"
-        ruleType == "NUMBER" -> "Blocked by number"
-        ruleType == "SENDER_NAME" -> "Blocked by sender"
-        ruleType == "KEYWORD" -> "Blocked by keyword"
-        ruleType == "LANGUAGE" -> "Blocked by language"
-        ruleType == "INTERNATIONAL_FILTER" -> "International filter"
-        ruleType.startsWith("SPAM_FILTER:") ->
-            formatSpamFilterReason(ruleType.removePrefix("SPAM_FILTER:"))
-        ruleType.startsWith("INBOX_SCAN:") ->
-            formatSpamFilterReason(ruleType.removePrefix("INBOX_SCAN:"))
-        else -> ruleType
-    }
+    ruleType.startsWith("SPAM_AGENT:") -> ruleType.removePrefix("SPAM_AGENT:").replace('_', ' ')
+    ruleType == "SCAM_REPORT" -> stringResource(R.string.spam_detail_scam_report_label)
+    ruleType == "NUMBER" -> stringResource(R.string.spam_detail_number_blocked_label)
+    ruleType == "SENDER_NAME" -> stringResource(R.string.spam_detail_sender_blocked_label)
+    ruleType == "KEYWORD" -> stringResource(R.string.spam_detail_keyword_match_label)
+    ruleType == "LANGUAGE" -> stringResource(R.string.spam_detail_language_filtered_label)
+    ruleType == "INTERNATIONAL_FILTER" -> stringResource(R.string.spam_detail_international_filter_label)
+    ruleType.startsWith("SPAM_FILTER:") ->
+        formatSpamFilterReason(ruleType.removePrefix("SPAM_FILTER:"))
+    ruleType.startsWith("INBOX_SCAN:") ->
+        formatSpamFilterReason(ruleType.removePrefix("INBOX_SCAN:"))
+    else -> ruleType
+}
 
-    private fun formatSpamFilterReason(inner: String): String {
-        val cleaned = inner.replace(Regex("\\|SCORE_\\d+$"), "")
-        return when {
+@Composable
+private fun formatSpamFilterReason(inner: String): String {
+    val cleaned = inner.replace(Regex("\\|SCORE_\\d+$"), "")
+    return when {
         cleaned.startsWith("DET:") -> when (val det = cleaned.removePrefix("DET:")) {
-            "SHORTENED_URL" -> "Shortened link"
-            "SUSPICIOUS_TLD" -> "Suspicious website"
-            "IP_URL" -> "Suspicious link"
-            "URGENT_KEYWORDS" -> "Urgency tactics"
-            "OTP_VERIFY_EN", "OTP_VERIFY_HE" -> "Possible OTP scam"
-            else -> "Suspicious content"
+            "SHORTENED_URL" -> stringResource(R.string.spam_filter_shortened_link)
+            "SUSPICIOUS_TLD" -> stringResource(R.string.spam_filter_suspicious_tld)
+            "IP_URL" -> stringResource(R.string.spam_filter_ip_url)
+            "URGENT_KEYWORDS" -> stringResource(R.string.spam_filter_urgent_keywords)
+            "OTP_VERIFY_EN", "OTP_VERIFY_HE" -> stringResource(R.string.spam_filter_otp_verify)
+            else -> stringResource(R.string.spam_filter_suspicious_content)
         }
         cleaned.startsWith("HEUR:") -> {
             val heur = cleaned.removePrefix("HEUR:")
             when {
-                heur.contains("contains_url") -> "Suspicious link"
-                heur.contains("otp_verify") -> "Possible OTP scam"
-                heur.contains("high_special_chars") && heur.contains("sender_unknown") -> "Suspicious content"
-                heur.contains("sender_unknown") -> "Unknown sender"
-                else -> "Spam detected"
+                heur.contains("contains_url") -> stringResource(R.string.spam_filter_ip_url)
+                heur.contains("otp_verify") -> stringResource(R.string.spam_filter_otp_verify)
+                heur.contains("high_special_chars") && heur.contains("sender_unknown") -> stringResource(R.string.spam_filter_suspicious_content)
+                heur.contains("sender_unknown") -> stringResource(R.string.spam_filter_unknown_sender)
+                else -> stringResource(R.string.spam_filter_spam_detected)
             }
         }
-        cleaned.startsWith("SCORE_") -> "Spam detected"
-        else -> "Blocked as spam"
+        cleaned.startsWith("SCORE_") -> stringResource(R.string.spam_filter_spam_detected)
+        else -> stringResource(R.string.spam_filter_blocked_as_spam)
     }
-    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -111,16 +115,16 @@ fun SpamFolderScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Blocked / Spam") },
+                title = { Text(stringResource(R.string.blocked_spam)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
                     if (spamMessages.isNotEmpty()) {
                         IconButton(onClick = { viewModel.clearAll() }) {
-                            Icon(Icons.Default.CleaningServices, contentDescription = "Clear all")
+                            Icon(Icons.Default.CleaningServices, contentDescription = null)
                         }
                     }
                 }
@@ -143,7 +147,7 @@ fun SpamFolderScreen(
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "No spam messages",
+                        text = stringResource(R.string.no_spam_messages),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -212,14 +216,14 @@ fun SpamFolderScreen(
                             IconButton(onClick = { viewModel.restoreToInbox(spam.id) }) {
                                 Icon(
                                     Icons.Default.MoveToInbox,
-                                    contentDescription = "Restore to inbox",
+                                    contentDescription = stringResource(R.string.restore_to_inbox),
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                             }
                             IconButton(onClick = { viewModel.deleteSpamMessage(spam.id) }) {
                                 Icon(
                                     Icons.Default.Delete,
-                                    contentDescription = "Delete",
+                                    contentDescription = stringResource(R.string.delete),
                                     tint = MaterialTheme.colorScheme.error
                                 )
                             }

@@ -153,6 +153,8 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import android.widget.Toast
+import androidx.compose.ui.res.stringResource
+import com.novachat.R
 
 private sealed interface ChatListItem {
     @Immutable
@@ -210,11 +212,13 @@ fun ChatScreen(
         }
     }
 
-    val chatItems = remember(uiState.messages) {
+    val todayStr = stringResource(R.string.today)
+    val yesterdayStr = stringResource(R.string.yesterday)
+    val chatItems = remember(uiState.messages, todayStr, yesterdayStr) {
         buildList {
             var lastDate = ""
             for (message in uiState.messages) {
-                val date = formatDate(message.timestamp)
+                val date = formatDate(message.timestamp, todayStr, yesterdayStr)
                 if (date != lastDate) {
                     lastDate = date
                     add(ChatListItem.DateHeader(date))
@@ -230,9 +234,10 @@ fun ChatScreen(
         viewModel.loadMessages(threadId)
     }
 
+    val reportedAsSpamStr = stringResource(R.string.reported_as_spam)
     LaunchedEffect(uiState.spamReportedEvent) {
         if (uiState.spamReportedEvent) {
-            Toast.makeText(context, "Reported as spam", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, reportedAsSpamStr, Toast.LENGTH_SHORT).show()
             viewModel.consumeSpamReportedEvent()
         }
     }
@@ -262,6 +267,12 @@ fun ChatScreen(
         previousItemCount = totalCount
     }
 
+    val messageCopiedStr = stringResource(R.string.message_copied)
+    val voiceMmsUnavailableStr = stringResource(R.string.voice_mms_unavailable)
+    val numberCopiedStr = stringResource(R.string.number_copied)
+    val forwardMessageStr = stringResource(R.string.forward_message)
+    val shareMessageStr = stringResource(R.string.share_message)
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = {
@@ -281,7 +292,7 @@ fun ChatScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.back),
                             tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
@@ -333,7 +344,7 @@ fun ChatScreen(
                     }) {
                         Icon(
                             Icons.Default.Phone,
-                            contentDescription = "Call",
+                            contentDescription = stringResource(R.string.call),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -341,7 +352,7 @@ fun ChatScreen(
                         IconButton(onClick = { showOverflowMenu = true }) {
                             Icon(
                                 Icons.Default.MoreVert,
-                                contentDescription = "More",
+                                contentDescription = stringResource(R.string.more),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -350,28 +361,28 @@ fun ChatScreen(
                             onDismissRequest = { showOverflowMenu = false }
                         ) {
                             DropdownMenuItem(
-                                text = { Text("Search") },
+                                text = { Text(stringResource(R.string.search)) },
                                 onClick = {
                                     showOverflowMenu = false
                                     viewModel.toggleSearch()
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Pinned messages") },
+                                text = { Text(stringResource(R.string.pinned_messages)) },
                                 onClick = {
                                     showOverflowMenu = false
                                     onNavigateToPinnedMessages()
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Media gallery") },
+                                text = { Text(stringResource(R.string.media_gallery)) },
                                 onClick = {
                                     showOverflowMenu = false
                                     onNavigateToMediaGallery()
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Disappearing messages") },
+                                text = { Text(stringResource(R.string.disappearing_messages)) },
                                 onClick = {
                                     showOverflowMenu = false
                                     viewModel.showDisappearingDialog()
@@ -380,7 +391,7 @@ fun ChatScreen(
                             DropdownMenuItem(
                                 text = {
                                     Text(
-                                        "Block contact",
+                                        stringResource(R.string.block_contact),
                                         color = MaterialTheme.colorScheme.error
                                     )
                                 },
@@ -477,7 +488,7 @@ fun ChatScreen(
                                 .focusRequester(searchFocusRequester),
                             placeholder = {
                                 Text(
-                                    "Search in conversation...",
+                                    stringResource(R.string.search_in_conversation),
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             },
@@ -576,7 +587,7 @@ fun ChatScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Unknown sender",
+                            text = stringResource(R.string.unknown_sender),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.weight(1f)
@@ -586,7 +597,7 @@ fun ChatScreen(
                             modifier = Modifier.height(32.dp)
                         ) {
                             Text(
-                                "Trust",
+                                stringResource(R.string.trust),
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = AuroraColors.TealSpark
@@ -601,7 +612,7 @@ fun ChatScreen(
                             modifier = Modifier.height(32.dp)
                         ) {
                             Text(
-                                "Block",
+                                stringResource(R.string.block),
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.error
@@ -865,18 +876,18 @@ fun ChatScreen(
                                 }) {
                                     Icon(Icons.AutoMirrored.Filled.Reply, contentDescription = null, modifier = Modifier.size(18.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Reply")
+                                    Text(stringResource(R.string.reply))
                                 }
                                 TextButton(onClick = {
                                     viewModel.hideReactionPicker()
                                     if (message != null) {
                                         clipboardManager.setText(AnnotatedString(message.body))
-                                        Toast.makeText(context, "Message copied", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, messageCopiedStr, Toast.LENGTH_SHORT).show()
                                     }
                                 }) {
                                     Icon(Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(18.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Copy")
+                                    Text(stringResource(R.string.copy))
                                 }
                                 TextButton(onClick = {
                                     viewModel.hideReactionPicker()
@@ -886,12 +897,12 @@ fun ChatScreen(
                                             putExtra(Intent.EXTRA_TEXT, message.body)
                                             type = "text/plain"
                                         }
-                                        context.startActivity(Intent.createChooser(sendIntent, "Forward message"))
+                                        context.startActivity(Intent.createChooser(sendIntent, forwardMessageStr))
                                     }
                                 }) {
                                     Icon(Icons.AutoMirrored.Filled.Forward, contentDescription = null, modifier = Modifier.size(18.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Forward")
+                                    Text(stringResource(R.string.forward))
                                 }
                                 TextButton(onClick = {
                                     viewModel.hideReactionPicker()
@@ -899,7 +910,7 @@ fun ChatScreen(
                                 }) {
                                     Icon(Icons.Default.PushPin, contentDescription = null, modifier = Modifier.size(18.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Text(if (message?.isPinned == true) "Unpin" else "Pin")
+                                    Text(if (message?.isPinned == true) stringResource(R.string.unpin) else stringResource(R.string.pin))
                                 }
                             }
                             Row(
@@ -912,7 +923,7 @@ fun ChatScreen(
                                 }) {
                                     Icon(Icons.Default.Alarm, contentDescription = null, modifier = Modifier.size(18.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Remind")
+                                    Text(stringResource(R.string.remind))
                                 }
                                 TextButton(onClick = {
                                     viewModel.hideReactionPicker()
@@ -922,12 +933,12 @@ fun ChatScreen(
                                             putExtra(Intent.EXTRA_TEXT, message.body)
                                             type = "text/plain"
                                         }
-                                        context.startActivity(Intent.createChooser(shareIntent, "Share"))
+                                        context.startActivity(Intent.createChooser(shareIntent, shareMessageStr))
                                     }
                                 }) {
                                     Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Share")
+                                    Text(stringResource(R.string.share))
                                 }
                                 TextButton(
                                     onClick = {
@@ -937,7 +948,7 @@ fun ChatScreen(
                                 ) {
                                     Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.error)
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                                    Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
                                 }
                             }
                             if (message != null && (viewModel.canEditMessage(message) || message.isEdited)) {
@@ -952,7 +963,7 @@ fun ChatScreen(
                                         }) {
                                             Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
                                             Spacer(modifier = Modifier.width(4.dp))
-                                            Text("Edit")
+                                            Text(stringResource(R.string.edit))
                                         }
                                     }
                                     if (message.isEdited) {
@@ -962,7 +973,7 @@ fun ChatScreen(
                                         }) {
                                             Icon(Icons.Default.History, contentDescription = null, modifier = Modifier.size(18.dp))
                                             Spacer(modifier = Modifier.width(4.dp))
-                                            Text("View Details")
+                                            Text(stringResource(R.string.view_details))
                                         }
                                     }
                                 }
@@ -1027,7 +1038,7 @@ fun ChatScreen(
                             Spacer(modifier = Modifier.width(10.dp))
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = "Replying to",
+                                    text = stringResource(R.string.replying_to),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.primary,
                                     fontWeight = FontWeight.SemiBold
@@ -1074,7 +1085,7 @@ fun ChatScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Editing message",
+                            text = stringResource(R.string.editing_message),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold,
@@ -1119,7 +1130,7 @@ fun ChatScreen(
                             modifier = Modifier.padding(end = 8.dp)
                         )
                         Text(
-                            text = "Sending via WhatsApp",
+                            text = stringResource(R.string.sending_via_whatsapp),
                             style = MaterialTheme.typography.labelMedium,
                             color = Color(0xFF25D366),
                             fontWeight = FontWeight.Medium,
@@ -1151,7 +1162,7 @@ fun ChatScreen(
                 onSend = {
                     isVoiceRecording = false
                     voiceDurationMs = 0
-                    Toast.makeText(context, "Voice messages will be available with MMS support", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, voiceMmsUnavailableStr, Toast.LENGTH_SHORT).show()
                 }
             )
 
@@ -1172,7 +1183,7 @@ fun ChatScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Sending...",
+                            text = stringResource(R.string.sending),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.inverseOnSurface,
                             modifier = Modifier.weight(1f)
@@ -1217,7 +1228,7 @@ fun ChatScreen(
                             modifier = Modifier.fillMaxWidth(),
                             placeholder = {
                                 Text(
-                                    if (uiState.sendViaWhatsApp) "WhatsApp message" else "Message",
+                                    if (uiState.sendViaWhatsApp) stringResource(R.string.whatsapp_message) else stringResource(R.string.message_placeholder),
                                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                                     style = MaterialTheme.typography.bodyMedium
                                 )
@@ -1277,7 +1288,7 @@ fun ChatScreen(
                                     ) {
                                         Icon(
                                             Icons.Default.AddCircleOutline,
-                                            contentDescription = "More",
+                                            contentDescription = stringResource(R.string.more),
                                             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                                             modifier = Modifier.size(20.dp)
                                         )
@@ -1465,7 +1476,7 @@ fun ChatScreen(
                 onCopy = { number ->
                     phoneNumberDialogTarget = null
                     clipboardManager.setText(AnnotatedString(number))
-                    Toast.makeText(context, "Number copied", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, numberCopiedStr, Toast.LENGTH_SHORT).show()
                 },
                 onDismiss = { phoneNumberDialogTarget = null }
             )
@@ -1519,6 +1530,9 @@ private fun SwipeableMessageItem(
     viewModel: ChatViewModel,
     onPhoneNumberClick: (String) -> Unit
 ) {
+    val codeCopiedStr = stringResource(R.string.code_copied)
+    val codeNameCopiedStr = stringResource(R.string.code_name_copied)
+
     var offsetX by remember { mutableFloatStateOf(0f) }
     var didHapticAtThreshold by remember { mutableStateOf(false) }
 
@@ -1572,7 +1586,7 @@ private fun SwipeableMessageItem(
     ) {
         Icon(
             Icons.AutoMirrored.Filled.Reply,
-            contentDescription = "Reply",
+            contentDescription = stringResource(R.string.reply),
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .padding(start = 4.dp)
@@ -1608,13 +1622,13 @@ private fun SwipeableMessageItem(
             },
             onCodeCopy = { code ->
                 clipboardManager.setText(AnnotatedString(code))
-                Toast.makeText(context, "Code copied to clipboard", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, codeCopiedStr, Toast.LENGTH_SHORT).show()
             },
             onPhoneNumberClick = onPhoneNumberClick,
             onShortCodeCopy = { code ->
                 clipboardManager.setText(AnnotatedString(code))
                 hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                Toast.makeText(context, "Code \"$code\" copied", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, codeNameCopiedStr.format(code), Toast.LENGTH_SHORT).show()
             },
             onDismissScamWarning = { viewModel.dismissScamWarning(message.id) },
             onConfirmSpam = { viewModel.confirmSpam(message.id) }
@@ -1648,7 +1662,7 @@ private fun PhoneNumberActionDialog(
                     ) {
                         Icon(Icons.Default.Sms, contentDescription = null, modifier = Modifier.size(22.dp), tint = MaterialTheme.colorScheme.onPrimaryContainer)
                         Spacer(modifier = Modifier.width(12.dp))
-                        Text("Send message", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                        Text(stringResource(R.string.send_message_action), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onPrimaryContainer)
                     }
                 }
                 Surface(
@@ -1663,7 +1677,7 @@ private fun PhoneNumberActionDialog(
                     ) {
                         Icon(Icons.Default.PersonAdd, contentDescription = null, modifier = Modifier.size(22.dp), tint = MaterialTheme.colorScheme.onSecondaryContainer)
                         Spacer(modifier = Modifier.width(12.dp))
-                        Text("Add to contacts", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                        Text(stringResource(R.string.add_to_contacts), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSecondaryContainer)
                     }
                 }
                 Surface(
@@ -1678,7 +1692,7 @@ private fun PhoneNumberActionDialog(
                     ) {
                         Icon(Icons.Default.Phone, contentDescription = null, modifier = Modifier.size(22.dp), tint = MaterialTheme.colorScheme.onTertiaryContainer)
                         Spacer(modifier = Modifier.width(12.dp))
-                        Text("Call", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onTertiaryContainer)
+                        Text(stringResource(R.string.call), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onTertiaryContainer)
                     }
                 }
                 Surface(
@@ -1693,14 +1707,14 @@ private fun PhoneNumberActionDialog(
                     ) {
                         Icon(Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(22.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(modifier = Modifier.width(12.dp))
-                        Text("Copy number", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.copy_number), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
         },
         confirmButton = {},
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
         }
     )
 }
@@ -1738,12 +1752,12 @@ private fun ChatBlockDialog(
                 )
             }
         },
-        title = { Text("Block $displayName") },
+        title = { Text(stringResource(R.string.block_contact_title, displayName)) },
         text = {
             if (selectedOption == null) {
                 Column {
                     Text(
-                        text = "Choose how you want to block this contact. Blocked messages will be moved to the spam folder.",
+                        text = stringResource(R.string.block_choose_how),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -1769,7 +1783,7 @@ private fun ChatBlockDialog(
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
                                     Text(
-                                        text = "Block by number",
+                                        text = stringResource(R.string.block_by_number),
                                         style = MaterialTheme.typography.bodyLarge,
                                         fontWeight = FontWeight.SemiBold,
                                         color = MaterialTheme.colorScheme.onErrorContainer
@@ -1804,7 +1818,7 @@ private fun ChatBlockDialog(
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
                                     Text(
-                                        text = "Block by sender",
+                                        text = stringResource(R.string.block_by_sender),
                                         style = MaterialTheme.typography.bodyLarge,
                                         fontWeight = FontWeight.SemiBold,
                                         color = MaterialTheme.colorScheme.onErrorContainer
@@ -1837,7 +1851,7 @@ private fun ChatBlockDialog(
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                text = "Block by words",
+                                text = stringResource(R.string.block_by_words),
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onErrorContainer
@@ -1864,7 +1878,7 @@ private fun ChatBlockDialog(
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                text = "Block by language",
+                                text = stringResource(R.string.block_by_language),
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onErrorContainer
@@ -1876,8 +1890,8 @@ private fun ChatBlockDialog(
                 Column {
                     Text(
                         text = when (selectedOption) {
-                            "WORDS" -> "Enter words to block (comma separated)"
-                            "LANGUAGE" -> "Enter language code (e.g., en, es, fr)"
+                            "WORDS" -> stringResource(R.string.block_enter_words)
+                            "LANGUAGE" -> stringResource(R.string.block_enter_language)
                             else -> ""
                         },
                         style = MaterialTheme.typography.bodyMedium,
@@ -1905,7 +1919,7 @@ private fun ChatBlockDialog(
                     },
                     enabled = inputText.isNotBlank()
                 ) {
-                    Text("Block")
+                    Text(stringResource(R.string.block))
                 }
             }
         },
@@ -1920,7 +1934,7 @@ private fun ChatBlockDialog(
                     }
                 }
             ) {
-                Text(if (selectedOption != null) "Back" else "Cancel")
+                Text(if (selectedOption != null) stringResource(R.string.back) else stringResource(R.string.cancel))
             }
         }
     )
@@ -1933,15 +1947,15 @@ private fun ScheduleMessageDialog(
     onSchedule: (Long) -> Unit
 ) {
     val options = listOf(
-        "In 1 hour" to 60 * 60 * 1000L,
-        "In 3 hours" to 3 * 60 * 60 * 1000L,
-        "Tomorrow morning (9 AM)" to calculateTomorrow9Am(),
-        "Tomorrow evening (6 PM)" to calculateTomorrow6Pm(),
+        stringResource(R.string.schedule_in_1h) to 60 * 60 * 1000L,
+        stringResource(R.string.schedule_in_3h) to 3 * 60 * 60 * 1000L,
+        stringResource(R.string.schedule_tomorrow_morning) to calculateTomorrow9Am(),
+        stringResource(R.string.schedule_tomorrow_evening) to calculateTomorrow6Pm(),
     )
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Schedule Message") },
+        title = { Text(stringResource(R.string.schedule_message)) },
         text = {
             Column {
                 if (sendViaWhatsApp) {
@@ -1962,7 +1976,7 @@ private fun ScheduleMessageDialog(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                "Will be sent via WhatsApp",
+                                stringResource(R.string.will_send_whatsapp),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = Color(0xFF25D366),
                                 fontWeight = FontWeight.Medium
@@ -1972,7 +1986,7 @@ private fun ScheduleMessageDialog(
                     Spacer(modifier = Modifier.height(12.dp))
                 }
                 Text(
-                    "Choose when to send this message",
+                    stringResource(R.string.choose_when_to_send),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -2006,7 +2020,7 @@ private fun ScheduleMessageDialog(
         },
         confirmButton = {},
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
         }
     )
 }
@@ -2017,19 +2031,19 @@ private fun ReminderDialog(
     onSetReminder: (Long) -> Unit
 ) {
     val options = listOf(
-        "In 30 minutes" to 30 * 60 * 1000L,
-        "In 1 hour" to 60 * 60 * 1000L,
-        "In 3 hours" to 3 * 60 * 60 * 1000L,
-        "Tomorrow morning (9 AM)" to calculateTomorrow9Am(),
+        stringResource(R.string.remind_in_30min) to 30 * 60 * 1000L,
+        stringResource(R.string.remind_in_1h) to 60 * 60 * 1000L,
+        stringResource(R.string.remind_in_3h) to 3 * 60 * 60 * 1000L,
+        stringResource(R.string.remind_tomorrow_morning) to calculateTomorrow9Am(),
     )
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Remind Me") },
+        title = { Text(stringResource(R.string.remind_me)) },
         text = {
             Column {
                 Text(
-                    "When should we remind you?",
+                    stringResource(R.string.when_to_remind),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -2062,7 +2076,7 @@ private fun ReminderDialog(
         },
         confirmButton = {},
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
         }
     )
 }
@@ -2087,14 +2101,14 @@ private fun calculateTomorrow6Pm(): Long {
     return cal.timeInMillis - System.currentTimeMillis()
 }
 
-private fun formatDate(timestamp: Long): String {
+private fun formatDate(timestamp: Long, todayLabel: String, yesterdayLabel: String): String {
     val cal = Calendar.getInstance().apply { timeInMillis = timestamp }
     val today = Calendar.getInstance()
     return when {
         cal.get(Calendar.DATE) == today.get(Calendar.DATE) &&
-            cal.get(Calendar.YEAR) == today.get(Calendar.YEAR) -> "Today"
+            cal.get(Calendar.YEAR) == today.get(Calendar.YEAR) -> todayLabel
         today.get(Calendar.DATE) - cal.get(Calendar.DATE) == 1 &&
-            cal.get(Calendar.YEAR) == today.get(Calendar.YEAR) -> "Yesterday"
+            cal.get(Calendar.YEAR) == today.get(Calendar.YEAR) -> yesterdayLabel
         cal.get(Calendar.YEAR) != today.get(Calendar.YEAR) ->
             SimpleDateFormat("EEEE, MMM d, yyyy", Locale.getDefault()).format(Date(timestamp))
         else -> SimpleDateFormat("EEEE, MMM d", Locale.getDefault()).format(Date(timestamp))

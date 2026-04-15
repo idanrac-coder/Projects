@@ -55,6 +55,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
+import com.novachat.R
 import com.novachat.core.database.entity.NotificationProfileEntity
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,11 +72,11 @@ fun NotificationProfilesScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Notification Profiles", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.notification_profiles), fontWeight = FontWeight.Bold)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -89,7 +91,7 @@ fun NotificationProfilesScreen(
                 contentColor = Color.White,
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Create profile")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.new_profile))
             }
         }
     ) { padding ->
@@ -117,13 +119,13 @@ fun NotificationProfilesScreen(
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                     Text(
-                        text = "No notification profiles",
+                        text = stringResource(R.string.no_notification_profiles),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Create profiles like Work, Sleep, or\nPersonal with custom notification settings",
+                        text = stringResource(R.string.no_notification_profiles_hint),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
@@ -167,9 +169,9 @@ fun NotificationProfilesScreen(
                             }
                             Spacer(modifier = Modifier.width(14.dp))
                             Column(modifier = Modifier.weight(1f)) {
-                                Text("Default", fontWeight = FontWeight.SemiBold)
+                                Text(stringResource(R.string.default_profile), fontWeight = FontWeight.SemiBold)
                                 Text(
-                                    "Standard notifications",
+                                    stringResource(R.string.standard_notifications),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -257,7 +259,7 @@ private fun NotificationProfileCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = buildString {
-                            append(if (profile.vibrationEnabled) "Vibration" else "Silent")
+                            append(if (profile.vibrationEnabled) stringResource(R.string.vibration) else stringResource(R.string.silent_label))
                             append(" · ")
                             append(profile.priority)
                             if (profile.scheduleStartHour != null) {
@@ -285,10 +287,10 @@ private fun NotificationProfileCard(
                 Spacer(modifier = Modifier.width(4.dp))
             }
             IconButton(onClick = onEdit, modifier = Modifier.size(32.dp)) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit", modifier = Modifier.size(18.dp))
+                Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit), modifier = Modifier.size(18.dp))
             }
             IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete", modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.error)
+                Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete), modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.error)
             }
         }
     }
@@ -309,14 +311,14 @@ private fun CreateEditProfileDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (existing != null) "Edit Profile" else "New Profile") },
+        title = { Text(if (existing != null) stringResource(R.string.edit_profile) else stringResource(R.string.new_profile)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Profile name") },
-                    placeholder = { Text("e.g., Work, Sleep, Personal") },
+                    label = { Text(stringResource(R.string.profile_name)) },
+                    placeholder = { Text(stringResource(R.string.profile_name_hint)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp)
@@ -327,9 +329,9 @@ private fun CreateEditProfileDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Vibration", fontWeight = FontWeight.Medium)
+                        Text(stringResource(R.string.vibration), fontWeight = FontWeight.Medium)
                         Text(
-                            "Vibrate on notifications",
+                            stringResource(R.string.vibrate_on_notifications),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -348,9 +350,9 @@ private fun CreateEditProfileDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Popup notifications", fontWeight = FontWeight.Medium)
+                        Text(stringResource(R.string.popup_notifications), fontWeight = FontWeight.Medium)
                         Text(
-                            "Show heads-up notifications",
+                            stringResource(R.string.show_heads_up),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -364,7 +366,7 @@ private fun CreateEditProfileDialog(
                     )
                 }
 
-                Text("Priority", fontWeight = FontWeight.Medium)
+                Text(stringResource(R.string.priority), fontWeight = FontWeight.Medium)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf("LOW", "DEFAULT", "HIGH").forEach { p ->
                         Surface(
@@ -397,9 +399,9 @@ private fun CreateEditProfileDialog(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Schedule", fontWeight = FontWeight.Medium)
+                        Text(stringResource(R.string.schedule_label), fontWeight = FontWeight.Medium)
                         Text(
-                            "Auto-activate at specific times",
+                            stringResource(R.string.schedule_subtitle),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -437,11 +439,11 @@ private fun CreateEditProfileDialog(
                 },
                 enabled = name.isNotBlank()
             ) {
-                Text(if (existing != null) "Update" else "Create")
+                Text(if (existing != null) stringResource(R.string.update) else stringResource(R.string.create))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
         }
     )
 }

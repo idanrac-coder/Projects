@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.EmojiPeople
 import androidx.compose.material.icons.filled.SentimentSatisfied
 import androidx.compose.material.icons.filled.Translate
@@ -33,11 +32,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.novachat.R
 
 data class AiTone(
-    val name: String,
+    val key: String,
+    val displayName: String,
     val icon: androidx.compose.ui.graphics.vector.ImageVector,
     val description: String
 )
@@ -50,14 +52,12 @@ fun AiComposeSheet(
     onDismiss: () -> Unit,
     onApply: (String) -> Unit
 ) {
-    val tones = remember {
-        listOf(
-            AiTone("Formal", Icons.Default.WorkOutline, "Professional and polished"),
-            AiTone("Casual", Icons.Default.EmojiPeople, "Relaxed and friendly"),
-            AiTone("Funny", Icons.Default.SentimentSatisfied, "Humorous and witty"),
-            AiTone("Translate", Icons.Default.Translate, "Translate to another language"),
-        )
-    }
+    val tones = listOf(
+        AiTone("Formal", stringResource(R.string.ai_tone_formal), Icons.Default.WorkOutline, stringResource(R.string.ai_tone_formal_desc)),
+        AiTone("Casual", stringResource(R.string.ai_tone_casual), Icons.Default.EmojiPeople, stringResource(R.string.ai_tone_casual_desc)),
+        AiTone("Funny", stringResource(R.string.ai_tone_funny), Icons.Default.SentimentSatisfied, stringResource(R.string.ai_tone_funny_desc)),
+        AiTone("Translate", stringResource(R.string.ai_tone_translate), Icons.Default.Translate, stringResource(R.string.ai_tone_translate_desc)),
+    )
 
     var result by remember { mutableStateOf("") }
 
@@ -73,12 +73,12 @@ fun AiComposeSheet(
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
             Text(
-                text = "AI Compose Assistant",
+                text = stringResource(R.string.ai_compose_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Transform your message with AI",
+                text = stringResource(R.string.ai_compose_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -93,7 +93,7 @@ fun AiComposeSheet(
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
                         Text(
-                            "Your message",
+                            stringResource(R.string.ai_compose_your_message),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontWeight = FontWeight.Medium
@@ -109,7 +109,7 @@ fun AiComposeSheet(
             }
 
             Text(
-                "Change Tone",
+                stringResource(R.string.ai_compose_change_tone),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
             )
@@ -125,7 +125,7 @@ fun AiComposeSheet(
                         shape = RoundedCornerShape(14.dp),
                         color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
                         onClick = {
-                            result = transformTone(currentText, tone.name)
+                            result = transformTone(currentText, tone.key)
                         }
                     ) {
                         Column(
@@ -140,13 +140,13 @@ fun AiComposeSheet(
                             ) {
                                 Icon(
                                     tone.icon,
-                                    contentDescription = tone.name,
+                                    contentDescription = tone.displayName,
                                     modifier = Modifier.size(18.dp),
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                             }
                             Text(
-                                text = tone.name,
+                                text = tone.displayName,
                                 style = MaterialTheme.typography.labelLarge,
                                 fontWeight = FontWeight.SemiBold,
                                 modifier = Modifier.padding(top = 8.dp)
@@ -164,7 +164,7 @@ fun AiComposeSheet(
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(
-                "Or describe what you want to say",
+                stringResource(R.string.ai_compose_custom_prompt_label),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
             )
@@ -175,7 +175,7 @@ fun AiComposeSheet(
                 value = prompt,
                 onValueChange = { prompt = it },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("e.g., Write a birthday wish for my friend") },
+                placeholder = { Text(stringResource(R.string.ai_compose_placeholder)) },
                 shape = RoundedCornerShape(14.dp),
                 maxLines = 3
             )
@@ -190,7 +190,7 @@ fun AiComposeSheet(
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
                         Text(
-                            "Suggestion (tap to use)",
+                            stringResource(R.string.ai_compose_suggestion_label),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
                             fontWeight = FontWeight.Medium
@@ -212,7 +212,7 @@ fun AiComposeSheet(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "AI features require internet connection. Suggestions are generated locally when possible.",
+                    text = stringResource(R.string.ai_compose_disclaimer),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                     modifier = Modifier.padding(12.dp)
@@ -224,9 +224,9 @@ fun AiComposeSheet(
     }
 }
 
-private fun transformTone(text: String, tone: String): String {
+private fun transformTone(text: String, toneKey: String): String {
     if (text.isBlank()) return "Please enter a message first"
-    return when (tone) {
+    return when (toneKey) {
         "Formal" -> "I would like to convey that: $text"
         "Casual" -> "Hey! ${text.lowercase().removeSuffix(".")}, ya know?"
         "Funny" -> "$text \uD83D\uDE04 (but seriously though!)"

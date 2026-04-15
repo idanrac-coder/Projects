@@ -49,6 +49,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.novachat.core.sms.financial.FinancialCategory
 import com.novachat.domain.model.SenderInfo
+import androidx.compose.ui.res.stringResource
+import com.novachat.R
 import com.novachat.ui.financial.components.CATEGORY_COLORS
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,10 +69,10 @@ fun FinancialSettingsScreen(
     Scaffold(
         topBar = {
             LargeTopAppBar(
-                title = { Text("Financial Settings") },
+                title = { Text(stringResource(R.string.financial_settings)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -84,10 +86,10 @@ fun FinancialSettingsScreen(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
         ) {
             // General Section
-            item { SectionHeader("General") }
+            item { SectionHeader(stringResource(R.string.general)) }
             item {
                 SettingsRow(
-                    title = "Financial Intelligence",
+                    title = stringResource(R.string.financial_intelligence),
                     trailing = {
                         Switch(
                             checked = state.isEnabled,
@@ -98,26 +100,26 @@ fun FinancialSettingsScreen(
             }
             item {
                 SettingsRow(
-                    title = "Primary Currency",
+                    title = stringResource(R.string.primary_currency),
                     subtitle = "${state.primaryCurrency} (${currencySymbolFromCode(state.primaryCurrency)})",
                     trailing = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null) }
                 )
             }
             item {
                 SettingsRow(
-                    title = "Scan Inbox",
-                    subtitle = "Re-scan all SMS for transactions from your senders",
+                    title = stringResource(R.string.scan_inbox),
+                    subtitle = stringResource(R.string.scan_inbox_financial_subtitle),
                     leading = { Icon(Icons.Default.MailOutline, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp)) },
                     onClick = { viewModel.scanInbox() }
                 )
             }
 
             // Card Management Section
-            item { SectionHeader("Card Management") }
+            item { SectionHeader(stringResource(R.string.card_management)) }
             item {
                 SettingsRow(
-                    title = "Manage Cards",
-                    subtitle = "${state.cardCount} cards detected",
+                    title = stringResource(R.string.manage_cards),
+                    subtitle = stringResource(R.string.cards_detected_fmt, state.cardCount),
                     trailing = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null) },
                     onClick = onNavigateToCardManager
                 )
@@ -133,14 +135,14 @@ fun FinancialSettingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Sender Management",
+                        text = stringResource(R.string.sender_management),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )
                     TextButton(onClick = { showAddSenderDialog = true }) {
                         Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Text("Add Sender")
+                        Text(stringResource(R.string.add_sender))
                     }
                 }
             }
@@ -157,27 +159,27 @@ fun FinancialSettingsScreen(
             }
 
             // Privacy & Security Section
-            item { SectionHeader("Privacy & Security") }
+            item { SectionHeader(stringResource(R.string.privacy_and_security)) }
             item {
                 SettingsRow(
-                    title = "Database Encryption",
-                    subtitle = "Financial data is encrypted with SQLCipher",
+                    title = stringResource(R.string.database_encryption),
+                    subtitle = stringResource(R.string.database_encryption_subtitle),
                     leading = { Icon(Icons.Default.Lock, contentDescription = null, tint = Color(0xFF4CAF50), modifier = Modifier.size(20.dp)) },
                     trailing = { Text("✓", color = Color(0xFF4CAF50), fontWeight = FontWeight.Bold) }
                 )
             }
             item {
                 SettingsRow(
-                    title = "On-Device Only",
-                    subtitle = "No data leaves your device",
+                    title = stringResource(R.string.on_device_only),
+                    subtitle = stringResource(R.string.on_device_only_subtitle),
                     leading = { Icon(Icons.Default.PhoneAndroid, contentDescription = null, tint = Color(0xFF4CAF50), modifier = Modifier.size(20.dp)) },
                     trailing = { Text("✓", color = Color(0xFF4CAF50), fontWeight = FontWeight.Bold) }
                 )
             }
             item {
                 SettingsRow(
-                    title = "Clear Financial Data",
-                    subtitle = "Delete all tracked transactions and subscriptions",
+                    title = stringResource(R.string.clear_financial_data),
+                    subtitle = stringResource(R.string.clear_financial_data_subtitle),
                     leading = { Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(20.dp)) },
                     titleColor = MaterialTheme.colorScheme.error,
                     onClick = { showClearDialog = true }
@@ -185,7 +187,7 @@ fun FinancialSettingsScreen(
             }
 
             // Categories Section
-            item { SectionHeader("Categories") }
+            item { SectionHeader(stringResource(R.string.categories)) }
             item {
                 Surface(
                     shape = RoundedCornerShape(16.dp),
@@ -193,10 +195,10 @@ fun FinancialSettingsScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         listOf(
-                            FinancialCategory.BILL to "Bills",
-                            FinancialCategory.SUBSCRIPTION to "Subscriptions",
-                            FinancialCategory.PAYMENT to "Payments",
-                            FinancialCategory.EXPENSE to "Expenses"
+                            FinancialCategory.BILL to stringResource(R.string.category_bills),
+                            FinancialCategory.SUBSCRIPTION to stringResource(R.string.category_subscriptions),
+                            FinancialCategory.PAYMENT to stringResource(R.string.category_payments),
+                            FinancialCategory.EXPENSE to stringResource(R.string.category_expenses)
                         ).forEach { (cat, label) ->
                             val color = CATEGORY_COLORS[cat] ?: Color.Gray
                             val count = state.categoryCounts[cat.name] ?: 0
@@ -235,11 +237,11 @@ fun FinancialSettingsScreen(
             }
 
             // Setup Section
-            item { SectionHeader("Setup") }
+            item { SectionHeader(stringResource(R.string.setup)) }
             item {
                 SettingsRow(
-                    title = "Setup Guide",
-                    subtitle = "Re-open provider SMS activation links",
+                    title = stringResource(R.string.setup_guide),
+                    subtitle = stringResource(R.string.setup_guide_subtitle),
                     trailing = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null) },
                     onClick = onNavigateToSetupGuide
                 )
@@ -250,16 +252,16 @@ fun FinancialSettingsScreen(
     if (showClearDialog) {
         AlertDialog(
             onDismissRequest = { showClearDialog = false },
-            title = { Text("Clear Financial Data") },
-            text = { Text("This will permanently delete all tracked transactions, subscriptions, merchant data, and alerts. This cannot be undone.") },
+            title = { Text(stringResource(R.string.clear_financial_data)) },
+            text = { Text(stringResource(R.string.clear_financial_data_dialog_text)) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.clearData()
                     showClearDialog = false
-                }) { Text("Delete All", color = MaterialTheme.colorScheme.error) }
+                }) { Text(stringResource(R.string.delete_all), color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
-                TextButton(onClick = { showClearDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showClearDialog = false }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
@@ -267,16 +269,16 @@ fun FinancialSettingsScreen(
     senderToRemove?.let { sender ->
         AlertDialog(
             onDismissRequest = { senderToRemove = null },
-            title = { Text("Remove Sender") },
-            text = { Text("Remove \"${sender.displayName ?: sender.address}\"? All ${sender.transactionCount} transactions from this sender will be permanently deleted.") },
+            title = { Text(stringResource(R.string.remove_sender)) },
+            text = { Text(stringResource(R.string.remove_sender_confirm, sender.displayName ?: sender.address, sender.transactionCount)) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.removeSender(sender.id)
                     senderToRemove = null
-                }) { Text("Remove", color = MaterialTheme.colorScheme.error) }
+                }) { Text(stringResource(R.string.remove), color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
-                TextButton(onClick = { senderToRemove = null }) { Text("Cancel") }
+                TextButton(onClick = { senderToRemove = null }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
@@ -286,19 +288,19 @@ fun FinancialSettingsScreen(
         var displayName by remember { mutableStateOf("") }
         AlertDialog(
             onDismissRequest = { showAddSenderDialog = false },
-            title = { Text("Add Sender") },
+            title = { Text(stringResource(R.string.add_sender)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(
                         value = address,
                         onValueChange = { address = it },
-                        label = { Text("Sender Address") },
-                        placeholder = { Text("e.g., MAX, Leumi") }
+                        label = { Text(stringResource(R.string.sender_address)) },
+                        placeholder = { Text(stringResource(R.string.sender_address_hint)) }
                     )
                     OutlinedTextField(
                         value = displayName,
                         onValueChange = { displayName = it },
-                        label = { Text("Display Name (optional)") }
+                        label = { Text(stringResource(R.string.display_name_optional)) }
                     )
                 }
             },
@@ -310,10 +312,10 @@ fun FinancialSettingsScreen(
                             showAddSenderDialog = false
                         }
                     }
-                ) { Text("Add") }
+                ) { Text(stringResource(R.string.add)) }
             },
             dismissButton = {
-                TextButton(onClick = { showAddSenderDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showAddSenderDialog = false }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }
@@ -389,14 +391,14 @@ private fun SenderRow(
                 Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Monitor", style = MaterialTheme.typography.labelSmall)
+                Text(stringResource(R.string.monitor), style = MaterialTheme.typography.labelSmall)
                 Switch(checked = monitorEnabled, onCheckedChange = onMonitorToggle)
             }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.alpha(if (monitorEnabled) 1f else 0.4f)
             ) {
-                Text("Alerts", style = MaterialTheme.typography.labelSmall)
+                Text(stringResource(R.string.alerts), style = MaterialTheme.typography.labelSmall)
                 Switch(
                     checked = alertsEnabled,
                     onCheckedChange = onAlertsToggle,
@@ -406,7 +408,7 @@ private fun SenderRow(
             IconButton(onClick = onRemove) {
                 Icon(
                     Icons.Default.Delete,
-                    contentDescription = "Remove sender",
+                    contentDescription = stringResource(R.string.remove_sender),
                     tint = MaterialTheme.colorScheme.error
                 )
             }

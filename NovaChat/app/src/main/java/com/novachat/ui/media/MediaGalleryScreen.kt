@@ -37,8 +37,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.novachat.R
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,17 +50,22 @@ fun MediaGalleryScreen(
     contactName: String?,
     onBack: () -> Unit
 ) {
-    val tabs = listOf("Photos", "Videos", "Links", "Files")
+    val tabs = listOf(
+        stringResource(R.string.photos),
+        stringResource(R.string.videos),
+        stringResource(R.string.links),
+        stringResource(R.string.files)
+    )
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Media - ${contactName ?: "Chat"}") },
+                title = { Text("${stringResource(R.string.media_gallery_title)} - ${contactName ?: "Chat"}") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -85,19 +92,19 @@ fun MediaGalleryScreen(
             ) { page ->
                 when (page) {
                     0 -> MediaGrid(
-                        emptyPlaceholder = "No photos shared yet",
+                        emptyPlaceholder = stringResource(R.string.no_photos_shared),
                         icon = Icons.Default.Image
                     )
                     1 -> MediaGrid(
-                        emptyPlaceholder = "No videos shared yet",
+                        emptyPlaceholder = stringResource(R.string.no_videos_shared),
                         icon = Icons.Default.AudioFile
                     )
                     2 -> MediaGrid(
-                        emptyPlaceholder = "No links shared yet",
+                        emptyPlaceholder = stringResource(R.string.no_links_shared),
                         icon = Icons.Default.Link
                     )
                     3 -> MediaGrid(
-                        emptyPlaceholder = "No files shared yet",
+                        emptyPlaceholder = stringResource(R.string.no_files_shared),
                         icon = Icons.AutoMirrored.Filled.InsertDriveFile
                     )
                 }

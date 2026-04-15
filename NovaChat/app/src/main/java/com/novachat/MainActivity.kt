@@ -38,8 +38,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.os.LocaleListCompat
 import com.novachat.core.billing.LicenseManager
 import com.novachat.core.datastore.UserPreferencesRepository
 import com.novachat.core.sms.BubbleNotificationHelper
@@ -139,14 +137,6 @@ class MainActivity : AppCompatActivity() {
             provider.remove()
         }
         enableEdgeToEdge()
-
-        // Restore saved locale on every launch
-        lifecycleScope.launch {
-            val savedLanguage = userPreferencesRepository.appLanguage.first()
-            val localeList = if (savedLanguage.isEmpty()) LocaleListCompat.getEmptyLocaleList()
-            else LocaleListCompat.forLanguageTags(savedLanguage)
-            AppCompatDelegate.setApplicationLocales(localeList)
-        }
 
         hasPermissions = requiredPermissions
             .all { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
