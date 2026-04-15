@@ -33,6 +33,7 @@ object FinancialDatabaseModule {
         @ApplicationContext context: Context,
         keyManager: FinancialKeyManager
     ): FinancialDatabase {
+        System.loadLibrary("sqlcipher")
         val passphrase = keyManager.getPassphrase()
         val dbFile = context.getDatabasePath("financial.db")
         val hook: SQLiteDatabaseHook? = if (dbFile.exists()) object : SQLiteDatabaseHook {

@@ -26,6 +26,5 @@
 -dontwarn org.tensorflow.lite.**
 
 # SQLCipher – encrypted financial database
--keep class net.sqlcipher.** { *; }
--keep class net.sqlcipher.database.** { *; }
--dontwarn net.sqlcipher.**
+-keep class net.zetetic.database.sqlcipher.** { *; }
+-dontwarn net.zetetic.database.sqlcipher.**
