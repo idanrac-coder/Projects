@@ -24,7 +24,7 @@ playServicesCoroutines = "1.9.0"
 playReview = "2.0.2"
 splashscreen = "1.2.0"
 litert = "1.4.1"
-sqlcipher = "4.5.4"
+sqlcipher = "4.14.1"
 sqliteKtx = "2.4.0"
 
 [libraries]
@@ -96,7 +96,7 @@ play-review-ktx = { group = "com.google.android.play", name = "review-ktx", vers
 litert = { group = "com.google.ai.edge.litert", name = "litert", version.ref = "litert" }
 
 # SQLCipher – encrypted financial database
-sqlcipher = { group = "net.zetetic", name = "android-database-sqlcipher", version.ref = "sqlcipher" }
+sqlcipher = { group = "net.zetetic", name = "sqlcipher-android", version.ref = "sqlcipher" }
 androidx-sqlite-ktx = { group = "androidx.sqlite", name = "sqlite-ktx", version.ref = "sqliteKtx" }
 
 [plugins]
