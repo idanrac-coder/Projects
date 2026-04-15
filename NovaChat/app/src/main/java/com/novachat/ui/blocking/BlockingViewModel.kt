@@ -3,6 +3,7 @@ package com.novachat.ui.blocking
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.novachat.core.billing.LicenseManager
 import com.novachat.core.database.dao.SpamMessageDao
 import com.novachat.core.datastore.UserPreferencesRepository
 import com.novachat.core.sms.SmsProvider
@@ -42,7 +43,8 @@ class BlockingViewModel @Inject constructor(
     private val spamMessageDao: SpamMessageDao,
     private val smsProvider: SmsProvider,
     private val conversationRepository: ConversationRepository,
-    preferencesRepository: UserPreferencesRepository
+    preferencesRepository: UserPreferencesRepository,
+    licenseManager: LicenseManager
 ) : ViewModel() {
 
     private val _showDialog = MutableStateFlow(false)
@@ -58,7 +60,7 @@ class BlockingViewModel @Inject constructor(
         blockRepository.getRulesByType(BlockType.SENDER_NAME),
         blockRepository.getRulesByType(BlockType.LANGUAGE),
         blockRepository.getRuleCount(),
-        preferencesRepository.isPremium,
+        licenseManager.hasPremiumAccess,
         _showDialog,
         _dialogType,
         _error

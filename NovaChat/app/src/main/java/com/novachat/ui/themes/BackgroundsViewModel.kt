@@ -2,6 +2,7 @@ package com.novachat.ui.themes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.novachat.core.billing.LicenseManager
 import com.novachat.core.datastore.UserPreferencesRepository
 import com.novachat.domain.model.ConversationBackground
 import com.novachat.domain.model.BuiltInBackgrounds
@@ -24,14 +25,15 @@ data class BackgroundsUiState(
 
 @HiltViewModel
 class BackgroundsViewModel @Inject constructor(
-    private val preferencesRepository: UserPreferencesRepository
+    private val preferencesRepository: UserPreferencesRepository,
+    private val licenseManager: LicenseManager
 ) : ViewModel() {
 
     private val _previewBackground = MutableStateFlow<ConversationBackground?>(null)
 
     val uiState: StateFlow<BackgroundsUiState> = combine(
         preferencesRepository.conversationBackgroundId,
-        preferencesRepository.isPremium,
+        licenseManager.hasPremiumAccess,
         _previewBackground
     ) { id, isPremium, preview ->
         BackgroundsUiState(

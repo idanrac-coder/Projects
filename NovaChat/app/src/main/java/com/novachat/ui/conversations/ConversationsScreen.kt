@@ -100,6 +100,8 @@ import com.novachat.core.theme.ShimmerConversationItem
 import com.novachat.domain.model.MessageCategory
 import com.novachat.domain.model.SwipeAction
 import androidx.compose.material3.HorizontalDivider
+import com.novachat.domain.model.Conversation
+import com.novachat.ui.components.ConversationContextMenu
 import com.novachat.ui.components.ConversationItem
 import com.novachat.ui.components.SwipeableRow
 
@@ -110,6 +112,7 @@ fun ConversationsScreen(
     onComposeClick: () -> Unit,
     onSearchClick: () -> Unit,
     onNavigateToPremium: () -> Unit = {},
+    onNavigateToArchived: () -> Unit = {},
     viewModel: ConversationsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -117,6 +120,7 @@ fun ConversationsScreen(
     val swipeRight by viewModel.swipeRightAction.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val hapticFeedback = LocalHapticFeedback.current
+    var contextMenuConversation by remember { mutableStateOf<Conversation?>(null) }
 
     val defaultSmsLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -329,6 +333,35 @@ fun ConversationsScreen(
                     }
                 }
 
+                // Archived chip — navigates to archived screen
+                item {
+                    Surface(
+                        onClick = onNavigateToArchived,
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        tonalElevation = 0.dp
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Default.Archive,
+                                contentDescription = "Archived",
+                                modifier = Modifier.size(14.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "Archived",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+                }
+
                 item {
                     Surface(
                         onClick = { viewModel.showManageCategoriesDialog() },
@@ -465,7 +498,7 @@ fun ConversationsScreen(
                                         },
                                         onLongClick = {
                                             hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                                            viewModel.toggleSelection(conversation.threadId)
+                                            contextMenuConversation = conversation
                                         }
                                     )
                                 }
@@ -659,6 +692,23 @@ fun ConversationsScreen(
                         Text("Not now")
                     }
                 }
+            )
+        }
+
+        contextMenuConversation?.let { conv ->
+            ConversationContextMenu(
+                conversation = conv,
+                onMute = { muteUntil -> viewModel.muteConversationUntil(conv.threadId, muteUntil) },
+                onUnmute = { viewModel.unmuteConversation(conv.threadId) },
+                onPin = { viewModel.pinConversation(conv.threadId, true) },
+                onUnpin = { viewModel.pinConversation(conv.threadId, false) },
+                onArchive = { viewModel.archiveConversation(conv.threadId) },
+                onMarkAsRead = { viewModel.markAsRead(conv.threadId) },
+                onFavorite = { viewModel.setConversationFavorite(conv.threadId, true) },
+                onUnfavorite = { viewModel.setConversationFavorite(conv.threadId, false) },
+                onSelect = { viewModel.toggleSelection(conv.threadId) },
+                onDelete = { viewModel.deleteConversation(conv.threadId) },
+                onDismiss = { contextMenuConversation = null }
             )
         }
 

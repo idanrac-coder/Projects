@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.filled.SwipeRight
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,13 +43,21 @@ import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -85,6 +94,8 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val isPremium by viewModel.isPremium.collectAsStateWithLifecycle()
+    val appLanguage by viewModel.appLanguage.collectAsStateWithLifecycle()
+    var showLanguagePicker by remember { mutableStateOf(false) }
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -189,6 +200,17 @@ fun SettingsScreen(
                         title = "Swipe Actions",
                         subtitle = "Configure swipe gestures",
                         onClick = onSwipeActionsClick
+                    )
+                    SettingsDivider()
+                    SettingsItem(
+                        icon = Icons.Default.Translate,
+                        title = "Language",
+                        subtitle = when (appLanguage) {
+                            "he" -> "Hebrew"
+                            "en" -> "English"
+                            else -> "System default"
+                        },
+                        onClick = { showLanguagePicker = true }
                     )
                 }
             }
@@ -358,6 +380,17 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            if (showLanguagePicker) {
+                LanguagePickerDialog(
+                    currentLanguage = appLanguage,
+                    onConfirm = { tag ->
+                        viewModel.setAppLanguage(tag)
+                        showLanguagePicker = false
+                    },
+                    onDismiss = { showLanguagePicker = false }
+                )
+            }
+
             Text(
                 text = "Aura v${BuildConfig.VERSION_NAME}",
                 style = MaterialTheme.typography.bodySmall,
@@ -485,4 +518,59 @@ private fun SettingsToggleItem(
             )
         )
     }
+}
+
+private val LANGUAGE_OPTIONS = listOf(
+    "" to "System default",
+    "en" to "English",
+    "he" to "עברית (Hebrew)"
+)
+
+@Composable
+private fun LanguagePickerDialog(
+    currentLanguage: String,
+    onConfirm: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var selectedTag by remember { mutableStateOf(currentLanguage) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Language", fontWeight = FontWeight.SemiBold) },
+        text = {
+            Column {
+                LANGUAGE_OPTIONS.forEach { (tag, label) ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = selectedTag == tag,
+                                onClick = { selectedTag = tag },
+                                role = Role.RadioButton
+                            )
+                            .padding(vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = selectedTag == tag,
+                            onClick = null
+                        )
+                        Text(
+                            text = label,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(start = 12.dp)
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(selectedTag) }) {
+                Text("Apply", fontWeight = FontWeight.SemiBold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancel") }
+        }
+    )
 }

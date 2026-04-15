@@ -66,6 +66,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.novachat.BuildConfig
+import com.novachat.core.billing.TrialState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,6 +75,8 @@ fun LicenseScreen(
     viewModel: LicenseViewModel = hiltViewModel()
 ) {
     val isPremium by viewModel.isPremium.collectAsStateWithLifecycle()
+    val trialState by viewModel.trialState.collectAsStateWithLifecycle()
+    val trialDaysRemaining by viewModel.trialDaysRemaining.collectAsStateWithLifecycle()
     val purchaseInProgress by viewModel.purchaseInProgress.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -122,44 +125,87 @@ fun LicenseScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    if (isPremium) {
-                        Icon(
-                            Icons.Default.Verified,
-                            contentDescription = null,
-                            modifier = Modifier.size(64.dp),
-                            tint = Color.White
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            text = "You're Premium!",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                        Text(
-                            text = "All features are unlocked",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = Color.White.copy(alpha = 0.9f)
-                        )
-                    } else {
-                        Icon(
-                            Icons.Default.Star,
-                            contentDescription = null,
-                            modifier = Modifier.size(64.dp),
-                            tint = Color.White
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            text = "Aura Premium",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                        Text(
-                            text = "One-time purchase, lifetime access",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = Color.White.copy(alpha = 0.9f)
-                        )
+                    when {
+                        isPremium -> {
+                            Icon(
+                                Icons.Default.Verified,
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp),
+                                tint = Color.White
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                text = "You're Premium!",
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                            Text(
+                                text = "All features are unlocked",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Color.White.copy(alpha = 0.9f)
+                            )
+                        }
+                        trialState == TrialState.ACTIVE -> {
+                            Icon(
+                                Icons.Default.Star,
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp),
+                                tint = Color.White
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                text = "Premium Trial",
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                            Text(
+                                text = "$trialDaysRemaining day${if (trialDaysRemaining != 1) "s" else ""} remaining",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Color.White.copy(alpha = 0.9f)
+                            )
+                        }
+                        trialState == TrialState.EXPIRED -> {
+                            Icon(
+                                Icons.Default.Star,
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp),
+                                tint = Color.White.copy(alpha = 0.6f)
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                text = "Trial Ended",
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                            Text(
+                                text = "Purchase to unlock all premium features",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Color.White.copy(alpha = 0.9f)
+                            )
+                        }
+                        else -> {
+                            Icon(
+                                Icons.Default.Star,
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp),
+                                tint = Color.White
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                text = "Aura Premium",
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                            Text(
+                                text = "One-time purchase, lifetime access",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Color.White.copy(alpha = 0.9f)
+                            )
+                        }
                     }
                 }
             }
@@ -217,7 +263,7 @@ fun LicenseScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             if (!isPremium) {
-                // Price card
+                // Price card — show to non-premium users always (trial or not)
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -294,7 +340,10 @@ fun LicenseScreen(
                                 Text("Processing...")
                             } else {
                                 Text(
-                                    text = "Purchase Lifetime License",
+                                    text = if (trialState == TrialState.ACTIVE)
+                                        "Purchase to Keep Premium"
+                                    else
+                                        "Purchase Lifetime License",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold
                                 )

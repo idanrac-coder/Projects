@@ -19,7 +19,7 @@ interface ConversationMetaDao {
     @Query("SELECT * FROM conversation_meta WHERE isArchived = 1")
     fun getArchivedConversations(): Flow<List<ConversationMetaEntity>>
 
-    @Query("SELECT * FROM conversation_meta WHERE isMuted = 1")
+    @Query("SELECT * FROM conversation_meta WHERE isMuted = 1 OR (muteUntil IS NOT NULL AND muteUntil > 0)")
     fun getMutedConversations(): Flow<List<ConversationMetaEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -33,6 +33,15 @@ interface ConversationMetaDao {
 
     @Query("UPDATE conversation_meta SET isMuted = :muted WHERE threadId = :threadId")
     suspend fun setMuted(threadId: Long, muted: Boolean)
+
+    @Query("UPDATE conversation_meta SET muteUntil = :muteUntil WHERE threadId = :threadId")
+    suspend fun setMuteUntil(threadId: Long, muteUntil: Long?)
+
+    @Query("UPDATE conversation_meta SET isFavorite = :favorite WHERE threadId = :threadId")
+    suspend fun setFavorite(threadId: Long, favorite: Boolean)
+
+    @Query("UPDATE conversation_meta SET isLocked = :locked WHERE threadId = :threadId")
+    suspend fun setLocked(threadId: Long, locked: Boolean)
 
     @Query("UPDATE conversation_meta SET customThemeId = :themeId WHERE threadId = :threadId")
     suspend fun setCustomTheme(threadId: Long, themeId: Long?)

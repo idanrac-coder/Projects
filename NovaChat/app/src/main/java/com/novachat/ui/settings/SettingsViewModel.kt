@@ -1,5 +1,7 @@
 package com.novachat.ui.settings
 
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.novachat.core.datastore.UserPreferencesRepository
@@ -33,6 +35,9 @@ class SettingsViewModel @Inject constructor(
     val themeMode: StateFlow<String> = preferencesRepository.themeMode
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "system")
 
+    val appLanguage: StateFlow<String> = preferencesRepository.appLanguage
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+
     val isWhatsAppInstalled: Boolean
         get() = whatsAppForwarder.isWhatsAppInstalled()
 
@@ -50,6 +55,18 @@ class SettingsViewModel @Inject constructor(
     fun setThemeMode(mode: String) {
         viewModelScope.launch {
             preferencesRepository.setThemeMode(mode)
+        }
+    }
+
+    fun setAppLanguage(languageTag: String) {
+        viewModelScope.launch {
+            preferencesRepository.setAppLanguage(languageTag)
+            val localeList = if (languageTag.isEmpty()) {
+                LocaleListCompat.getEmptyLocaleList()
+            } else {
+                LocaleListCompat.forLanguageTags(languageTag)
+            }
+            AppCompatDelegate.setApplicationLocales(localeList)
         }
     }
 }

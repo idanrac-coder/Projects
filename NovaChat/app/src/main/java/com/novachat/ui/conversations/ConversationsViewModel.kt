@@ -260,8 +260,13 @@ class ConversationsViewModel @Inject constructor(
         var result = conversations
         if (customCategory != null) {
             result = result.filter { it.customCategory == customCategory }
-        } else if (category != MessageCategory.ALL) {
-            result = result.filter { it.category == category }
+        } else {
+            result = when (category) {
+                MessageCategory.ALL -> result
+                MessageCategory.CONTACTS -> result.filter { it.category == MessageCategory.CONTACTS }
+                MessageCategory.UNREAD -> result.filter { it.unreadCount > 0 }
+                MessageCategory.FAVORITES -> result.filter { it.isFavorite }
+            }
         }
         if (query.isNotBlank()) {
             result = result.filter {
@@ -442,6 +447,27 @@ class ConversationsViewModel @Inject constructor(
     fun muteConversation(threadId: Long, muted: Boolean) {
         viewModelScope.launch {
             conversationRepository.muteConversation(threadId, muted)
+            loadConversations()
+        }
+    }
+
+    fun muteConversationUntil(threadId: Long, muteUntil: Long) {
+        viewModelScope.launch {
+            conversationRepository.muteConversationUntil(threadId, muteUntil)
+            loadConversations()
+        }
+    }
+
+    fun unmuteConversation(threadId: Long) {
+        viewModelScope.launch {
+            conversationRepository.muteConversationUntil(threadId, null)
+            loadConversations()
+        }
+    }
+
+    fun setConversationFavorite(threadId: Long, favorite: Boolean) {
+        viewModelScope.launch {
+            conversationRepository.setConversationFavorite(threadId, favorite)
             loadConversations()
         }
     }

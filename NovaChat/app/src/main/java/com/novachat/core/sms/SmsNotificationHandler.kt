@@ -259,6 +259,13 @@ class SmsNotificationHandler @Inject constructor(
             body
         }
 
+        // Suppress notification if conversation is muted
+        if (threadId > 0 && conversationRepository.isConversationMuted(threadId)) {
+            if (BuildConfig.DEBUG) Log.d(TAG, "Notification suppressed — conversation $threadId is muted")
+            conversationRepository.refreshAfterChange(threadId)
+            return
+        }
+
         if (BuildConfig.DEBUG) Log.d("NC_DEBUG", "=== Handler: showing notification threadId=$threadId address=$address")
         showNotification(
             title = notifTitle,

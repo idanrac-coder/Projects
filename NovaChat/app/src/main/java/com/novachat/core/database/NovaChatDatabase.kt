@@ -57,7 +57,7 @@ import com.novachat.core.database.entity.VoiceTranscriptionEntity
         ScanExcludedMessageEntity::class,
         VoiceTranscriptionEntity::class
     ],
-    version = 17,
+    version = 18,
     exportSchema = true
 )
 abstract class NovaChatDatabase : RoomDatabase() {

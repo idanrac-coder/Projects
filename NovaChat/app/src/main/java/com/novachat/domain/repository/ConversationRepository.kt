@@ -33,6 +33,10 @@ interface ConversationRepository {
     suspend fun pinConversation(threadId: Long, pinned: Boolean)
     suspend fun archiveConversation(threadId: Long, archived: Boolean)
     suspend fun muteConversation(threadId: Long, muted: Boolean)
+    suspend fun muteConversationUntil(threadId: Long, muteUntil: Long?)
+    suspend fun isConversationMuted(threadId: Long): Boolean
+    suspend fun setConversationFavorite(threadId: Long, favorite: Boolean)
+    suspend fun setConversationLocked(threadId: Long, locked: Boolean)
     suspend fun sendSms(address: String, body: String): Result<Unit>
     suspend fun getThreadIdForAddress(address: String): Long
 

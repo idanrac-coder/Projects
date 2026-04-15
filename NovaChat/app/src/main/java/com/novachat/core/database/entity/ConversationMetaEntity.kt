@@ -9,14 +9,17 @@ import androidx.room.PrimaryKey
     indices = [
         Index(value = ["isPinned"]),
         Index(value = ["isArchived"]),
-        Index(value = ["isMuted"])
+        Index(value = ["isMuted"]),
+        Index(value = ["muteUntil"]),
+        Index(value = ["isFavorite"]),
+        Index(value = ["isLocked"])
     ]
 )
 data class ConversationMetaEntity(
     @PrimaryKey
     val threadId: Long,
     val isPinned: Boolean = false,
-    val isMuted: Boolean = false,
+    val isMuted: Boolean = false,  // legacy — kept for schema compat; use muteUntil instead
     val isArchived: Boolean = false,
     val isDeleted: Boolean = false,
     val customNotificationSound: String? = null,
@@ -28,5 +31,8 @@ data class ConversationMetaEntity(
     val autoDeleteAfterMs: Long? = null,
     val customCategory: String? = null,
     val lastReadTimestamp: Long? = null,
-    val lastReadMessageCount: Int? = null
+    val lastReadMessageCount: Int? = null,
+    val muteUntil: Long? = null,       // null = not muted, Long.MAX_VALUE = forever, else expiry timestamp
+    val isFavorite: Boolean = false,
+    val isLocked: Boolean = false
 )

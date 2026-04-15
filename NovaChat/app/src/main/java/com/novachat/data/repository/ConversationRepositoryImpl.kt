@@ -99,12 +99,15 @@ class ConversationRepositoryImpl @Inject constructor(
                 if (meta != null) {
                     conversation.copy(
                         isPinned = meta.isPinned,
-                        isMuted = meta.isMuted,
+                        isMuted = meta.muteUntil?.let { System.currentTimeMillis() < it } ?: meta.isMuted,
                         isArchived = meta.isArchived,
                         category = category,
                         customCategory = meta.customCategory,
                         customThemeId = meta.customThemeId,
-                        unreadCount = effectiveUnread
+                        unreadCount = effectiveUnread,
+                        muteUntil = meta.muteUntil,
+                        isFavorite = meta.isFavorite,
+                        isLocked = meta.isLocked
                     )
                 } else {
                     conversation.copy(category = category)
@@ -146,11 +149,14 @@ class ConversationRepositoryImpl @Inject constructor(
                 val meta = archivedMetas.find { it.threadId == conversation.threadId }
                 conversation.copy(
                     isPinned = meta?.isPinned ?: false,
-                    isMuted = meta?.isMuted ?: false,
+                    isMuted = meta?.muteUntil?.let { System.currentTimeMillis() < it } ?: (meta?.isMuted ?: false),
                     isArchived = true,
                     category = categorize(conversation),
                     customCategory = meta?.customCategory,
-                    customThemeId = meta?.customThemeId
+                    customThemeId = meta?.customThemeId,
+                    muteUntil = meta?.muteUntil,
+                    isFavorite = meta?.isFavorite ?: false,
+                    isLocked = meta?.isLocked ?: false
                 )
             }
             .sortedByDescending { it.timestamp }
@@ -226,6 +232,27 @@ class ConversationRepositoryImpl @Inject constructor(
     override suspend fun muteConversation(threadId: Long, muted: Boolean) {
         ensureMetaExists(threadId)
         conversationMetaDao.setMuted(threadId, muted)
+    }
+
+    override suspend fun muteConversationUntil(threadId: Long, muteUntil: Long?) {
+        ensureMetaExists(threadId)
+        conversationMetaDao.setMuteUntil(threadId, muteUntil)
+    }
+
+    override suspend fun isConversationMuted(threadId: Long): Boolean {
+        val meta = conversationMetaDao.getMetaForThread(threadId) ?: return false
+        val muteUntil = meta.muteUntil
+        return if (muteUntil != null) System.currentTimeMillis() < muteUntil else meta.isMuted
+    }
+
+    override suspend fun setConversationFavorite(threadId: Long, favorite: Boolean) {
+        ensureMetaExists(threadId)
+        conversationMetaDao.setFavorite(threadId, favorite)
+    }
+
+    override suspend fun setConversationLocked(threadId: Long, locked: Boolean) {
+        ensureMetaExists(threadId)
+        conversationMetaDao.setLocked(threadId, locked)
     }
 
     override suspend fun sendSms(address: String, body: String): Result<Unit> {

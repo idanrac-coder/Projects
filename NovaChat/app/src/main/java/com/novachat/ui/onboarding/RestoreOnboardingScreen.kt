@@ -57,7 +57,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun RestoreOnboardingScreen(
-    onSkip: () -> Unit
+    onSkip: () -> Unit,
+    onRestoreComplete: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -99,7 +100,7 @@ fun RestoreOnboardingScreen(
                             isRestoring = false
                             if (success) {
                                 Toast.makeText(context, "Restore successful. Restarting...", Toast.LENGTH_SHORT).show()
-                                restartApp(context)
+                                onRestoreComplete()
                             } else {
                                 Toast.makeText(context, "Restore failed. The backup file may be invalid.", Toast.LENGTH_LONG).show()
                             }

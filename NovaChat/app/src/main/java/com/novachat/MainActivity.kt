@@ -38,6 +38,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import com.novachat.core.billing.LicenseManager
 import com.novachat.core.datastore.UserPreferencesRepository
 import com.novachat.core.sms.BubbleNotificationHelper
@@ -51,6 +53,7 @@ import com.novachat.domain.model.NovaChatTheme
 import com.novachat.domain.repository.ConversationRepository
 import com.novachat.domain.repository.ThemeRepository
 import com.novachat.ui.navigation.ChatRoute
+import com.novachat.core.backup.restartApp
 import com.novachat.ui.navigation.NovaChatNavHost
 import com.novachat.ui.onboarding.RestoreOnboardingScreen
 import com.google.android.play.core.review.ReviewManagerFactory
@@ -136,6 +139,14 @@ class MainActivity : ComponentActivity() {
             provider.remove()
         }
         enableEdgeToEdge()
+
+        // Restore saved locale on every launch
+        lifecycleScope.launch {
+            val savedLanguage = userPreferencesRepository.appLanguage.first()
+            val localeList = if (savedLanguage.isEmpty()) LocaleListCompat.getEmptyLocaleList()
+            else LocaleListCompat.forLanguageTags(savedLanguage)
+            AppCompatDelegate.setApplicationLocales(localeList)
+        }
 
         hasPermissions = requiredPermissions
             .all { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
@@ -234,6 +245,12 @@ class MainActivity : ComponentActivity() {
                                 scope.launch {
                                     userPreferencesRepository.setFirstLaunchComplete()
                                 }
+                            },
+                            onRestoreComplete = {
+                                scope.launch {
+                                    userPreferencesRepository.setFirstLaunchComplete()
+                                    restartApp(this@MainActivity)
+                                }
                             }
                         )
                     } else {
@@ -261,12 +278,19 @@ class MainActivity : ComponentActivity() {
 
                         val isPremiumState by licenseManager.isPremium
                             .collectAsStateWithLifecycle(initialValue = false)
+                        val hasPremiumAccess by licenseManager.hasPremiumAccess
+                            .collectAsStateWithLifecycle(initialValue = false)
+                        val trialState by licenseManager.trialState
+                            .collectAsStateWithLifecycle(initialValue = com.novachat.core.billing.TrialState.NOT_STARTED)
                         val financialOnboardingComplete by userPreferencesRepository.financialOnboardingComplete
                             .collectAsStateWithLifecycle(initialValue = false)
 
                         NovaChatNavHost(
                             navController = navController,
                             isPremium = isPremiumState,
+                            hasPremiumAccess = hasPremiumAccess,
+                            trialState = trialState,
+                            onStartTrial = { scope.launch { licenseManager.startTrial() } },
                             financialOnboardingComplete = financialOnboardingComplete
                         )
                     }

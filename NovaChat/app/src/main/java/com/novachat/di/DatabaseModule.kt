@@ -26,6 +26,19 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+val MIGRATION_17_18 = object : Migration(17, 18) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        // Per-sender mute with duration (replaces boolean isMuted)
+        db.execSQL("ALTER TABLE conversation_meta ADD COLUMN muteUntil INTEGER")
+        // Migrate existing muted conversations to muted-forever
+        db.execSQL("UPDATE conversation_meta SET muteUntil = 9223372036854775807 WHERE isMuted = 1")
+        // Inbox filter: Favorites
+        db.execSQL("ALTER TABLE conversation_meta ADD COLUMN isFavorite INTEGER NOT NULL DEFAULT 0")
+        // Inbox filter: Locked chats
+        db.execSQL("ALTER TABLE conversation_meta ADD COLUMN isLocked INTEGER NOT NULL DEFAULT 0")
+    }
+}
+
 val MIGRATION_15_16 = object : Migration(15, 16) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("""
@@ -302,7 +315,7 @@ object DatabaseModule {
             context,
             NovaChatDatabase::class.java,
             "novachat.db"
-        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17).build()
+        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17, MIGRATION_17_18).build()
     }
 
     @Provides

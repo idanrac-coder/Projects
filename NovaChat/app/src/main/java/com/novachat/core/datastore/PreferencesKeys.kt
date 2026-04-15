@@ -38,4 +38,6 @@ object PreferencesKeys {
     val FINANCIAL_LAST_PARSED_SMS_ID = longPreferencesKey("financial_last_parsed_sms_id")
     val FINANCIAL_PRIMARY_CURRENCY = stringPreferencesKey("financial_primary_currency")
     val FINANCIAL_ONBOARDING_COMPLETE = booleanPreferencesKey("financial_onboarding_complete")
+    val TRIAL_START_TIME = longPreferencesKey("trial_start_time")
+    val APP_LANGUAGE = stringPreferencesKey("app_language")
 }

@@ -211,4 +211,25 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun setFinancialOnboardingComplete(complete: Boolean) {
         dataStore.edit { it[PreferencesKeys.FINANCIAL_ONBOARDING_COMPLETE] = complete }
     }
+
+    val trialStartTime: Flow<Long> = dataStore.data.map { prefs ->
+        prefs[PreferencesKeys.TRIAL_START_TIME] ?: 0L
+    }
+
+    suspend fun startTrial() {
+        dataStore.edit { prefs ->
+            if (prefs[PreferencesKeys.TRIAL_START_TIME] == null || prefs[PreferencesKeys.TRIAL_START_TIME] == 0L) {
+                prefs[PreferencesKeys.TRIAL_START_TIME] = System.currentTimeMillis()
+            }
+        }
+    }
+
+    // "" means follow system default; "en" = English; "he" = Hebrew
+    val appLanguage: Flow<String> = dataStore.data.map { prefs ->
+        prefs[PreferencesKeys.APP_LANGUAGE] ?: ""
+    }
+
+    suspend fun setAppLanguage(languageTag: String) {
+        dataStore.edit { it[PreferencesKeys.APP_LANGUAGE] = languageTag }
+    }
 }

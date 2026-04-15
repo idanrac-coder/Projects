@@ -2,6 +2,7 @@ package com.novachat.ui.themes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.novachat.core.billing.LicenseManager
 import com.novachat.core.datastore.UserPreferencesRepository
 import com.novachat.domain.model.BubbleShape
 import com.novachat.domain.model.NovaChatTheme
@@ -26,14 +27,15 @@ data class ThemesUiState(
 @HiltViewModel
 class ThemesViewModel @Inject constructor(
     private val themeRepository: ThemeRepository,
-    private val preferencesRepository: UserPreferencesRepository
+    private val preferencesRepository: UserPreferencesRepository,
+    private val licenseManager: LicenseManager
 ) : ViewModel() {
 
     val uiState: StateFlow<ThemesUiState> = combine(
         themeRepository.getBuiltInThemes(),
         themeRepository.getCustomThemes(),
         preferencesRepository.activeThemeId,
-        preferencesRepository.isPremium,
+        licenseManager.hasPremiumAccess,
         combine(
             preferencesRepository.activeBubbleShape,
             preferencesRepository.themeMode

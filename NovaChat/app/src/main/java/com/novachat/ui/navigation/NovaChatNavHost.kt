@@ -56,7 +56,11 @@ import com.novachat.ui.financial.FinancialDashboardScreen
 import com.novachat.ui.financial.FinancialOnboardingScreen
 import com.novachat.ui.financial.FinancialSettingsScreen
 import com.novachat.ui.financial.SubscriptionListScreen
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import com.novachat.core.billing.TrialState
 import com.novachat.ui.license.LicenseScreen
+import com.novachat.ui.license.TrialOfferDialog
 import com.novachat.ui.media.MediaGalleryScreen
 import com.novachat.ui.pinned.PinnedMessagesScreen
 import com.novachat.ui.notifications.NotificationProfilesScreen
@@ -75,9 +79,46 @@ import com.novachat.ui.themes.ThemesScreen
 fun NovaChatNavHost(
     navController: NavHostController,
     isPremium: Boolean = false,
+    hasPremiumAccess: Boolean = false,
+    trialState: TrialState = TrialState.NOT_STARTED,
+    onStartTrial: () -> Unit = {},
     financialOnboardingComplete: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    var showTrialDialog by remember { mutableStateOf(false) }
+    var pendingPremiumAction by remember { mutableStateOf<(() -> Unit)?>(null) }
+
+    if (showTrialDialog) {
+        TrialOfferDialog(
+            onStartTrial = {
+                showTrialDialog = false
+                onStartTrial()
+                pendingPremiumAction?.invoke()
+                pendingPremiumAction = null
+            },
+            onViewPlans = {
+                showTrialDialog = false
+                pendingPremiumAction = null
+                navController.navigate(LicenseRoute)
+            },
+            onDismiss = {
+                showTrialDialog = false
+                pendingPremiumAction = null
+            }
+        )
+    }
+
+    fun navigateToPremiumGate(onGranted: () -> Unit) {
+        when {
+            hasPremiumAccess -> onGranted()
+            trialState == TrialState.NOT_STARTED -> {
+                pendingPremiumAction = onGranted
+                showTrialDialog = true
+            }
+            else -> navController.navigate(LicenseRoute)
+        }
+    }
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -132,15 +173,13 @@ fun NovaChatNavHost(
                             selected = selected,
                             onClick = {
                                 if (dest == TopLevelDestination.FINANCIAL) {
-                                    val target = when {
-                                        !isPremium -> LicenseRoute
-                                        !financialOnboardingComplete -> FinancialOnboardingRoute
-                                        else -> FinancialDashboardRoute
-                                    }
-                                    navController.navigate(target) {
-                                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                        launchSingleTop = true
-                                        restoreState = true
+                                    navigateToPremiumGate {
+                                        val target = if (!financialOnboardingComplete) FinancialOnboardingRoute else FinancialDashboardRoute
+                                        navController.navigate(target) {
+                                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
                                     }
                                 } else {
                                     navController.navigate(dest.route) {
@@ -191,7 +230,8 @@ fun NovaChatNavHost(
                     },
                     onComposeClick = { navController.navigate(ComposeMessageRoute()) },
                     onSearchClick = { navController.navigate(SearchRoute) },
-                    onNavigateToPremium = { navController.navigate(LicenseRoute) }
+                    onNavigateToPremium = { navController.navigate(LicenseRoute) },
+                    onNavigateToArchived = { navController.navigate(ArchivedConversationsRoute) }
                 )
             }
 
@@ -251,12 +291,10 @@ fun NovaChatNavHost(
                     onSmartSecureClick = { navController.navigate(SmartSecureRoute) },
                     onMessagingSettingsClick = { navController.navigate(MessagingSettingsRoute) },
                     onFinancialIntelligenceClick = {
-                        val target = when {
-                            !isPremium -> LicenseRoute
-                            !financialOnboardingComplete -> FinancialOnboardingRoute
-                            else -> FinancialSettingsRoute
+                        navigateToPremiumGate {
+                            val target = if (!financialOnboardingComplete) FinancialOnboardingRoute else FinancialSettingsRoute
+                            navController.navigate(target)
                         }
-                        navController.navigate(target)
                     }
                 )
             }
