@@ -19,6 +19,9 @@ interface MerchantDao {
     @Query("SELECT * FROM merchants WHERE name = :name LIMIT 1")
     suspend fun getByName(name: String): MerchantEntity?
 
+    @Query("UPDATE merchants SET category = :category WHERE name = :name")
+    suspend fun updateCategory(name: String, category: String)
+
     @Query("DELETE FROM merchants")
     suspend fun deleteAll()
 }

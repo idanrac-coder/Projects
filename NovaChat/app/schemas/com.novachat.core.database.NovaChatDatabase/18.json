@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 18,
-    "identityHash": "6e314334452d9208da7c141135c453ee",
+    "identityHash": "d61c7c79fe0f30a4344988652fbfb56f",
     "entities": [
       {
         "tableName": "block_rules",
@@ -264,7 +264,7 @@
       },
       {
         "tableName": "conversation_meta",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`threadId` INTEGER NOT NULL, `isPinned` INTEGER NOT NULL, `isMuted` INTEGER NOT NULL, `isArchived` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `customNotificationSound` TEXT, `customVibration` INTEGER, `customLedColor` INTEGER, `priorityLevel` TEXT, `bubbleEnabled` INTEGER, `customThemeId` INTEGER, `autoDeleteAfterMs` INTEGER, `customCategory` TEXT, `lastReadTimestamp` INTEGER, `lastReadMessageCount` INTEGER, `muteUntil` INTEGER, `isFavorite` INTEGER NOT NULL, `isLocked` INTEGER NOT NULL, PRIMARY KEY(`threadId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`threadId` INTEGER NOT NULL, `isPinned` INTEGER NOT NULL, `isMuted` INTEGER NOT NULL, `isArchived` INTEGER NOT NULL, `isDeleted` INTEGER NOT NULL, `customNotificationSound` TEXT, `customVibration` INTEGER, `customLedColor` INTEGER, `priorityLevel` TEXT, `bubbleEnabled` INTEGER, `customThemeId` INTEGER, `autoDeleteAfterMs` INTEGER, `customCategory` TEXT, `lastReadTimestamp` INTEGER, `lastReadMessageCount` INTEGER, `muteUntil` INTEGER, `isFavorite` INTEGER NOT NULL DEFAULT 0, `isLocked` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`threadId`))",
         "fields": [
           {
             "fieldPath": "threadId",
@@ -366,13 +366,15 @@
             "fieldPath": "isFavorite",
             "columnName": "isFavorite",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": true,
+            "defaultValue": "0"
           },
           {
             "fieldPath": "isLocked",
             "columnName": "isLocked",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": true,
+            "defaultValue": "0"
           }
         ],
         "primaryKey": {
@@ -1199,7 +1201,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6e314334452d9208da7c141135c453ee')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd61c7c79fe0f30a4344988652fbfb56f')"
     ]
   }
 }

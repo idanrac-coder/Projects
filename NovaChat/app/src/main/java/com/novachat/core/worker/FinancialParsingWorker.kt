@@ -112,7 +112,7 @@ class FinancialParsingWorker @AssistedInject constructor(
                 val body = cursor.getString(bodyIdx) ?: continue
                 val date = cursor.getLong(dateIdx)
 
-                financialSmsParser.parse(smsId, address, body, date)
+                financialSmsParser.parse(smsId, address, body, date, suppressAlerts = true)
                 yield()
             }
         }

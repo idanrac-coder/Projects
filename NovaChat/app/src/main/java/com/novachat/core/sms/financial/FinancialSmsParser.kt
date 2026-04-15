@@ -33,7 +33,7 @@ class FinancialSmsParser @Inject constructor(
         parse(smsId, address, body, timestamp)
     }
 
-    suspend fun parse(smsId: Long, address: String, body: String, timestamp: Long) {
+    suspend fun parse(smsId: Long, address: String, body: String, timestamp: Long, suppressAlerts: Boolean = false) {
         // Step 1: Duplicate check — skip if already processed
         if (transactionDao.existsBySmsId(smsId)) return
 
@@ -84,9 +84,13 @@ class FinancialSmsParser @Inject constructor(
             }
         }
 
-        // Classify category
+        // Classify category — check existing merchant's stored category first (respects user overrides)
+        val existingMerchant = merchantName?.let { merchantDao.getByName(it) }
         val isRecurring = false // Will be updated by recurrence detector
-        val category = categoryClassifier.classify(
+        val category = existingMerchant?.category?.let {
+            try { FinancialCategory.valueOf(it) } catch (_: Exception) { null }
+        } ?: categoryClassifier.classify(
+            merchantName = merchantName,
             isRecurring = isRecurring,
             hasDueDate = regexData.hasDueDate,
             hasPaymentKeyword = regexData.hasPaymentKeyword,
@@ -118,9 +122,9 @@ class FinancialSmsParser @Inject constructor(
         val insertedId = transactionDao.insert(entity)
         if (insertedId == -1L) return // Duplicate smsId
 
-        // Update merchant stats
+        // Update merchant stats (reuse already-fetched existingMerchant to avoid double lookup)
         if (merchantName != null) {
-            val merchant = merchantDao.getByName(merchantName)
+            val merchant = existingMerchant
             if (merchant != null) {
                 val newCount = merchant.transactionCount + 1
                 val newAvg = ((merchant.averageAmount * merchant.transactionCount) + amount) / newCount
@@ -128,7 +132,7 @@ class FinancialSmsParser @Inject constructor(
                     averageAmount = newAvg,
                     transactionCount = newCount,
                     lastSeenTimestamp = timestamp,
-                    category = merchant.category ?: category.name
+                    category = category.name
                 ))
             } else {
                 merchantDao.insert(
@@ -159,10 +163,12 @@ class FinancialSmsParser @Inject constructor(
             checkForeignConversion(insertedId, merchantName, amount, currency, timestamp)
         }
 
-        // Run anomaly detection (if alerts enabled for this sender)
-        val sender = senderDao.getByAddress(address)
-        if (sender?.alertsEnabled != false) {
-            anomalyDetector.evaluate(entity.copy(id = insertedId))
+        // Run anomaly detection (if alerts enabled for this sender, and not during initial scan)
+        if (!suppressAlerts) {
+            val sender = senderDao.getByAddress(address)
+            if (sender?.alertsEnabled != false) {
+                anomalyDetector.evaluate(entity.copy(id = insertedId))
+            }
         }
     }
 

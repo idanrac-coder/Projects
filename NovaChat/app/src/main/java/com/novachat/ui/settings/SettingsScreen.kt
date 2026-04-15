@@ -204,7 +204,7 @@ fun SettingsScreen(
                     SettingsDivider()
                     SettingsItem(
                         icon = Icons.Default.Translate,
-                        title = "Language",
+                        title = "App Language",
                         subtitle = when (appLanguage) {
                             "he" -> "Hebrew"
                             "en" -> "English"
@@ -536,7 +536,7 @@ private fun LanguagePickerDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Language", fontWeight = FontWeight.SemiBold) },
+        title = { Text("App Language", fontWeight = FontWeight.SemiBold) },
         text = {
             Column {
                 LANGUAGE_OPTIONS.forEach { (tag, label) ->

@@ -36,6 +36,10 @@ val MIGRATION_17_18 = object : Migration(17, 18) {
         db.execSQL("ALTER TABLE conversation_meta ADD COLUMN isFavorite INTEGER NOT NULL DEFAULT 0")
         // Inbox filter: Locked chats
         db.execSQL("ALTER TABLE conversation_meta ADD COLUMN isLocked INTEGER NOT NULL DEFAULT 0")
+        // Indices for new columns and muteUntil
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_conversation_meta_muteUntil ON conversation_meta(muteUntil)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_conversation_meta_isFavorite ON conversation_meta(isFavorite)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_conversation_meta_isLocked ON conversation_meta(isLocked)")
     }
 }
 

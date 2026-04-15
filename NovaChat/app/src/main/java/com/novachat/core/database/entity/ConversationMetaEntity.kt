@@ -1,5 +1,6 @@
 package com.novachat.core.database.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -33,6 +34,6 @@ data class ConversationMetaEntity(
     val lastReadTimestamp: Long? = null,
     val lastReadMessageCount: Int? = null,
     val muteUntil: Long? = null,       // null = not muted, Long.MAX_VALUE = forever, else expiry timestamp
-    val isFavorite: Boolean = false,
-    val isLocked: Boolean = false
+    @ColumnInfo(defaultValue = "0") val isFavorite: Boolean = false,
+    @ColumnInfo(defaultValue = "0") val isLocked: Boolean = false
 )

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -71,7 +72,9 @@ private fun AlertBannerCard(
     Surface(
         shape = RoundedCornerShape(12.dp),
         color = color.copy(alpha = 0.12f),
-        modifier = androidx.compose.ui.Modifier.padding(vertical = 4.dp)
+        modifier = Modifier
+            .padding(vertical = 4.dp)
+            .widthIn(min = 240.dp)
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
