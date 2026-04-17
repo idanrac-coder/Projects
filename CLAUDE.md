@@ -69,8 +69,10 @@ Routes are defined as `@Serializable` objects/data classes in `ui/navigation/Nav
 
 ### Database
 
-- **Main DB:** Room (`NovaChatDatabase`, version 17). Uses both `autoMigrations` and manual `Migration` objects. Always add a migration when changing the schema — never bump version without one.
-- **Financial DB:** Separate SQLCipher-encrypted database. The passphrase is stored in Android Keystore via `FinancialKeyManager`. Never store the passphrase anywhere else.
+- **Main DB:** Room (`NovaChatDatabase`, version 18). Uses both `autoMigrations` and manual `Migration` objects. Always add a migration when changing the schema — never bump version without one.
+- **Financial DB:** Separate SQLCipher-encrypted database (sqlcipher-android 4.14.1). The passphrase is stored in Android Keystore via `FinancialKeyManager`. Never store the passphrase anywhere else.
+
+**SQLCipher critical:** `System.loadLibrary("sqlcipher")` must be called in `FinancialModule` before opening the database. The `cipher_page_size` pragma (`PRAGMA cipher_page_size = 4096`) must run in `postKey` (after key is set), **not** `preKey`. ProGuard rules must keep `net.zetetic.database.sqlcipher.**` or R8 will strip the native bridge and crash at runtime.
 
 ### Spam detection pipeline
 
@@ -83,4 +85,30 @@ Routes are defined as `@Serializable` objects/data classes in `ui/navigation/Nav
 
 ### Financial Intelligence
 
-Premium feature (`core/sms/financial/`). Parses SMS from Israeli and US banks into structured `FinancialTransaction` entities stored in the encrypted DB. Uses ML Kit Entity Extraction + regex. Gated behind `LicenseManager.isPremium` and a one-time onboarding flow (`FinancialOnboardingRoute`).
+Premium feature (`core/sms/financial/`). Parses SMS from Israeli and US banks into structured `FinancialTransaction` entities stored in the encrypted DB. Uses ML Kit Entity Extraction + regex. Gated behind `LicenseManager.isPremium` (or active trial) and a one-time onboarding flow (`FinancialOnboardingRoute`).
+
+Key behaviors:
+- **Provider opt-in:** Users select which senders to parse during onboarding (`FinancialOnboardingScreen`). Disabled/removed senders are excluded from the dashboard queries — filter at the DAO level, not in the UI.
+- **Duplicate prevention:** `FinancialTransactionDao` enforces uniqueness; `FinancialSmsParser` checks before insert on repeated inbox scans.
+- **Month filtering:** `FinancialDashboardViewModel` scopes recent transactions to the currently viewed month. `FinancialParsingWorker` respects this scope.
+- **Parser coverage:** `RegexParsingEngine` handles Isracard, AMEX, and Cal SMS formats in addition to the standard Israeli/US bank formats.
+
+### Licensing & Trial
+
+`LicenseManager` (`core/billing/`) manages premium access with a **21-day free trial**:
+- `TrialState`: `NOT_STARTED` → `ACTIVE` → `EXPIRED`
+- `startTrial()` records `trialStartTime` in DataStore and schedules `TrialExpiryWorker`.
+- `hasPremiumAccess` is `true` when either `isPremium` or `trialState == ACTIVE`.
+- `TrialOfferDialog` is shown to eligible users; `LicenseScreen` displays days remaining.
+
+### Conversation inbox filters
+
+`MessageCategory` enum (`domain/model/`) provides four inbox filter tabs: `ALL`, `CONTACTS`, `UNREAD`, `FAVORITES`. `ConversationsViewModel` exposes the active category and filters the conversation list accordingly.
+
+### Conversation mute
+
+`ConversationContextMenu` (`ui/components/`) includes a mute option that opens `MuteDurationPicker`. Mute state is persisted on `ConversationMetaEntity`. `SmsNotificationHandler` checks mute state before posting notifications.
+
+### Localization
+
+The app supports English and Hebrew (`iw`/`he`). Per-app language selection is available via `SettingsScreen` (options: system default, English, Hebrew). The locale config is declared in `res/xml/locales_config.xml` and referenced in `AndroidManifest.xml`. AppCompat auto-persists the locale for API < 33.
