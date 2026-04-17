@@ -718,7 +718,9 @@
     <string name="transaction_singular">עסקה</string>
     <string name="transactions_plural">עסקאות</string>
 
-    <!-- Spending Velocity Card -->
+    <!-- Spending Velocity Card / Chart -->
+    <string name="daily_spending">הוצאות יומיות</string>
+    <string name="spending_velocity">קצב הוצאות</string>
     <string name="spending_pace">קצב הוצאות</string>
     <string name="daily_rate_label">שיעור יומי</string>
     <string name="projected_total">סה"כ צפוי</string>

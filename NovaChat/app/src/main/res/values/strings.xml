@@ -718,7 +718,9 @@
     <string name="transaction_singular">transaction</string>
     <string name="transactions_plural">transactions</string>
 
-    <!-- Spending Velocity Card -->
+    <!-- Spending Velocity Card / Chart -->
+    <string name="daily_spending">Daily Spending</string>
+    <string name="spending_velocity">Spending Velocity</string>
     <string name="spending_pace">Spending Pace</string>
     <string name="daily_rate_label">Daily rate</string>
     <string name="projected_total">Projected total</string>

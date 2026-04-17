@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
@@ -20,7 +19,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,6 +35,9 @@ import androidx.compose.ui.unit.dp
 import com.novachat.R
 import com.novachat.core.sms.financial.FinancialCategory
 import com.novachat.domain.model.TransactionInfo
+import com.novachat.ui.financial.FinancialRed
+import com.novachat.ui.financial.FinancialTextPrimary
+import com.novachat.ui.financial.FinancialTextSecondary
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -56,7 +57,7 @@ fun TransactionItem(
 ) {
     val firstLetter = (transaction.merchantName ?: "?").first().uppercase()
     val avatarColor = AVATAR_COLORS[firstLetter.hashCode().mod(AVATAR_COLORS.size).let { if (it < 0) it + AVATAR_COLORS.size else it }]
-    val dateStr = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault()).format(Date(transaction.timestamp))
+    val dateStr = SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(transaction.timestamp))
 
     val categoryColor = try {
         CATEGORY_COLORS[FinancialCategory.valueOf(transaction.category)] ?: Color.Gray
@@ -88,16 +89,17 @@ fun TransactionItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // Rounded-square avatar with dark-tinted background (matches mockup tx-icon)
             Box(
                 modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(avatarColor),
+                    .size(38.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(avatarColor.copy(alpha = 0.20f)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = firstLetter,
-                    color = Color.White,
+                    color = avatarColor,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium
                 )
@@ -106,48 +108,23 @@ fun TransactionItem(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = transaction.merchantName ?: stringResource(R.string.unknown_merchant),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = FinancialTextPrimary
                 )
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Surface(
-                        shape = RoundedCornerShape(4.dp),
-                        color = categoryColor.copy(alpha = 0.15f)
-                    ) {
-                        Text(
-                            text = transaction.category.lowercase().replaceFirstChar { it.uppercase() },
-                            style = MaterialTheme.typography.labelSmall,
-                            color = categoryColor,
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                        )
-                    }
-                    Text(
-                        text = dateStr,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    if (transaction.cardLast4 != null) {
-                        Surface(
-                            shape = RoundedCornerShape(4.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant
-                        ) {
-                            Text(
-                                text = "*${transaction.cardLast4}",
-                                style = MaterialTheme.typography.labelSmall,
-                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
-                            )
-                        }
-                    }
-                }
+                Text(
+                    text = "$dateStr · ${transaction.category.lowercase().replaceFirstChar { it.uppercase() }}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = FinancialTextSecondary
+                )
             }
 
+            // All parsed transactions are expenses — show negative in red like the mockup
             Text(
-                text = "${currencySymbol(transaction.currency)}${"%.2f".format(transaction.amount)}",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold
+                text = "-${currencySymbol(transaction.currency)}${"%.2f".format(transaction.amount)}",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = FinancialRed
             )
         }
 

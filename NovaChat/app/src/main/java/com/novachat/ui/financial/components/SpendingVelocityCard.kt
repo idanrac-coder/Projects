@@ -1,5 +1,8 @@
 package com.novachat.ui.financial.components
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,19 +12,26 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.novachat.R
 import com.novachat.domain.model.SpendingVelocity
+import com.novachat.ui.financial.FinancialAccent
+import com.novachat.ui.financial.FinancialAccentLight
+import com.novachat.ui.financial.FinancialAmber
+import com.novachat.ui.financial.FinancialCard
+import com.novachat.ui.financial.FinancialDivider
+import com.novachat.ui.financial.FinancialTextPrimary
+import com.novachat.ui.financial.FinancialTextSecondary
 
 @Composable
 fun SpendingVelocityCard(
@@ -29,83 +39,93 @@ fun SpendingVelocityCard(
     modifier: Modifier = Modifier
 ) {
     val symbol = currencySymbol(velocity.currency)
-    val progress = if (velocity.projectedMonthTotal > 0)
+    val targetProgress = if (velocity.projectedMonthTotal > 0)
         (velocity.dailyRate * velocity.daysElapsed / velocity.projectedMonthTotal).toFloat().coerceIn(0f, 1f)
     else 0f
 
+    val animatedProgress by animateFloatAsState(
+        targetValue = targetProgress,
+        animationSpec = tween(900, easing = FastOutSlowInEasing),
+        label = "velocityProgress"
+    )
+
     val daysLeft = velocity.daysInMonth - velocity.daysElapsed
-    val trackColor = MaterialTheme.colorScheme.surfaceVariant
-    val fillColor = Color(0xFF26A69A)
 
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors()
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(FinancialCard)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+        Text(
+            text = stringResource(R.string.spending_velocity),
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold,
+            color = FinancialTextPrimary
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                text = stringResource(R.string.spending_pace),
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column {
-                    Text(
-                        text = stringResource(R.string.daily_rate_label),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = "~$symbol${"%.2f".format(velocity.dailyRate)}/day",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-                Column(horizontalAlignment = androidx.compose.ui.Alignment.End) {
-                    Text(
-                        text = stringResource(R.string.projected_total),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = "$symbol${"%.2f".format(velocity.projectedMonthTotal)}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            }
-
-            // Progress bar
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(6.dp)
-                    .clip(RoundedCornerShape(3.dp))
-                    .background(trackColor)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(progress)
-                        .height(6.dp)
-                        .clip(RoundedCornerShape(3.dp))
-                        .background(fillColor)
+            Column {
+                Text(
+                    text = stringResource(R.string.daily_rate_label),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = FinancialTextSecondary
+                )
+                Text(
+                    text = "~$symbol${"%.2f".format(velocity.dailyRate)}/day",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = FinancialTextPrimary
                 )
             }
+            Column(horizontalAlignment = androidx.compose.ui.Alignment.End) {
+                Text(
+                    text = stringResource(R.string.projected_total),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = FinancialTextSecondary
+                )
+                Text(
+                    text = "$symbol${"%.2f".format(velocity.projectedMonthTotal)}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = FinancialAmber
+                )
+            }
+        }
 
-            val daysRemainingStr = if (daysLeft != 1) stringResource(R.string.days_remaining_plural_fmt, daysLeft) else stringResource(R.string.day_remaining_singular)
-            Text(
-                text = "${velocity.daysElapsed} of ${velocity.daysInMonth} days elapsed · $daysRemainingStr",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+        // Animated progress bar
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(8.dp)
+                .clip(RoundedCornerShape(999.dp))
+                .background(FinancialDivider)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(animatedProgress)
+                    .height(8.dp)
+                    .clip(RoundedCornerShape(999.dp))
+                    .background(
+                        Brush.horizontalGradient(
+                            colors = listOf(FinancialAccent, FinancialAccentLight)
+                        )
+                    )
             )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "Day 1", style = MaterialTheme.typography.labelSmall, color = FinancialTextSecondary)
+            Text(text = "Today (day ${velocity.daysElapsed})", style = MaterialTheme.typography.labelSmall, color = FinancialTextSecondary)
+            Text(text = "Day ${velocity.daysInMonth}", style = MaterialTheme.typography.labelSmall, color = FinancialTextSecondary)
         }
     }
 }
