@@ -16,6 +16,7 @@ import com.novachat.domain.model.DailySpending
 import com.novachat.domain.model.MonthlySummary
 import com.novachat.domain.model.SenderInfo
 import com.novachat.domain.model.SubscriptionInfo
+import com.novachat.domain.model.SubscriptionSummary
 import com.novachat.domain.model.TopMerchant
 import com.novachat.domain.model.TransactionInfo
 import com.novachat.domain.repository.FinancialRepository
@@ -133,6 +134,36 @@ class FinancialRepositoryImpl @Inject constructor(
 
     override suspend fun markSubscriptionInactive(id: Long) =
         subscriptionDao.markInactive(id)
+
+    override fun getSubscriptionsFromCategory(cardLast4: String?): Flow<List<SubscriptionSummary>> =
+        combine(
+            transactionDao.getSubscriptionMerchants(cardLast4),
+            subscriptionDao.getActiveSubscriptions(null),
+            cardDao.getAllCards()
+        ) { merchants, subs, cards ->
+            val cardMap = cards.associate { it.last4 to it.nickname }
+            val subMap = subs.associateBy { "${it.merchantName}|${it.cardLast4}" }
+            merchants.map { m ->
+                val sub = subMap["${m.merchantName}|${m.cardLast4}"]
+                val freq = sub?.frequency ?: "MONTHLY"
+                val freqMs = if (freq == "YEARLY") 365L * 24 * 60 * 60 * 1000
+                             else 30L * 24 * 60 * 60 * 1000
+                SubscriptionSummary(
+                    merchantName = m.merchantName,
+                    amount = m.latestAmount,
+                    currency = m.currency,
+                    lastCharged = m.lastCharged,
+                    cardLast4 = m.cardLast4,
+                    cardNickname = m.cardLast4?.let { cardMap[it] },
+                    previousAmount = sub?.previousAmount,
+                    frequency = freq,
+                    nextChargeEstimate = m.lastCharged + freqMs
+                )
+            }
+        }.flowOn(Dispatchers.IO)
+
+    override fun getSubscriptionTotalFromCategory(cardLast4: String?): Flow<Double> =
+        transactionDao.getSubscriptionTotalByCategory(cardLast4)
 
     override fun getActiveAlerts(): Flow<List<AlertInfo>> =
         alertDao.getActiveAlerts().map { alerts ->

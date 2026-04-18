@@ -548,7 +548,7 @@
     <string name="subscriptions">Subscriptions</string>
     <string name="subscriptions_total_label">Monthly Subscription Total:</string>
     <string name="subscriptions_active_suffix">active subscriptions</string>
-    <string name="subscriptions_footer_hint">Swipe left to mark inactive</string>
+    <string name="subscriptions_footer_hint">Change a transaction\'s category to \"Subscription\" to have it appear here</string>
 
     <!-- Financial Onboarding -->
     <string name="financial_onboarding_badge">Premium Feature</string>

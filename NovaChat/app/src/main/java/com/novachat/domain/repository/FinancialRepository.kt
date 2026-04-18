@@ -7,6 +7,7 @@ import com.novachat.domain.model.DailySpending
 import com.novachat.domain.model.MonthlySummary
 import com.novachat.domain.model.SenderInfo
 import com.novachat.domain.model.SubscriptionInfo
+import com.novachat.domain.model.SubscriptionSummary
 import com.novachat.domain.model.TopMerchant
 import com.novachat.domain.model.TransactionInfo
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +23,9 @@ interface FinancialRepository {
     fun getActiveSubscriptions(cardLast4: String?): Flow<List<SubscriptionInfo>>
     fun getSubscriptionTotal(cardLast4: String?): Flow<Double>
     suspend fun markSubscriptionInactive(id: Long)
+
+    fun getSubscriptionsFromCategory(cardLast4: String?): Flow<List<SubscriptionSummary>>
+    fun getSubscriptionTotalFromCategory(cardLast4: String?): Flow<Double>
 
     fun getActiveAlerts(): Flow<List<AlertInfo>>
     fun getAlertCount(): Flow<Int>

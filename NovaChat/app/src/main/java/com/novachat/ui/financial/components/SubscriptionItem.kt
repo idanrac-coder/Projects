@@ -22,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.novachat.R
-import com.novachat.domain.model.SubscriptionInfo
+import com.novachat.domain.model.SubscriptionSummary
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -32,26 +32,45 @@ private val AVATAR_COLORS = listOf(
     Color(0xFF42A5F5), Color(0xFFAB47BC), Color(0xFFEF5350)
 )
 
+fun currencySymbol(currency: String): String = when (currency.uppercase()) {
+    "ILS" -> "₪"
+    "USD" -> "$"
+    "EUR" -> "€"
+    "GBP" -> "£"
+    else -> currency
+}
+
 @Composable
 fun SubscriptionItem(
-    subscription: SubscriptionInfo,
+    subscription: SubscriptionSummary,
     modifier: Modifier = Modifier
 ) {
     val firstLetter = subscription.merchantName.first().uppercase()
     val avatarColor = AVATAR_COLORS[firstLetter.hashCode().mod(AVATAR_COLORS.size).let { if (it < 0) it + AVATAR_COLORS.size else it }]
-    val dateStr = SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(Date(subscription.lastCharged))
+    val sym = currencySymbol(subscription.currency)
+    val lastChargedStr = SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(Date(subscription.lastCharged))
+    val nextChargeStr = subscription.nextChargeEstimate?.let {
+        val daysUntil = ((it - System.currentTimeMillis()) / (24L * 60 * 60 * 1000)).toInt()
+        when {
+            daysUntil <= 0 -> "Due now"
+            daysUntil == 1 -> "Tomorrow"
+            daysUntil <= 7 -> "In $daysUntil days"
+            else -> "~" + SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(it))
+        }
+    }
     val hasPriceIncrease = subscription.previousAmount != null && subscription.amount > subscription.previousAmount
+    val hasPriceDecrease = subscription.previousAmount != null && subscription.amount < subscription.previousAmount
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp)
+                .size(42.dp)
                 .clip(CircleShape)
                 .background(avatarColor),
             contentAlignment = Alignment.Center
@@ -76,12 +95,16 @@ fun SubscriptionItem(
                     if (subscription.cardLast4 != null) {
                         append(" · *${subscription.cardLast4}")
                     }
+                    subscription.cardNickname?.let { append(" ($it)") }
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "${stringResource(R.string.last_charged_prefix)}$dateStr",
+                text = buildString {
+                    append("${stringResource(R.string.last_charged_prefix)}$lastChargedStr")
+                    if (nextChargeStr != null) append(" · Next: $nextChargeStr")
+                },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -89,35 +112,38 @@ fun SubscriptionItem(
 
         Column(horizontalAlignment = Alignment.End) {
             Text(
-                text = "${currencySymbol(subscription.currency)}${"%.2f".format(subscription.amount)}",
+                text = "$sym${"%.2f".format(subscription.amount)}",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold
             )
-            if (hasPriceIncrease) {
-                val delta = subscription.amount - subscription.previousAmount!!
-                Surface(
-                    shape = RoundedCornerShape(4.dp),
-                    color = Color(0xFFF44336).copy(alpha = 0.12f)
-                ) {
-                    Text(
-                        text = "↑ +${currencySymbol(subscription.currency)}${"%.2f".format(delta)}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color(0xFFF44336),
-                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
-                    )
+            when {
+                hasPriceIncrease -> {
+                    val delta = subscription.amount - subscription.previousAmount!!
+                    Surface(
+                        shape = RoundedCornerShape(4.dp),
+                        color = Color(0xFFF44336).copy(alpha = 0.12f)
+                    ) {
+                        Text(
+                            text = "↑ +$sym${"%.2f".format(delta)}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color(0xFFF44336),
+                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                        )
+                    }
                 }
-            } else if (subscription.previousAmount != null && subscription.amount < subscription.previousAmount) {
-                val delta = subscription.previousAmount - subscription.amount
-                Surface(
-                    shape = RoundedCornerShape(4.dp),
-                    color = Color(0xFF4CAF50).copy(alpha = 0.12f)
-                ) {
-                    Text(
-                        text = "↓ -${currencySymbol(subscription.currency)}${"%.2f".format(delta)}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color(0xFF4CAF50),
-                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
-                    )
+                hasPriceDecrease -> {
+                    val delta = subscription.previousAmount!! - subscription.amount
+                    Surface(
+                        shape = RoundedCornerShape(4.dp),
+                        color = Color(0xFF4CAF50).copy(alpha = 0.12f)
+                    ) {
+                        Text(
+                            text = "↓ -$sym${"%.2f".format(delta)}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color(0xFF4CAF50),
+                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                        )
+                    }
                 }
             }
         }

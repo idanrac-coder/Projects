@@ -99,3 +99,17 @@ data class SpendingVelocity(
     val daysInMonth: Int,
     val currency: String
 )
+
+data class SubscriptionSummary(
+    val merchantName: String,
+    val amount: Double,
+    val currency: String,
+    val lastCharged: Long,
+    val cardLast4: String?,
+    val cardNickname: String?,
+    val previousAmount: Double?,
+    val frequency: String,
+    val nextChargeEstimate: Long?
+)
+
+enum class InsightType { ANNUAL_COST, PRICE_CHANGES, NEXT_RENEWAL, STALE }

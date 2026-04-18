@@ -68,6 +68,37 @@ interface FinancialTransactionDao {
     @Query("SELECT merchantName, COALESCE(SUM(amount), 0.0) as totalSpent, COUNT(*) as txCount FROM financial_transactions WHERE isConversion = 0 AND timestamp BETWEEN :startMs AND :endMs AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4) AND sender NOT IN (SELECT address FROM financial_senders WHERE isEnabled = 0) AND merchantName IS NOT NULL GROUP BY merchantName ORDER BY totalSpent DESC LIMIT :limit")
     fun getTopMerchants(startMs: Long, endMs: Long, cardLast4: String?, limit: Int): Flow<List<MerchantTotal>>
 
+    @Query("""
+        SELECT merchantName,
+               MAX(amount)    AS latestAmount,
+               currency,
+               MAX(timestamp) AS lastCharged,
+               cardLast4
+        FROM financial_transactions
+        WHERE category = 'SUBSCRIPTION'
+          AND isConversion = 0
+          AND sender NOT IN (SELECT address FROM financial_senders WHERE isEnabled = 0)
+          AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4)
+          AND merchantName IS NOT NULL
+        GROUP BY merchantName, cardLast4
+        ORDER BY lastCharged DESC
+    """)
+    fun getSubscriptionMerchants(cardLast4: String?): Flow<List<SubscriptionMerchantSummary>>
+
+    @Query("""
+        SELECT COALESCE(SUM(maxAmt), 0.0) FROM (
+            SELECT MAX(amount) AS maxAmt
+            FROM financial_transactions
+            WHERE category = 'SUBSCRIPTION'
+              AND isConversion = 0
+              AND sender NOT IN (SELECT address FROM financial_senders WHERE isEnabled = 0)
+              AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4)
+              AND merchantName IS NOT NULL
+            GROUP BY merchantName, cardLast4
+        )
+    """)
+    fun getSubscriptionTotalByCategory(cardLast4: String?): Flow<Double>
+
     @Query("DELETE FROM financial_transactions")
     suspend fun deleteAll()
 }
@@ -75,3 +106,10 @@ interface FinancialTransactionDao {
 data class CategoryTotal(val category: String, val total: Double, val count: Int)
 data class DailyTotal(val dayOfMonth: Int, val total: Double)
 data class MerchantTotal(val merchantName: String, val totalSpent: Double, val txCount: Int)
+data class SubscriptionMerchantSummary(
+    val merchantName: String,
+    val latestAmount: Double,
+    val currency: String,
+    val lastCharged: Long,
+    val cardLast4: String?
+)
