@@ -50,6 +50,7 @@ fun MonthlySummaryCard(
     onPreviousMonth: () -> Unit,
     onNextMonth: () -> Unit,
     monthComparison: MonthComparison? = null,
+    skipAnimation: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val monthName = DateFormatSymbols().months[summary.month - 1].replaceFirstChar { it.uppercase() }
@@ -58,16 +59,20 @@ fun MonthlySummaryCard(
         colors = listOf(Color(0xFF2D1B69), Color(0xFF1A0E40))
     )
 
-    // Count-up animation
+    // Count-up animation — skipped on scroll re-entry
     val animatedTotal = remember { Animatable(0f) }
     var prevTotal by remember { mutableFloatStateOf(0f) }
     LaunchedEffect(summary.total) {
         val target = summary.total.toFloat()
         if (target != prevTotal) {
-            animatedTotal.animateTo(
-                targetValue = target,
-                animationSpec = tween(durationMillis = 900, easing = FastOutSlowInEasing)
-            )
+            if (skipAnimation) {
+                animatedTotal.snapTo(target)
+            } else {
+                animatedTotal.animateTo(
+                    targetValue = target,
+                    animationSpec = tween(durationMillis = 900, easing = FastOutSlowInEasing)
+                )
+            }
             prevTotal = target
         }
     }

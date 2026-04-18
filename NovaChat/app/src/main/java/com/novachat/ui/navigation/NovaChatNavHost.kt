@@ -53,6 +53,7 @@ import com.novachat.ui.compose.ComposeMessageScreen
 import com.novachat.ui.conversations.ConversationsScreen
 import com.novachat.ui.financial.AlertsScreen
 import com.novachat.ui.financial.CardManagerScreen
+import com.novachat.ui.financial.CategoryManagementScreen
 import com.novachat.ui.financial.FinancialDashboardScreen
 import com.novachat.ui.financial.FinancialOnboardingScreen
 import com.novachat.ui.financial.FinancialSettingsScreen
@@ -443,7 +444,8 @@ fun NovaChatNavHost(
                 FinancialSettingsScreen(
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateToCardManager = { navController.navigate(CardManagerRoute) },
-                    onNavigateToSetupGuide = { navController.navigate(FinancialOnboardingRoute) }
+                    onNavigateToSetupGuide = { navController.navigate(FinancialOnboardingRoute) },
+                    onNavigateToCategories = { navController.navigate(CategoryManagementRoute) }
                 )
             }
 
@@ -461,6 +463,10 @@ fun NovaChatNavHost(
 
             composable<CardManagerRoute> {
                 CardManagerScreen(onNavigateBack = { navController.popBackStack() })
+            }
+
+            composable<CategoryManagementRoute> {
+                CategoryManagementScreen(onNavigateBack = { navController.popBackStack() })
             }
         }
     }

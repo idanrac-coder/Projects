@@ -51,6 +51,7 @@ object FinancialDatabaseModule {
             "financial.db"
         )
             .openHelperFactory(factory)
+            .addMigrations(FinancialDatabase.MIGRATION_1_2)
             .build()
     }
 

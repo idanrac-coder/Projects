@@ -745,4 +745,21 @@
     <string name="restore_onboarding_question">Do you have a previous backup to restore?</string>
     <string name="restore_in_progress">Restoring your data...</string>
     <string name="start_fresh">Start Fresh</string>
+
+    <!-- Card Management -->
+    <string name="add_card">Add Card</string>
+    <string name="delete_card_title">Delete Card</string>
+    <string name="delete_card_msg">Remove \"%s\" from your cards? Existing transactions will not be affected.</string>
+    <string name="card_last4_label">Last 4 digits</string>
+
+    <!-- Category Management -->
+    <string name="manage_categories_subtitle">Create, rename, and recolor spending categories</string>
+    <string name="add_category">Add Category</string>
+    <string name="edit_category">Edit Category</string>
+    <string name="delete_category_title">Delete Category</string>
+    <string name="delete_builtin_category_msg">Transactions already assigned this category will keep their label. The category will no longer appear in the picker.</string>
+    <string name="delete_custom_category_msg">This category will be permanently removed. Transactions using it will keep their label.</string>
+    <string name="built_in_label">Built-in</string>
+    <string name="category_name_label">Name</string>
+    <string name="pick_color_label">Color</string>
 </resources>

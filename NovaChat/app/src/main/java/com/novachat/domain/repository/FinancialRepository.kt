@@ -31,6 +31,9 @@ interface FinancialRepository {
     fun getCardCount(): Flow<Int>
     suspend fun updateCardNickname(last4: String, nickname: String)
     suspend fun setCardHidden(last4: String, isHidden: Boolean)
+    suspend fun addCard(last4: String, nickname: String?)
+    suspend fun deleteCard(last4: String)
+    suspend fun reorderCards(orderedLast4s: List<String>)
 
     fun getAllSenders(): Flow<List<SenderInfo>>
     suspend fun setSenderEnabled(id: Long, enabled: Boolean)

@@ -40,4 +40,5 @@ object PreferencesKeys {
     val FINANCIAL_ONBOARDING_COMPLETE = booleanPreferencesKey("financial_onboarding_complete")
     val TRIAL_START_TIME = longPreferencesKey("trial_start_time")
     val APP_LANGUAGE = stringPreferencesKey("app_language")
+    val USER_CATEGORIES = stringPreferencesKey("user_categories")
 }

@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.novachat.core.sms.financial.FinancialCategory
 import com.novachat.domain.model.CategoryBreakdown
+import com.novachat.domain.model.UserCategory
 import com.novachat.ui.financial.FinancialCard
 import com.novachat.ui.financial.FinancialTextPrimary
 import com.novachat.ui.financial.FinancialTextSecondary
@@ -38,9 +39,18 @@ val CATEGORY_COLORS = mapOf(
     FinancialCategory.EXPENSE to Color(0xFFFDCB6E)
 )
 
+fun resolveCategory(id: String, userCategories: List<UserCategory>): Pair<String, Color> {
+    val cat = userCategories.firstOrNull { it.id == id && !it.isDeleted }
+    val color = cat?.colorHex?.let {
+        try { Color(android.graphics.Color.parseColor(it)) } catch (_: Exception) { null }
+    } ?: CATEGORY_COLORS[runCatching { FinancialCategory.valueOf(id) }.getOrNull()] ?: Color.Gray
+    return (cat?.displayName ?: id.lowercase().replaceFirstChar { it.uppercase() }) to color
+}
+
 @Composable
 fun CategoryBreakdownBar(
     breakdown: List<CategoryBreakdown>,
+    userCategories: List<UserCategory> = emptyList(),
     onSubscriptionClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -77,7 +87,7 @@ fun CategoryBreakdownBar(
                     animationSpec = tween(700, easing = FastOutSlowInEasing),
                     label = "catFraction_${item.category.name}"
                 )
-                val color = CATEGORY_COLORS[item.category] ?: Color.Gray
+                val (_, color) = resolveCategory(item.category.name, userCategories)
                 val clickModifier = if (item.category == FinancialCategory.SUBSCRIPTION)
                     Modifier.clickable { onSubscriptionClick() } else Modifier
 
@@ -99,7 +109,7 @@ fun CategoryBreakdownBar(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             breakdown.forEach { item ->
-                val color = CATEGORY_COLORS[item.category] ?: Color.Gray
+                val (displayName, color) = resolveCategory(item.category.name, userCategories)
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(5.dp)
@@ -111,7 +121,7 @@ fun CategoryBreakdownBar(
                             .background(color)
                     )
                     Text(
-                        text = "${item.category.name.lowercase().replaceFirstChar { it.uppercase() }} ${"%.0f".format(item.percentage)}%",
+                        text = "$displayName ${"%.0f".format(item.percentage)}%",
                         style = MaterialTheme.typography.labelSmall,
                         color = FinancialTextSecondary
                     )

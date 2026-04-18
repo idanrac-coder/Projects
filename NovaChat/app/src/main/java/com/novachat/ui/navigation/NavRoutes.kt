@@ -91,3 +91,6 @@ object FinancialOnboardingRoute
 
 @Serializable
 object CardManagerRoute
+
+@Serializable
+object CategoryManagementRoute

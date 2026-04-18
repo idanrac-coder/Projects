@@ -171,6 +171,26 @@ class FinancialRepositoryImpl @Inject constructor(
     override suspend fun setCardHidden(last4: String, isHidden: Boolean) =
         cardDao.setHidden(last4, isHidden)
 
+    override suspend fun addCard(last4: String, nickname: String?) {
+        val now = System.currentTimeMillis()
+        cardDao.insert(
+            com.novachat.core.database.financial.entity.CardEntity(
+                last4 = last4,
+                nickname = nickname,
+                createdAt = now,
+                lastSeenTimestamp = now
+            )
+        )
+    }
+
+    override suspend fun deleteCard(last4: String) = cardDao.delete(last4)
+
+    override suspend fun reorderCards(orderedLast4s: List<String>) {
+        orderedLast4s.forEachIndexed { index, last4 ->
+            cardDao.updateSortOrder(last4, index)
+        }
+    }
+
     override fun getAllSenders(): Flow<List<SenderInfo>> =
         senderDao.getAllSenders().map { senders ->
             senders.map { s ->

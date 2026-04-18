@@ -4,9 +4,13 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.novachat.domain.model.BubbleShape
+import com.novachat.domain.model.DEFAULT_USER_CATEGORIES
 import com.novachat.domain.model.SwipeAction
+import com.novachat.domain.model.UserCategory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -231,5 +235,49 @@ class UserPreferencesRepository @Inject constructor(
 
     suspend fun setAppLanguage(languageTag: String) {
         dataStore.edit { it[PreferencesKeys.APP_LANGUAGE] = languageTag }
+    }
+
+    val userCategories: Flow<List<UserCategory>> = dataStore.data.map { prefs ->
+        val json = prefs[PreferencesKeys.USER_CATEGORIES]
+        if (json == null) {
+            DEFAULT_USER_CATEGORIES
+        } else {
+            try {
+                Json.decodeFromString<List<UserCategory>>(json)
+            } catch (_: Exception) {
+                DEFAULT_USER_CATEGORIES
+            }
+        }
+    }
+
+    suspend fun saveUserCategory(category: UserCategory) {
+        dataStore.edit { prefs ->
+            val current = deserializeCategories(prefs)
+            val updated = current.toMutableList()
+            val idx = updated.indexOfFirst { it.id == category.id }
+            if (idx >= 0) updated[idx] = category else updated.add(category)
+            prefs[PreferencesKeys.USER_CATEGORIES] = Json.encodeToString(updated)
+        }
+    }
+
+    suspend fun deleteUserCategory(id: String) {
+        dataStore.edit { prefs ->
+            val current = deserializeCategories(prefs)
+            val updated = current.map { cat ->
+                if (cat.id == id) {
+                    if (cat.isBuiltIn) cat.copy(isDeleted = true) else null
+                } else cat
+            }.filterNotNull()
+            prefs[PreferencesKeys.USER_CATEGORIES] = Json.encodeToString(updated)
+        }
+    }
+
+    private fun deserializeCategories(prefs: Preferences): List<UserCategory> {
+        val json = prefs[PreferencesKeys.USER_CATEGORIES] ?: return DEFAULT_USER_CATEGORIES
+        return try {
+            Json.decodeFromString(json)
+        } catch (_: Exception) {
+            DEFAULT_USER_CATEGORIES
+        }
     }
 }

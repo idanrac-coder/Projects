@@ -7,11 +7,13 @@ import com.novachat.domain.model.AlertInfo
 import com.novachat.domain.model.CardInfo
 import com.novachat.domain.model.CategoryBreakdown
 import com.novachat.domain.model.DailySpending
+import com.novachat.domain.model.DEFAULT_USER_CATEGORIES
 import com.novachat.domain.model.MonthComparison
 import com.novachat.domain.model.MonthlySummary
 import com.novachat.domain.model.SpendingVelocity
 import com.novachat.domain.model.TopMerchant
 import com.novachat.domain.model.TransactionInfo
+import com.novachat.domain.model.UserCategory
 import com.novachat.domain.repository.ConversationRepository
 import com.novachat.domain.repository.FinancialRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -41,7 +43,8 @@ data class DashboardUiState(
     val currentYear: Int = Calendar.getInstance().get(Calendar.YEAR),
     val topMerchants: List<TopMerchant> = emptyList(),
     val monthComparison: MonthComparison? = null,
-    val spendingVelocity: SpendingVelocity? = null
+    val spendingVelocity: SpendingVelocity? = null,
+    val userCategories: List<UserCategory> = DEFAULT_USER_CATEGORIES
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -78,7 +81,7 @@ class FinancialDashboardViewModel @Inject constructor(
                 repository.getMonthlySummary(prevYear, prevMonth, card)
             ) { topMerchants, prevSummary -> Pair(topMerchants, prevSummary) }
 
-            combine(coreFlow, extraFlow, repository.getAllCards()) { core, extra, cards ->
+            combine(coreFlow, extraFlow, repository.getAllCards(), userPreferencesRepository.userCategories) { core, extra, cards, userCats ->
                 val (summary, breakdown, daily, transactions, alerts) = core
                 val (topMerchants, prevSummary) = extra
 
@@ -127,7 +130,8 @@ class FinancialDashboardViewModel @Inject constructor(
                     currentYear = year,
                     topMerchants = topMerchants,
                     monthComparison = comparison,
-                    spendingVelocity = velocity
+                    spendingVelocity = velocity,
+                    userCategories = userCats
                 )
             }
         }

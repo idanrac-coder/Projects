@@ -11,5 +11,6 @@ data class CardEntity(
     val createdAt: Long,
     val lastSeenTimestamp: Long,
     val transactionCount: Int = 0,
-    val isHidden: Boolean = false
+    val isHidden: Boolean = false,
+    val sortOrder: Int = 0
 )

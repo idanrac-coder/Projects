@@ -20,7 +20,7 @@ interface CardDao {
     @Query("SELECT * FROM cards WHERE last4 = :last4")
     suspend fun getByLast4(last4: String): CardEntity?
 
-    @Query("SELECT * FROM cards ORDER BY lastSeenTimestamp DESC")
+    @Query("SELECT * FROM cards ORDER BY sortOrder ASC, lastSeenTimestamp DESC")
     fun getAllCards(): Flow<List<CardEntity>>
 
     @Query("SELECT COUNT(*) FROM cards")
@@ -31,6 +31,12 @@ interface CardDao {
 
     @Query("UPDATE cards SET isHidden = :isHidden WHERE last4 = :last4")
     suspend fun setHidden(last4: String, isHidden: Boolean)
+
+    @Query("UPDATE cards SET sortOrder = :sortOrder WHERE last4 = :last4")
+    suspend fun updateSortOrder(last4: String, sortOrder: Int)
+
+    @Query("DELETE FROM cards WHERE last4 = :last4")
+    suspend fun delete(last4: String)
 
     @Query("SELECT COALESCE(SUM(t.amount), 0.0) FROM financial_transactions t WHERE t.cardLast4 = :cardLast4 AND t.isConversion = 0")
     suspend fun getTotalSpentForCard(cardLast4: String): Double

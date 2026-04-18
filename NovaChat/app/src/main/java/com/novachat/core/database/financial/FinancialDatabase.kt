@@ -2,6 +2,8 @@ package com.novachat.core.database.financial
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.novachat.core.database.financial.dao.CardDao
 import com.novachat.core.database.financial.dao.FinancialAlertDao
 import com.novachat.core.database.financial.dao.FinancialSenderDao
@@ -24,7 +26,7 @@ import com.novachat.core.database.financial.entity.SubscriptionEntity
         FinancialSenderEntity::class,
         FinancialAlertEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class FinancialDatabase : RoomDatabase() {
@@ -34,4 +36,12 @@ abstract class FinancialDatabase : RoomDatabase() {
     abstract fun cardDao(): CardDao
     abstract fun senderDao(): FinancialSenderDao
     abstract fun alertDao(): FinancialAlertDao
+
+    companion object {
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE cards ADD COLUMN sortOrder INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+    }
 }

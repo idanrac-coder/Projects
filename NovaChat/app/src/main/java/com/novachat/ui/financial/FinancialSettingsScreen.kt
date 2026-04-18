@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -47,11 +46,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.novachat.core.sms.financial.FinancialCategory
 import com.novachat.domain.model.SenderInfo
 import androidx.compose.ui.res.stringResource
 import com.novachat.R
-import com.novachat.ui.financial.components.CATEGORY_COLORS
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,6 +56,7 @@ fun FinancialSettingsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToCardManager: () -> Unit,
     onNavigateToSetupGuide: () -> Unit,
+    onNavigateToCategories: () -> Unit = {},
     viewModel: FinancialSettingsViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -189,51 +187,12 @@ fun FinancialSettingsScreen(
             // Categories Section
             item { SectionHeader(stringResource(R.string.categories)) }
             item {
-                Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        listOf(
-                            FinancialCategory.BILL to stringResource(R.string.category_bills),
-                            FinancialCategory.SUBSCRIPTION to stringResource(R.string.category_subscriptions),
-                            FinancialCategory.PAYMENT to stringResource(R.string.category_payments),
-                            FinancialCategory.EXPENSE to stringResource(R.string.category_expenses)
-                        ).forEach { (cat, label) ->
-                            val color = CATEGORY_COLORS[cat] ?: Color.Gray
-                            val count = state.categoryCounts[cat.name] ?: 0
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(10.dp)
-                                            .padding(0.dp)
-                                            .then(
-                                                Modifier
-                                                    .size(10.dp)
-                                                    .background(color, CircleShape)
-                                            )
-                                    )
-                                    Text(label, style = MaterialTheme.typography.bodyMedium)
-                                }
-                                Text(
-                                    "$count",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                    }
-                }
+                SettingsRow(
+                    title = stringResource(R.string.manage_categories),
+                    subtitle = stringResource(R.string.manage_categories_subtitle),
+                    trailing = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null) },
+                    onClick = onNavigateToCategories
+                )
             }
 
             // Setup Section

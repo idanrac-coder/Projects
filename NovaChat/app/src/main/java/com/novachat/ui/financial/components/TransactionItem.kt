@@ -33,8 +33,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.novachat.R
-import com.novachat.core.sms.financial.FinancialCategory
 import com.novachat.domain.model.TransactionInfo
+import com.novachat.domain.model.UserCategory
 import com.novachat.ui.financial.FinancialRed
 import com.novachat.ui.financial.FinancialTextPrimary
 import com.novachat.ui.financial.FinancialTextSecondary
@@ -51,7 +51,8 @@ private val AVATAR_COLORS = listOf(
 @Composable
 fun TransactionItem(
     transaction: TransactionInfo,
-    onCategoryChange: ((String, FinancialCategory) -> Unit)? = null,
+    userCategories: List<UserCategory> = emptyList(),
+    onCategoryChange: ((String, String) -> Unit)? = null,
     onViewInConversation: ((String) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
@@ -59,9 +60,7 @@ fun TransactionItem(
     val avatarColor = AVATAR_COLORS[firstLetter.hashCode().mod(AVATAR_COLORS.size).let { if (it < 0) it + AVATAR_COLORS.size else it }]
     val dateStr = SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(transaction.timestamp))
 
-    val categoryColor = try {
-        CATEGORY_COLORS[FinancialCategory.valueOf(transaction.category)] ?: Color.Gray
-    } catch (_: Exception) { Color.Gray }
+    val (categoryDisplayName, categoryColor) = resolveCategory(transaction.category, userCategories)
 
     var showCategoryPicker by remember { mutableStateOf(false) }
     var showContextMenu by remember { mutableStateOf(false) }
@@ -69,8 +68,9 @@ fun TransactionItem(
     if (showCategoryPicker && onCategoryChange != null) {
         CategoryPickerDialog(
             currentCategory = transaction.category,
-            onCategorySelected = { newCat ->
-                transaction.merchantName?.let { onCategoryChange(it, newCat) }
+            userCategories = userCategories,
+            onCategorySelected = { newCatId ->
+                transaction.merchantName?.let { onCategoryChange(it, newCatId) }
                 showCategoryPicker = false
             },
             onDismiss = { showCategoryPicker = false }
@@ -112,11 +112,29 @@ fun TransactionItem(
                     fontWeight = FontWeight.Medium,
                     color = FinancialTextPrimary
                 )
-                Text(
-                    text = "$dateStr · ${transaction.category.lowercase().replaceFirstChar { it.uppercase() }}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = FinancialTextSecondary
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text(
+                        text = dateStr,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = FinancialTextSecondary
+                    )
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(999.dp))
+                            .background(categoryColor.copy(alpha = 0.18f))
+                            .padding(horizontal = 6.dp, vertical = 1.dp)
+                    ) {
+                        Text(
+                            text = categoryDisplayName,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = categoryColor,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
             }
 
             // All parsed transactions are expenses — show negative in red like the mockup

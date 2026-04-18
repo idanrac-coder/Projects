@@ -45,6 +45,7 @@ private val MERCHANT_AVATAR_COLORS = listOf(
 fun TopMerchantsCard(
     merchants: List<TopMerchant>,
     currency: String,
+    skipAnimation: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -63,9 +64,9 @@ fun TopMerchantsCard(
         )
 
         merchants.forEachIndexed { index, merchant ->
-            var visible by remember(merchant.merchantName) { mutableStateOf(false) }
-            LaunchedEffect(merchant.merchantName) {
-                delay(index * 80L)
+            var visible by remember(merchant.merchantName) { mutableStateOf(skipAnimation) }
+            LaunchedEffect(merchant.merchantName, skipAnimation) {
+                if (!skipAnimation) delay(index * 80L)
                 visible = true
             }
             AnimatedVisibility(

@@ -1,12 +1,10 @@
 package com.novachat.ui.financial
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
@@ -44,6 +42,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -95,6 +94,11 @@ fun FinancialDashboardScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var transactionsExpanded by remember { mutableStateOf(false) }
+    // Once data loads for the first time, mark animations as done so scroll re-entry skips them
+    val hasAnimated = remember { mutableStateOf(false) }
+    LaunchedEffect(state.isLoading) {
+        if (!state.isLoading) hasAnimated.value = true
+    }
 
     Scaffold(
         containerColor = FinancialBg,
@@ -272,6 +276,7 @@ fun FinancialDashboardScreen(
                             onPreviousMonth = viewModel::previousMonth,
                             onNextMonth = viewModel::nextMonth,
                             monthComparison = state.monthComparison,
+                            skipAnimation = hasAnimated.value,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                         )
                     }
@@ -284,17 +289,13 @@ fun FinancialDashboardScreen(
                     CategoryBreakdownSkeleton(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
                     )
-                } else {
-                    AnimatedVisibility(
-                        visible = state.categoryBreakdown.isNotEmpty(),
-                        enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { it / 4 }
-                    ) {
-                        CategoryBreakdownBar(
-                            breakdown = state.categoryBreakdown,
-                            onSubscriptionClick = onNavigateToSubscriptions,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
-                        )
-                    }
+                } else if (state.categoryBreakdown.isNotEmpty()) {
+                    CategoryBreakdownBar(
+                        breakdown = state.categoryBreakdown,
+                        userCategories = state.userCategories,
+                        onSubscriptionClick = onNavigateToSubscriptions,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                    )
                 }
             }
 
@@ -306,16 +307,11 @@ fun FinancialDashboardScreen(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
                     )
                 } else {
-                    AnimatedVisibility(
-                        visible = state.spendingVelocity != null,
-                        enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { it / 4 }
-                    ) {
-                        state.spendingVelocity?.let { velocity ->
-                            SpendingVelocityCard(
-                                velocity = velocity,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
-                            )
-                        }
+                    state.spendingVelocity?.let { velocity ->
+                        SpendingVelocityCard(
+                            velocity = velocity,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                        )
                     }
                 }
             }
@@ -327,17 +323,13 @@ fun FinancialDashboardScreen(
                         lineCount = 3,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
                     )
-                } else {
-                    AnimatedVisibility(
-                        visible = state.topMerchants.isNotEmpty(),
-                        enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { it / 4 }
-                    ) {
-                        TopMerchantsCard(
-                            merchants = state.topMerchants,
-                            currency = state.monthlySummary.currency,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
-                        )
-                    }
+                } else if (state.topMerchants.isNotEmpty()) {
+                    TopMerchantsCard(
+                        merchants = state.topMerchants,
+                        currency = state.monthlySummary.currency,
+                        skipAnimation = hasAnimated.value,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                    )
                 }
             }
 
@@ -348,17 +340,13 @@ fun FinancialDashboardScreen(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
                     )
                 } else {
-                    AnimatedVisibility(
-                        visible = true,
-                        enter = fadeIn(tween(400))
-                    ) {
-                        SpendingChart(
-                            dailySpending = state.dailySpending,
-                            month = state.currentMonth,
-                            year = state.currentYear,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
-                        )
-                    }
+                    SpendingChart(
+                        dailySpending = state.dailySpending,
+                        month = state.currentMonth,
+                        year = state.currentYear,
+                        skipAnimation = hasAnimated.value,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                    )
                 }
             }
 
@@ -397,8 +385,9 @@ fun FinancialDashboardScreen(
                             HorizontalDivider(color = FinancialDivider, thickness = 1.dp)
                             TransactionItem(
                                 transaction = transaction,
-                                onCategoryChange = { merchantName, category ->
-                                    viewModel.updateTransactionCategory(merchantName, category.name)
+                                userCategories = state.userCategories,
+                                onCategoryChange = { merchantName, categoryId ->
+                                    viewModel.updateTransactionCategory(merchantName, categoryId)
                                 },
                                 onViewInConversation = { address ->
                                     viewModel.resolveAndNavigateToConversation(address) { threadId ->

@@ -49,6 +49,7 @@ fun SpendingChart(
     dailySpending: List<DailySpending>,
     month: Int,
     year: Int,
+    skipAnimation: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val todayDay = Calendar.getInstance().let {
@@ -68,11 +69,15 @@ fun SpendingChart(
     var selectedDay by remember { mutableIntStateOf(-1) }
     var barWidthPx by remember { mutableFloatStateOf(0f) }
 
-    // Bar reveal animation: sweeps left-to-right when data arrives
+    // Bar reveal animation: sweeps left-to-right on first entry; skipped on scroll re-entry
     val revealProgress = remember { Animatable(0f) }
     LaunchedEffect(dailySpending) {
-        revealProgress.snapTo(0f)
-        revealProgress.animateTo(1f, tween(900, easing = FastOutSlowInEasing))
+        if (skipAnimation) {
+            revealProgress.snapTo(1f)
+        } else {
+            revealProgress.snapTo(0f)
+            revealProgress.animateTo(1f, tween(900, easing = FastOutSlowInEasing))
+        }
     }
 
     // Auto-dismiss tooltip
@@ -118,7 +123,7 @@ fun SpendingChart(
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(160.dp)
+                .height(100.dp)
                 .pointerInput(daysInMonth) {
                     detectTapGestures { offset ->
                         val bw = size.width.toFloat() / (daysInMonth + 1)
