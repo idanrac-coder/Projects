@@ -19,11 +19,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.NotificationsNone
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -58,6 +67,7 @@ import com.novachat.domain.model.InsightType
 import com.novachat.domain.model.SubscriptionSummary
 import com.novachat.ui.financial.components.SubscriptionItem
 import com.novachat.ui.financial.components.currencySymbol
+import java.text.DateFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -104,6 +114,46 @@ fun SubscriptionListScreen(
                 verticalArrangement = Arrangement.spacedBy(0.dp),
                 contentPadding = PaddingValues(bottom = 24.dp)
             ) {
+                // Month navigation
+                item {
+                    val monthName = DateFormatSymbols().months[state.currentMonth - 1]
+                        .replaceFirstChar { it.uppercase() }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(onClick = viewModel::previousMonth) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                                contentDescription = stringResource(R.string.previous_month)
+                            )
+                        }
+                        AnimatedContent(
+                            targetState = "$monthName ${state.currentYear}",
+                            transitionSpec = {
+                                (slideInHorizontally(tween(260)) { it / 2 } + fadeIn(tween(260))) togetherWith
+                                    (slideOutHorizontally(tween(200)) { -it / 2 } + fadeOut(tween(200)))
+                            },
+                            label = "subMonthTicker"
+                        ) { label ->
+                            Text(
+                                text = label,
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                        IconButton(onClick = viewModel::nextMonth) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                contentDescription = stringResource(R.string.next_month)
+                            )
+                        }
+                    }
+                }
+
                 // Header card
                 item {
                     SubscriptionHeaderCard(

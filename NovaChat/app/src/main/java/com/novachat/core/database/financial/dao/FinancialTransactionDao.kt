@@ -70,34 +70,33 @@ interface FinancialTransactionDao {
 
     @Query("""
         SELECT merchantName,
-               MAX(amount)    AS latestAmount,
+               SUM(amount)    AS latestAmount,
                currency,
                MAX(timestamp) AS lastCharged,
                cardLast4
         FROM financial_transactions
         WHERE category = 'SUBSCRIPTION'
           AND isConversion = 0
+          AND timestamp BETWEEN :startMs AND :endMs
           AND sender NOT IN (SELECT address FROM financial_senders WHERE isEnabled = 0)
           AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4)
           AND merchantName IS NOT NULL
         GROUP BY merchantName, cardLast4
         ORDER BY lastCharged DESC
     """)
-    fun getSubscriptionMerchants(cardLast4: String?): Flow<List<SubscriptionMerchantSummary>>
+    fun getSubscriptionMerchants(startMs: Long, endMs: Long, cardLast4: String?): Flow<List<SubscriptionMerchantSummary>>
 
     @Query("""
-        SELECT COALESCE(SUM(maxAmt), 0.0) FROM (
-            SELECT MAX(amount) AS maxAmt
-            FROM financial_transactions
-            WHERE category = 'SUBSCRIPTION'
-              AND isConversion = 0
-              AND sender NOT IN (SELECT address FROM financial_senders WHERE isEnabled = 0)
-              AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4)
-              AND merchantName IS NOT NULL
-            GROUP BY merchantName, cardLast4
-        )
+        SELECT COALESCE(SUM(amount), 0.0)
+        FROM financial_transactions
+        WHERE category = 'SUBSCRIPTION'
+          AND isConversion = 0
+          AND timestamp BETWEEN :startMs AND :endMs
+          AND sender NOT IN (SELECT address FROM financial_senders WHERE isEnabled = 0)
+          AND (:cardLast4 IS NULL OR cardLast4 = :cardLast4)
+          AND merchantName IS NOT NULL
     """)
-    fun getSubscriptionTotalByCategory(cardLast4: String?): Flow<Double>
+    fun getSubscriptionTotalByCategory(startMs: Long, endMs: Long, cardLast4: String?): Flow<Double>
 
     @Query("DELETE FROM financial_transactions")
     suspend fun deleteAll()

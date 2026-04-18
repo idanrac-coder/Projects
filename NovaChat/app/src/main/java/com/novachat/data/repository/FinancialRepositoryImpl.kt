@@ -135,9 +135,10 @@ class FinancialRepositoryImpl @Inject constructor(
     override suspend fun markSubscriptionInactive(id: Long) =
         subscriptionDao.markInactive(id)
 
-    override fun getSubscriptionsFromCategory(cardLast4: String?): Flow<List<SubscriptionSummary>> =
-        combine(
-            transactionDao.getSubscriptionMerchants(cardLast4),
+    override fun getSubscriptionsFromCategory(year: Int, month: Int, cardLast4: String?): Flow<List<SubscriptionSummary>> {
+        val (startMs, endMs) = monthRange(year, month)
+        return combine(
+            transactionDao.getSubscriptionMerchants(startMs, endMs, cardLast4),
             subscriptionDao.getActiveSubscriptions(null),
             cardDao.getAllCards()
         ) { merchants, subs, cards ->
@@ -161,9 +162,25 @@ class FinancialRepositoryImpl @Inject constructor(
                 )
             }
         }.flowOn(Dispatchers.IO)
+    }
 
-    override fun getSubscriptionTotalFromCategory(cardLast4: String?): Flow<Double> =
-        transactionDao.getSubscriptionTotalByCategory(cardLast4)
+    override fun getSubscriptionTotalFromCategory(year: Int, month: Int, cardLast4: String?): Flow<Double> {
+        val (startMs, endMs) = monthRange(year, month)
+        return transactionDao.getSubscriptionTotalByCategory(startMs, endMs, cardLast4)
+    }
+
+    private fun monthRange(year: Int, month: Int): Pair<Long, Long> {
+        val cal = Calendar.getInstance()
+        cal.set(year, month - 1, 1, 0, 0, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+        val startMs = cal.timeInMillis
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH))
+        cal.set(Calendar.HOUR_OF_DAY, 23)
+        cal.set(Calendar.MINUTE, 59)
+        cal.set(Calendar.SECOND, 59)
+        cal.set(Calendar.MILLISECOND, 999)
+        return startMs to cal.timeInMillis
+    }
 
     override fun getActiveAlerts(): Flow<List<AlertInfo>> =
         alertDao.getActiveAlerts().map { alerts ->

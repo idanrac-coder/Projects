@@ -24,8 +24,8 @@ interface FinancialRepository {
     fun getSubscriptionTotal(cardLast4: String?): Flow<Double>
     suspend fun markSubscriptionInactive(id: Long)
 
-    fun getSubscriptionsFromCategory(cardLast4: String?): Flow<List<SubscriptionSummary>>
-    fun getSubscriptionTotalFromCategory(cardLast4: String?): Flow<Double>
+    fun getSubscriptionsFromCategory(year: Int, month: Int, cardLast4: String?): Flow<List<SubscriptionSummary>>
+    fun getSubscriptionTotalFromCategory(year: Int, month: Int, cardLast4: String?): Flow<Double>
 
     fun getActiveAlerts(): Flow<List<AlertInfo>>
     fun getAlertCount(): Flow<Int>

@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 private val INSIGHTS_KEY = stringSetPreferencesKey("subscription_insights")
@@ -34,7 +35,9 @@ data class SubscriptionListUiState(
     val staleCount: Int = 0,
     val cards: List<CardInfo> = emptyList(),
     val selectedCardLast4: String? = null,
-    val enabledInsights: Set<InsightType> = setOf(InsightType.ANNUAL_COST, InsightType.PRICE_CHANGES)
+    val enabledInsights: Set<InsightType> = setOf(InsightType.ANNUAL_COST, InsightType.PRICE_CHANGES),
+    val currentMonth: Int = Calendar.getInstance().get(Calendar.MONTH) + 1,
+    val currentYear: Int = Calendar.getInstance().get(Calendar.YEAR),
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -45,6 +48,8 @@ class SubscriptionListViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _selectedCard = MutableStateFlow<String?>(null)
+    private val _currentMonth = MutableStateFlow(Calendar.getInstance().get(Calendar.MONTH) + 1)
+    private val _currentYear = MutableStateFlow(Calendar.getInstance().get(Calendar.YEAR))
 
     private val savedInsights = dataStore.data.map { prefs ->
         (prefs[INSIGHTS_KEY] ?: DEFAULT_INSIGHTS)
@@ -52,11 +57,12 @@ class SubscriptionListViewModel @Inject constructor(
             .toSet()
     }
 
-    val uiState: StateFlow<SubscriptionListUiState> = _selectedCard
-        .flatMapLatest { card ->
+    val uiState: StateFlow<SubscriptionListUiState> =
+        combine(_selectedCard, _currentMonth, _currentYear) { card, month, year -> Triple(card, month, year) }
+        .flatMapLatest { (card, month, year) ->
             combine(
-                repository.getSubscriptionsFromCategory(card),
-                repository.getSubscriptionTotalFromCategory(card),
+                repository.getSubscriptionsFromCategory(year, month, card),
+                repository.getSubscriptionTotalFromCategory(year, month, card),
                 repository.getAllCards(),
                 savedInsights
             ) { subs, total, cards, insights ->
@@ -74,7 +80,9 @@ class SubscriptionListViewModel @Inject constructor(
                     staleCount = subs.count { it.lastCharged < staleCutoff },
                     cards = cards,
                     selectedCardLast4 = card,
-                    enabledInsights = insights
+                    enabledInsights = insights,
+                    currentMonth = month,
+                    currentYear = year,
                 )
             }
         }
@@ -82,6 +90,24 @@ class SubscriptionListViewModel @Inject constructor(
 
     fun selectCard(last4: String?) {
         _selectedCard.value = last4
+    }
+
+    fun previousMonth() {
+        if (_currentMonth.value == 1) {
+            _currentMonth.value = 12
+            _currentYear.value -= 1
+        } else {
+            _currentMonth.value -= 1
+        }
+    }
+
+    fun nextMonth() {
+        if (_currentMonth.value == 12) {
+            _currentMonth.value = 1
+            _currentYear.value += 1
+        } else {
+            _currentMonth.value += 1
+        }
     }
 
     fun toggleInsight(type: InsightType) {
