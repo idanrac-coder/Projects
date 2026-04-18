@@ -32,14 +32,6 @@ private val AVATAR_COLORS = listOf(
     Color(0xFF42A5F5), Color(0xFFAB47BC), Color(0xFFEF5350)
 )
 
-fun currencySymbol(currency: String): String = when (currency.uppercase()) {
-    "ILS" -> "₪"
-    "USD" -> "$"
-    "EUR" -> "€"
-    "GBP" -> "£"
-    else -> currency
-}
-
 @Composable
 fun SubscriptionItem(
     subscription: SubscriptionSummary,
