@@ -21,12 +21,15 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import javax.inject.Inject
 
 data class DashboardUiState(
+    val isLoading: Boolean = true,
     val monthlySummary: MonthlySummary = MonthlySummary(0.0, 0, 0.0, "ILS", Calendar.getInstance().get(Calendar.MONTH) + 1, Calendar.getInstance().get(Calendar.YEAR)),
     val categoryBreakdown: List<CategoryBreakdown> = emptyList(),
     val dailySpending: List<DailySpending> = emptyList(),
@@ -112,6 +115,7 @@ class FinancialDashboardViewModel @Inject constructor(
                 } else null
 
                 DashboardUiState(
+                    isLoading = false,
                     monthlySummary = summary,
                     categoryBreakdown = breakdown,
                     dailySpending = daily,
@@ -127,7 +131,8 @@ class FinancialDashboardViewModel @Inject constructor(
                 )
             }
         }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), DashboardUiState())
+        .onStart { emit(DashboardUiState(isLoading = true)) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), DashboardUiState(isLoading = true))
 
     fun selectCard(last4: String?) {
         _selectedCard.value = last4

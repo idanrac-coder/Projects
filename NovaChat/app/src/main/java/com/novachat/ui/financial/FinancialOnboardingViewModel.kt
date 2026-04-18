@@ -8,10 +8,12 @@ import com.novachat.core.worker.FinancialParsingWorker
 import com.novachat.domain.repository.FinancialRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -43,12 +45,17 @@ class FinancialOnboardingViewModel @Inject constructor(
 
     fun completeOnboarding(providers: List<FinancialProvider>, scanInbox: Boolean = false) {
         viewModelScope.launch {
+            // Write navigation-gating flags first, non-cancellably, before any slow DB work.
+            // popBackStack() clears this ViewModel's scope; withContext(NonCancellable) ensures
+            // the DataStore writes complete even if cancellation arrives mid-flight.
+            withContext(NonCancellable) {
+                userPreferencesRepository.setFinancialOnboardingComplete(true)
+                userPreferencesRepository.setFinancialIntelligenceEnabled(true)
+            }
             _selectedProviders.value.forEach { addr ->
                 val provider = providers.firstOrNull { it.smsAddress == addr }
                 financialRepository.addSender(addr, provider?.name)
             }
-            userPreferencesRepository.setFinancialIntelligenceEnabled(true)
-            userPreferencesRepository.setFinancialOnboardingComplete(true)
             FinancialParsingWorker.enqueue(context)
             if (scanInbox) {
                 FinancialParsingWorker.enqueueScan(context)

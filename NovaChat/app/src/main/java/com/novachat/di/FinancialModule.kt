@@ -18,6 +18,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import net.zetetic.database.sqlcipher.SQLiteConnection
 import net.zetetic.database.sqlcipher.SQLiteDatabaseHook
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
@@ -34,7 +36,7 @@ object FinancialDatabaseModule {
         keyManager: FinancialKeyManager
     ): FinancialDatabase {
         System.loadLibrary("sqlcipher")
-        val passphrase = keyManager.getPassphrase()
+        val passphrase = runBlocking(Dispatchers.IO) { keyManager.getPassphrase() }
         val dbFile = context.getDatabasePath("financial.db")
         val hook: SQLiteDatabaseHook? = if (dbFile.exists()) object : SQLiteDatabaseHook {
             override fun preKey(connection: SQLiteConnection) {}

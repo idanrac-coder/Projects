@@ -7,8 +7,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.security.KeyStore
 import java.util.Base64
 import javax.crypto.Cipher
@@ -31,7 +32,7 @@ class FinancialKeyManager @Inject constructor(
         private val IV_KEY = stringPreferencesKey("passphrase_iv")
     }
 
-    fun getPassphrase(): ByteArray = runBlocking {
+    suspend fun getPassphrase(): ByteArray = withContext(Dispatchers.IO) {
         val prefs = context.financialKeyStore.data.first()
         val encryptedB64 = prefs[ENCRYPTED_PASSPHRASE_KEY]
         val ivB64 = prefs[IV_KEY]

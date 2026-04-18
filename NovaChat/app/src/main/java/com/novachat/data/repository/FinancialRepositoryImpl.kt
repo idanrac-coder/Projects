@@ -19,8 +19,10 @@ import com.novachat.domain.model.SubscriptionInfo
 import com.novachat.domain.model.TopMerchant
 import com.novachat.domain.model.TransactionInfo
 import com.novachat.domain.repository.FinancialRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import java.util.Calendar
 import javax.inject.Inject
@@ -79,7 +81,7 @@ class FinancialRepositoryImpl @Inject constructor(
                     senderAddress = tx.sender
                 )
             }
-        }
+        }.flowOn(Dispatchers.IO)
     }
 
     override fun getRecentTransactions(limit: Int, cardLast4: String?): Flow<List<TransactionInfo>> =
@@ -102,7 +104,7 @@ class FinancialRepositoryImpl @Inject constructor(
                     senderAddress = tx.sender
                 )
             }
-        }
+        }.flowOn(Dispatchers.IO)
 
     override fun getActiveSubscriptions(cardLast4: String?): Flow<List<SubscriptionInfo>> =
         combine(
@@ -124,7 +126,7 @@ class FinancialRepositoryImpl @Inject constructor(
                     isActive = sub.isActive
                 )
             }
-        }
+        }.flowOn(Dispatchers.IO)
 
     override fun getSubscriptionTotal(cardLast4: String?): Flow<Double> =
         subscriptionDao.getActiveTotal(cardLast4)
@@ -141,7 +143,7 @@ class FinancialRepositoryImpl @Inject constructor(
                     transactionId = a.transactionId
                 )
             }
-        }
+        }.flowOn(Dispatchers.IO)
 
     override fun getAlertCount(): Flow<Int> = alertDao.getActiveCount()
 
@@ -159,7 +161,7 @@ class FinancialRepositoryImpl @Inject constructor(
                     isHidden = c.isHidden
                 )
             }
-        }
+        }.flowOn(Dispatchers.IO)
 
     override fun getCardCount(): Flow<Int> = cardDao.getCardCount()
 
@@ -178,7 +180,7 @@ class FinancialRepositoryImpl @Inject constructor(
                     source = s.source, transactionCount = s.transactionCount
                 )
             }
-        }
+        }.flowOn(Dispatchers.IO)
 
     override suspend fun setSenderEnabled(id: Long, enabled: Boolean) =
         senderDao.setEnabled(id, enabled)
@@ -226,7 +228,7 @@ class FinancialRepositoryImpl @Inject constructor(
                 FinancialCategory.PAYMENT.name to payments,
                 FinancialCategory.EXPENSE.name to expenses
             )
-        }
+        }.flowOn(Dispatchers.IO)
 
     override suspend fun updateMerchantCategory(merchantName: String, category: String) {
         merchantDao.updateCategory(merchantName, category)

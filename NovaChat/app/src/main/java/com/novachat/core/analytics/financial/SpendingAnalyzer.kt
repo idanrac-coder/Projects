@@ -9,8 +9,10 @@ import com.novachat.domain.model.CategoryBreakdown
 import com.novachat.domain.model.DailySpending
 import com.novachat.domain.model.MonthlySummary
 import com.novachat.domain.model.TopMerchant
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import java.util.Calendar
 import javax.inject.Inject
@@ -35,7 +37,7 @@ class SpendingAnalyzer @Inject constructor(
                 month = month,
                 year = year
             )
-        }
+        }.flowOn(Dispatchers.IO)
     }
 
     fun getCategoryBreakdown(year: Int, month: Int, cardLast4: String?): Flow<List<CategoryBreakdown>> {
@@ -50,21 +52,21 @@ class SpendingAnalyzer @Inject constructor(
                     count = ct.count
                 )
             }
-        }
+        }.flowOn(Dispatchers.IO)
     }
 
     fun getDailySpending(year: Int, month: Int, cardLast4: String?): Flow<List<DailySpending>> {
         val (start, end) = getMonthRange(year, month)
         return transactionDao.getDailySpending(start, end, cardLast4).map { dailies ->
             dailies.map { DailySpending(dayOfMonth = it.dayOfMonth, total = it.total) }
-        }
+        }.flowOn(Dispatchers.IO)
     }
 
     fun getTopMerchants(year: Int, month: Int, cardLast4: String?, limit: Int = 5): Flow<List<TopMerchant>> {
         val (start, end) = getMonthRange(year, month)
         return transactionDao.getTopMerchants(start, end, cardLast4, limit).map { list ->
             list.map { TopMerchant(merchantName = it.merchantName, totalSpent = it.totalSpent, transactionCount = it.txCount) }
-        }
+        }.flowOn(Dispatchers.IO)
     }
 
     fun getSubscriptionTotal(cardLast4: String?): Flow<Double> =
